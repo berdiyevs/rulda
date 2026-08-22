@@ -10,7 +10,12 @@ const EXAM_SESSION_SIZE = 20
 const EXAM_DURATION_SECONDS = 20 * 60
 const EXAM_MAX_MISTAKES = 2
 
-function prepareSession(allQuestions, topic, mode) {
+function prepareSession(allQuestions, topic, mode, ticketId) {
+  if (mode === 'ticket') {
+    const pool = allQuestions.filter((q) => q.ticketId === Number(ticketId))
+    return pool.map((q) => ({ ...q, options: shuffleArray(q.options) }))
+  }
+
   const pool = mode === 'exam' ? allQuestions : filterQuestionsByTopic(allQuestions, topic)
   const size = mode === 'exam' ? EXAM_SESSION_SIZE : Math.min(PRACTICE_SESSION_SIZE, pool.length)
   const picked = pickRandom(pool, size)
@@ -20,7 +25,7 @@ function prepareSession(allQuestions, topic, mode) {
   }))
 }
 
-export function useQuizEngine({ topic, mode }) {
+export function useQuizEngine({ topic, mode, ticketId }) {
   const { user } = useAuth()
   const [sourceQuestions, setSourceQuestions] = useState([])
   const [sessionQuestions, setSessionQuestions] = useState([])
@@ -54,7 +59,7 @@ export function useQuizEngine({ topic, mode }) {
 
   useEffect(() => {
     if (sourceQuestions.length === 0) return
-    const session = prepareSession(sourceQuestions, topic, mode)
+    const session = prepareSession(sourceQuestions, topic, mode, ticketId)
     setSessionQuestions(session)
     setStepStatuses(Array.from({ length: session.length }, () => 'idle'))
     setCurrentIndex(0)
@@ -63,7 +68,7 @@ export function useQuizEngine({ topic, mode }) {
     setFinished(false)
     setResult(null)
     hasSavedRef.current = false
-  }, [sourceQuestions, topic, mode])
+  }, [sourceQuestions, topic, mode, ticketId])
 
   const finishSession = useCallback(
     (statuses) => {
@@ -74,8 +79,9 @@ export function useQuizEngine({ topic, mode }) {
       const wrongCount = statuses.filter((s) => s === 'wrong').length
       const totalQuestions = statuses.length
       const passed = mode === 'exam' ? wrongCount <= EXAM_MAX_MISTAKES : correctCount / totalQuestions >= 0.7
+      const attemptTopic = mode === 'ticket' ? `ticket-${ticketId}` : topic
 
-      const summary = { correctCount, wrongCount, totalQuestions, passed, topic, mode }
+      const summary = { correctCount, wrongCount, totalQuestions, passed, topic: attemptTopic, mode }
       setResult(summary)
       setFinished(true)
 
@@ -83,7 +89,7 @@ export function useQuizEngine({ topic, mode }) {
         saveAttempt(user.uid, summary).catch(() => {})
       }
     },
-    [mode, topic, user],
+    [mode, topic, ticketId, user],
   )
 
   const timer = useCountdown(EXAM_DURATION_SECONDS, {

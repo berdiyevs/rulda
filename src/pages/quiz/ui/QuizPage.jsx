@@ -10,9 +10,11 @@ export function QuizPage() {
   const [searchParams] = useSearchParams()
   const topicParam = searchParams.get('topic')
   const modeParam = searchParams.get('mode')
+  const ticketParam = searchParams.get('ticket')
 
+  const ticketId = ticketParam ? Number(ticketParam) : null
   const topic = VALID_TOPICS.includes(topicParam) ? topicParam : 'all'
-  const mode = modeParam === 'exam' ? 'exam' : 'practice'
+  const mode = ticketId ? 'ticket' : modeParam === 'exam' ? 'exam' : 'practice'
 
   const [sessionKey, setSessionKey] = useState(0)
   const [started, setStarted] = useState(false)
@@ -25,9 +27,9 @@ export function QuizPage() {
   return (
     <Box mih="100vh">
       {started ? (
-        <QuizPlay key={sessionKey} topic={topic} mode={mode} onRetry={handleRetry} />
+        <QuizPlay key={sessionKey} topic={topic} mode={mode} ticketId={ticketId} onRetry={handleRetry} />
       ) : (
-        <QuizIntro topic={topic} mode={mode} onStart={() => setStarted(true)} />
+        <QuizIntro topic={topic} mode={mode} ticketId={ticketId} onStart={() => setStarted(true)} />
       )}
     </Box>
   )

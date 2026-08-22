@@ -9,6 +9,7 @@ import { ROUTES } from '../../../shared/config/routes'
 
 const LINKS = [
   { to: ROUTES.CATEGORIES, label: 'Mavzular', end: true },
+  { to: ROUTES.TICKETS, label: 'Biletlar' },
   { to: ROUTES.ROAD_SIGNS, label: "Yo'l belgilari" },
   { to: '/quiz?mode=exam&topic=all', label: 'Imtihon' },
 ]

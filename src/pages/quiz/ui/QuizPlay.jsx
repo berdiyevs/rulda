@@ -4,7 +4,7 @@ import { QuizResults } from '../../../widgets/quiz-results'
 import { QuestionCard } from '../../../entities/question'
 import { useQuizEngine } from '../../../features/quiz-engine'
 
-export function QuizPlay({ topic, mode, onRetry }) {
+export function QuizPlay({ topic, mode, ticketId, onRetry }) {
   const {
     loading,
     error,
@@ -19,11 +19,11 @@ export function QuizPlay({ topic, mode, onRetry }) {
     correctAnswer,
     handleAnswer,
     timeFormatted,
-  } = useQuizEngine({ topic, mode })
+  } = useQuizEngine({ topic, mode, ticketId })
 
   return (
     <Box mih="100vh">
-      <QuizNav mode={mode} topic={topic} timeFormatted={timeFormatted} />
+      <QuizNav mode={mode} topic={topic} ticketId={ticketId} timeFormatted={timeFormatted} />
 
       <Flex align="flex-start" gap="lg" px={{ base: 'md', md: 'xl' }} py="lg" wrap="wrap">
         {!finished && (

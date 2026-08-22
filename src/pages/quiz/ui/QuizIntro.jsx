@@ -19,21 +19,24 @@ function RuleIcon({ color, icon: Icon }) {
   )
 }
 
-export function QuizIntro({ topic, mode, onStart }) {
-  const info = TOPIC_INFO[topic] || TOPIC_INFO.all
+export function QuizIntro({ topic, mode, ticketId, onStart }) {
+  const isTicket = mode === 'ticket'
+  const info = isTicket
+    ? { title: `Bilet ${ticketId}`, desc: 'Rasmiy imtihon formatidagi 10 ta savoldan iborat aniq to\'plam.' }
+    : TOPIC_INFO[topic] || TOPIC_INFO.all
   const isExam = mode === 'exam'
 
   return (
     <Center mih="100vh" py="xl">
       <Paper className="glass-card slide-up" p="xl" maw={460} w="100%">
         <Stack gap="md">
-          <Badge variant="primary">{isExam ? 'Imtihon rejimi' : "Mashg'ulot"}</Badge>
+          <Badge variant="primary">{isTicket ? 'Bilet' : isExam ? 'Imtihon rejimi' : "Mashg'ulot"}</Badge>
           <Title order={2}>{info.title}</Title>
           <Text c="dimmed">{info.desc}</Text>
 
           <Stack gap="sm" className="glass-card" p="md">
             <List spacing="sm" size="sm" center icon={<RuleIcon color="brand" icon={IconCircleCheck} />}>
-              <List.Item>{isExam ? '20' : 'Bir nechta'} savol</List.Item>
+              <List.Item>{isTicket ? '10' : isExam ? '20' : 'Bir nechta'} savol</List.Item>
               {isExam && (
                 <>
                   <List.Item icon={<RuleIcon color="brand" icon={IconClock} />}>20 daqiqa vaqt</List.Item>
