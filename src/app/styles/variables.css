@@ -1,0 +1,54 @@
+:root {
+  /* Surfaces */
+  --bg: #0a0c12;
+  --bg-elevated: #10131c;
+  --bg-card: rgba(255, 255, 255, 0.035);
+  --bg-card-hover: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  /* Brand */
+  --primary: #6d5bff;
+  --primary-hover: #8172ff;
+  --primary-soft: rgba(109, 91, 255, 0.14);
+  --accent: #22d3ee;
+  --accent-soft: rgba(34, 211, 238, 0.14);
+
+  /* Semantic */
+  --success: #2dd4a7;
+  --success-soft: rgba(45, 212, 167, 0.14);
+  --danger: #fb6f92;
+  --danger-soft: rgba(251, 111, 146, 0.14);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.14);
+
+  /* Text */
+  --text-primary: #f5f6fa;
+  --text-secondary: #a6adc0;
+  --text-muted: #656d80;
+
+  /* Radii */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-full: 999px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 0 1px var(--border), 0 20px 50px rgba(109, 91, 255, 0.12);
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, #6d5bff 0%, #22d3ee 100%);
+  --gradient-text: linear-gradient(135deg, #ffffff 0%, #a6adc0 100%);
+  --gradient-surface: radial-gradient(circle at 20% -10%, rgba(109, 91, 255, 0.18), transparent 45%),
+    radial-gradient(circle at 100% 0%, rgba(34, 211, 238, 0.12), transparent 40%);
+
+  /* Layout */
+  --container-max: 1180px;
+  --nav-height: 72px;
+
+  /* Fonts */
+  --font-display: 'Manrope', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
