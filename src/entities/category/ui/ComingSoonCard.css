@@ -1,11 +1,4 @@
-.topic-card-disabled {
+.category-card-disabled {
   opacity: 0.55;
   cursor: not-allowed;
-}
-
-.topic-card-disabled:hover {
-  transform: none;
-  border-color: var(--border);
-  background: var(--bg-card);
-  box-shadow: none;
 }

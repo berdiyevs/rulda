@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
+import { Container, Stack, Title, Text, SimpleGrid, Skeleton } from '@mantine/core'
 import { CategoriesNav } from '../../../widgets/sidebar'
 import { TOPICS, COMING_SOON, CategoryCard, ComingSoonCard } from '../../../entities/category'
 import { fetchAllLatestAttempts } from '../../../entities/quiz-attempt'
 import { useAuth } from '../../../entities/user'
-import { Spinner } from '../../../shared/ui/Spinner/Spinner'
-import './CategoriesPage.css'
 
 export function CategoriesPage() {
   const { user, profile } = useAuth()
@@ -36,37 +35,42 @@ export function CategoriesPage() {
     <div className="page-shell">
       <CategoriesNav />
 
-      <div className="container categories-page">
-        <div className="categories-header">
-          <div>
-            <h1>
-              Xush kelibsiz, <span className="gradient-text">{displayName}</span>
-            </h1>
-            <p>O'rganishni davom ettirish uchun mavzuni tanlang.</p>
-          </div>
-        </div>
+      <Container size={1180} py="xl">
+        <Stack gap={4} mb="xl">
+          <Title order={1}>
+            Xush kelibsiz,{' '}
+            <Text component="span" className="gradient-text" inherit fw={800}>
+              {displayName}
+            </Text>
+          </Title>
+          <Text c="dimmed">O'rganishni davom ettirish uchun mavzuni tanlang.</Text>
+        </Stack>
 
         {loading ? (
-          <div className="categories-loading">
-            <Spinner label="Statistika yuklanmoqda..." />
-          </div>
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} height={180} radius="lg" />
+            ))}
+          </SimpleGrid>
         ) : (
           <>
-            <div className="topics-grid">
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
               {TOPICS.map((topic) => (
                 <CategoryCard key={topic.id} topic={topic} latestAttempt={attempts[topic.id]} />
               ))}
-            </div>
+            </SimpleGrid>
 
-            <h2 className="coming-soon-title">Tez kunda qo'shiladi</h2>
-            <div className="topics-grid">
+            <Title order={2} fz="lg" mt="xl" mb="md">
+              Tez kunda qo'shiladi
+            </Title>
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
               {COMING_SOON.map((topic) => (
                 <ComingSoonCard key={topic.id} topic={topic} />
               ))}
-            </div>
+            </SimpleGrid>
           </>
         )}
-      </div>
+      </Container>
     </div>
   )
 }

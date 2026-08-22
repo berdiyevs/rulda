@@ -1,21 +1,36 @@
-import './Button.css'
+import { Button as MantineButton } from '@mantine/core'
+
+const VARIANT_MAP = {
+  primary: { variant: 'gradient' },
+  secondary: { variant: 'light', color: 'brand' },
+  ghost: { variant: 'subtle', color: 'brand' },
+  danger: { variant: 'filled', color: 'danger' },
+  outline: { variant: 'outline', color: 'brand' },
+}
 
 export function Button({
-  as: Component = 'button',
+  as,
   variant = 'primary',
   size = 'md',
   fullWidth = false,
-  className = '',
+  className,
   children,
   ...rest
 }) {
-  const classes = ['btn', `btn-${variant}`, `btn-${size}`, fullWidth ? 'btn-full' : '', className]
-    .filter(Boolean)
-    .join(' ')
+  const mapped = VARIANT_MAP[variant] ?? VARIANT_MAP.primary
+  const component = as && as !== 'button' ? as : undefined
 
   return (
-    <Component className={classes} {...rest}>
+    <MantineButton
+      component={component}
+      variant={mapped.variant}
+      color={mapped.color}
+      size={size}
+      fullWidth={fullWidth}
+      className={className}
+      {...rest}
+    >
       {children}
-    </Component>
+    </MantineButton>
   )
 }

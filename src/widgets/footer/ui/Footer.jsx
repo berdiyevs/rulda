@@ -1,21 +1,51 @@
 import { Link } from 'react-router-dom'
+import { Box, Stack, Group, Anchor, Text } from '@mantine/core'
 import { ROUTES } from '../../../shared/config/routes'
-import './Footer.css'
 
 export function Footer() {
   return (
-    <footer className="site-footer">
-      <div className="container footer-inner">
-        <Link to={ROUTES.HOME} className="logo">
-          <span>Rul</span>da
-        </Link>
-        <div className="footer-links">
-          <a href="#">Foydalanish shartlari</a>
-          <a href="#">Maxfiylik siyosati</a>
-          <a href="#">Texnik yordam</a>
-        </div>
-        <p className="copyright">&copy; {new Date().getFullYear()} Rulda. Barcha huquqlar himoyalangan.</p>
-      </div>
-    </footer>
+    <Box
+      component="footer"
+      py={44}
+      style={{ borderTop: '1px solid var(--mantine-color-dark-4)' }}
+    >
+      <Stack align="center" gap={18} ta="center" className="container">
+        <Text
+          component={Link}
+          to={ROUTES.HOME}
+          ff="Manrope, Inter, sans-serif"
+          fz={22}
+          fw={800}
+          style={{ textDecoration: 'none' }}
+        >
+          <Text
+            component="span"
+            variant="gradient"
+            gradient={{ from: 'brand.6', to: 'accent.5', deg: 135 }}
+            inherit
+            fw={800}
+          >
+            Rul
+          </Text>
+          da
+        </Text>
+
+        <Group gap={22} justify="center" wrap="wrap">
+          <Anchor href="#" c="dimmed" fz="0.88rem">
+            Foydalanish shartlari
+          </Anchor>
+          <Anchor href="#" c="dimmed" fz="0.88rem">
+            Maxfiylik siyosati
+          </Anchor>
+          <Anchor href="#" c="dimmed" fz="0.88rem">
+            Texnik yordam
+          </Anchor>
+        </Group>
+
+        <Text c="dimmed" fz="0.82rem">
+          &copy; {new Date().getFullYear()} Rulda. Barcha huquqlar himoyalangan.
+        </Text>
+      </Stack>
+    </Box>
   )
 }

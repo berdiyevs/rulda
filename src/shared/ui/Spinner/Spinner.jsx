@@ -1,10 +1,14 @@
-import './Spinner.css'
+import { Loader, Stack, Text } from '@mantine/core'
 
 export function Spinner({ size = 40, label }) {
   return (
-    <div className="spinner-wrap">
-      <div className="spinner" style={{ width: size, height: size }} />
-      {label && <p className="spinner-label">{label}</p>}
-    </div>
+    <Stack align="center" gap="sm">
+      <Loader size={size} color="brand" />
+      {label && (
+        <Text c="dimmed" size="sm">
+          {label}
+        </Text>
+      )}
+    </Stack>
   )
 }

@@ -1,38 +1,40 @@
 import { useState } from 'react'
-import { Modal } from '../../../shared/ui/Modal/Modal'
+import { Modal, Tabs, TextInput, PasswordInput, Stack, Text, Divider } from '@mantine/core'
+import { useForm } from '@mantine/form'
+import { IconUser, IconMail, IconLock } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
 import { useAuthActions } from '../../../features/auth'
-import './LoginModal.css'
 
 export function LoginModal({ isOpen, onClose }) {
   const [tab, setTab] = useState('login')
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const { signUpWithEmail, loginWithEmail, loginWithGoogle } = useAuthActions()
 
-  const clearInputs = () => {
-    setName('')
-    setEmail('')
-    setPassword('')
-  }
+  const form = useForm({
+    initialValues: { name: '', email: '', password: '' },
+    validate: {
+      name: (value) => (tab === 'signup' && !value.trim() ? 'Ismingizni kiriting' : null),
+      email: (value) => (/^\S+@\S+\.\S+$/.test(value) ? null : "Email manzili noto'g'ri"),
+      password: (value) =>
+        value.length < 6 ? "Parol kamida 6 ta belgidan iborat bo'lishi kerak" : null,
+    },
+  })
 
   const handleClose = () => {
-    clearInputs()
+    form.reset()
     setTab('login')
     onClose()
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (values) => {
     setSubmitting(true)
     try {
       if (tab === 'login') {
-        await loginWithEmail({ email, password })
+        await loginWithEmail({ email: values.email, password: values.password })
       } else {
-        await signUpWithEmail({ name, email, password })
+        await signUpWithEmail(values)
         setTab('login')
+        form.reset()
       }
     } finally {
       setSubmitting(false)
@@ -49,75 +51,64 @@ export function LoginModal({ isOpen, onClose }) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} maxWidth={400}>
-      <div className="login-modal">
-        <div className="login-logo">
-          <span>Rul</span>da
-        </div>
+    <Modal opened={isOpen} onClose={handleClose} size={400} centered withCloseButton>
+      <Stack gap="md" align="center" ta="center">
+        <Text fw={800} fz={22} style={{ fontFamily: 'Manrope, Inter, sans-serif' }}>
+          <Text span inherit variant="gradient" gradient={{ from: 'brand.6', to: 'accent.5', deg: 135 }}>
+            Rul
+          </Text>
+          da
+        </Text>
 
-        <div className="login-tabs">
-          <button className={tab === 'login' ? 'active' : ''} onClick={() => setTab('login')}>
-            Kirish
-          </button>
-          <button className={tab === 'signup' ? 'active' : ''} onClick={() => setTab('signup')}>
-            Ro'yxatdan o'tish
-          </button>
-        </div>
+        <Tabs value={tab} onChange={setTab} radius="xl" variant="pills" w="100%">
+          <Tabs.List grow>
+            <Tabs.Tab value="login">Kirish</Tabs.Tab>
+            <Tabs.Tab value="signup">Ro'yxatdan o'tish</Tabs.Tab>
+          </Tabs.List>
+        </Tabs>
 
-        <p className="login-subtitle">
+        <Text c="dimmed" size="sm">
           {tab === 'login'
             ? 'Mavzular va testlarga kirish uchun tizimga kiring'
             : "Bepul hisob yaratib, o'rganishni boshlang"}
-        </p>
+        </Text>
 
-        <form className="login-form" onSubmit={handleSubmit}>
-          {tab === 'signup' && (
-            <div className="input-group">
-              <i className="input-icon bi bi-person"></i>
-              <input
-                className="custom-input"
-                type="text"
+        <form onSubmit={form.onSubmit(handleSubmit)} style={{ width: '100%' }}>
+          <Stack gap="sm">
+            {tab === 'signup' && (
+              <TextInput
                 placeholder="Ismingiz"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+                leftSection={<IconUser size={16} />}
+                {...form.getInputProps('name')}
               />
-            </div>
-          )}
-          <div className="input-group">
-            <i className="input-icon bi bi-envelope"></i>
-            <input
-              className="custom-input"
+            )}
+            <TextInput
               type="email"
               placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              leftSection={<IconMail size={16} />}
+              {...form.getInputProps('email')}
             />
-          </div>
-          <div className="input-group">
-            <i className="input-icon bi bi-lock"></i>
-            <input
-              className="custom-input"
-              type="password"
+            <PasswordInput
               placeholder="Parol"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
+              leftSection={<IconLock size={16} />}
+              {...form.getInputProps('password')}
             />
-          </div>
 
-          <Button type="submit" variant="primary" fullWidth disabled={submitting}>
-            {submitting ? 'Iltimos kuting...' : tab === 'login' ? 'Kirish' : "Ro'yxatdan o'tish"}
-          </Button>
+            <Button type="submit" variant="primary" fullWidth disabled={submitting}>
+              {submitting ? 'Iltimos kuting...' : tab === 'login' ? 'Kirish' : "Ro'yxatdan o'tish"}
+            </Button>
+          </Stack>
         </form>
 
-        <div className="divider">
-          <span>yoki</span>
-        </div>
+        <Divider label="yoki" labelPosition="center" w="100%" />
 
-        <Button variant="secondary" fullWidth onClick={handleGoogle} disabled={submitting} className="btn-google">
+        <Button
+          variant="secondary"
+          fullWidth
+          onClick={handleGoogle}
+          disabled={submitting}
+          style={{ backgroundColor: '#fff', color: '#1f1f1f', borderColor: '#fff' }}
+        >
           <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
             <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.09-1.8 2.73v2.27h2.92c1.7-1.57 2.68-3.88 2.68-6.64z" />
             <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.27c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.34C2.44 15.98 5.48 18 9 18z" />
@@ -126,7 +117,7 @@ export function LoginModal({ isOpen, onClose }) {
           </svg>
           Google bilan davom etish
         </Button>
-      </div>
+      </Stack>
     </Modal>
   )
 }

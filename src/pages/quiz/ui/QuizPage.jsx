@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { Box } from '@mantine/core'
 import { QuizIntro } from './QuizIntro'
 import { QuizPlay } from './QuizPlay'
-import './QuizPage.css'
 
 const VALID_TOPICS = ['all', 'signs', 'theory']
 
@@ -23,12 +23,12 @@ export function QuizPage() {
   }
 
   return (
-    <div className="page-shell quiz-page-root">
+    <Box mih="100vh">
       {started ? (
         <QuizPlay key={sessionKey} topic={topic} mode={mode} onRetry={handleRetry} />
       ) : (
         <QuizIntro topic={topic} mode={mode} onStart={() => setStarted(true)} />
       )}
-    </div>
+    </Box>
   )
 }

@@ -7,6 +7,7 @@ import {
   signOut,
 } from 'firebase/auth'
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { notifications } from '@mantine/notifications'
 import { auth, googleProvider, db } from '../../../shared/api/firebase'
 import { ROUTES } from '../../../shared/config/routes'
 
@@ -15,7 +16,11 @@ export function useAuthActions() {
 
   const signUpWithEmail = async ({ name, email, password }) => {
     if (!email || !password || !name) {
-      alert("Iltimos, ism, email va parolni to'ldiring!")
+      notifications.show({
+        color: 'danger',
+        title: "To'ldirilmagan maydonlar",
+        message: "Iltimos, ism, email va parolni to'ldiring!",
+      })
       return
     }
 
@@ -33,10 +38,18 @@ export function useAuthActions() {
         createdAt: serverTimestamp(),
       })
 
-      alert("Ro'yxatdan o'tdingiz! Tasdiqlash xati yuborildi. Iltimos, pochtangizni tekshiring.")
+      notifications.show({
+        color: 'success',
+        title: "Ro'yxatdan o'tdingiz",
+        message: 'Tasdiqlash xati yuborildi. Iltimos, pochtangizni tekshiring.',
+      })
       await signOut(auth)
     } catch (error) {
-      alert('SignUp xatosi: ' + error.message)
+      notifications.show({
+        color: 'danger',
+        title: "Ro'yxatdan o'tishda xatolik",
+        message: error.message,
+      })
     }
   }
 
@@ -48,11 +61,19 @@ export function useAuthActions() {
       if (user.emailVerified) {
         navigate(ROUTES.CATEGORIES)
       } else {
-        alert('Avval emailingizni tasdiqlang! Link yuborilgan.')
+        notifications.show({
+          color: 'warning',
+          title: 'Email tasdiqlanmagan',
+          message: 'Avval emailingizni tasdiqlang! Link yuborilgan.',
+        })
         await signOut(auth)
       }
     } catch (error) {
-      alert("Email yoki parol noto'g'ri!")
+      notifications.show({
+        color: 'danger',
+        title: 'Kirishda xatolik',
+        message: "Email yoki parol noto'g'ri!",
+      })
     }
   }
 

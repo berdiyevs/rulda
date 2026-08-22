@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { Container, Stack, Group, Title, Text, SimpleGrid, Box } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 import { Navbar } from '../../../widgets/navbar'
 import { LoginModal } from '../../../widgets/login-modal'
 import { Footer } from '../../../widgets/footer'
@@ -7,7 +9,6 @@ import { Button } from '../../../shared/ui/Button/Button'
 import { Badge } from '../../../shared/ui/Badge/Badge'
 import { useAuth } from '../../../entities/user'
 import { ROUTES } from '../../../shared/config/routes'
-import './LandingPage.css'
 
 const STATS = [
   { value: '600+', label: 'Rasmiy savollar' },
@@ -18,12 +19,12 @@ const STATS = [
 const FEATURES = [
   {
     icon: '🎯',
-    title: "Real imtihon formati",
-    text: '20 ta savol, 20 daqiqa, maksimal 2 ta xato — DAN imtihoniga aynan o\'xshash sharoit.',
+    title: 'Real imtihon formati',
+    text: "20 ta savol, 20 daqiqa, maksimal 2 ta xato — DAN imtihoniga aynan o'xshash sharoit.",
   },
   {
     icon: '🖼️',
-    title: "Rasmli savollar",
+    title: 'Rasmli savollar',
     text: "Yo'l belgilarini haqiqiy rasmlar orqali o'rganing va eslab qoling.",
   },
   {
@@ -50,7 +51,11 @@ export function LandingPage() {
     if (user && isVerified) {
       navigate(ROUTES.CATEGORIES)
     } else if (user && !isVerified) {
-      alert("Iltimos, avval emailingizni tasdiqlang. Tasdiqlash xati emailingizga yuborilgan.")
+      notifications.show({
+        color: 'warning',
+        title: 'Email tasdiqlanmagan',
+        message: 'Iltimos, avval emailingizni tasdiqlang. Tasdiqlash xati emailingizga yuborilgan.',
+      })
     } else {
       setIsModalOpen(true)
     }
@@ -61,62 +66,78 @@ export function LandingPage() {
       <Navbar onOpenModal={() => setIsModalOpen(true)} />
       <LoginModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
-      <main className="page-shell">
-        <section className="hero">
-          <div className="container hero-inner">
-            <Badge variant="primary">✦ 2026 test bazasi yangilandi</Badge>
-            <h1 className="hero-title">
-              Haydovchilik guvohnomasini <span className="gradient-text">birinchi urinishda</span> oling
-            </h1>
-            <p className="hero-text">
-              O'zbekiston yo'l harakati qoidalarini interaktiv testlar orqali o'rganing. Rasmiy DAN
-              savollar bazasi, real imtihon rejimi va shaxsiy progress kuzatuvi bilan.
-            </p>
-            <div className="hero-actions">
-              <Button variant="primary" size="lg" onClick={handlePracticeClick}>
-                Mashq qilishni boshlash
-              </Button>
-              <Button variant="secondary" size="lg" onClick={handlePracticeClick}>
-                Imtihonni sinab ko'rish
-              </Button>
-            </div>
+      <Box component="main" className="page-shell">
+        <Box component="section" py={80}>
+          <Container size={1180}>
+            <Stack align="center" gap="lg" ta="center" maw={720} mx="auto">
+              <Badge variant="primary">✦ 2026 test bazasi yangilandi</Badge>
+              <Title order={1} fz={{ base: 32, sm: 48 }} fw={800}>
+                Haydovchilik guvohnomasini{' '}
+                <Text component="span" className="gradient-text" inherit fw={800}>
+                  birinchi urinishda
+                </Text>{' '}
+                oling
+              </Title>
+              <Text c="dimmed" fz="lg">
+                O'zbekiston yo'l harakati qoidalarini interaktiv testlar orqali o'rganing. Rasmiy DAN
+                savollar bazasi, real imtihon rejimi va shaxsiy progress kuzatuvi bilan.
+              </Text>
+              <Group justify="center">
+                <Button variant="primary" size="lg" onClick={handlePracticeClick}>
+                  Mashq qilishni boshlash
+                </Button>
+                <Button variant="secondary" size="lg" onClick={handlePracticeClick}>
+                  Imtihonni sinab ko'rish
+                </Button>
+              </Group>
 
-            <div className="hero-stats">
-              {STATS.map((s) => (
-                <div key={s.label} className="hero-stat">
-                  <span className="stat-value gradient-text">{s.value}</span>
-                  <span className="stat-label">{s.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+              <SimpleGrid cols={3} spacing="xl" mt="md">
+                {STATS.map((s) => (
+                  <Stack key={s.label} gap={2} align="center">
+                    <Text fz={28} fw={800} className="gradient-text">
+                      {s.value}
+                    </Text>
+                    <Text c="dimmed" size="sm">
+                      {s.label}
+                    </Text>
+                  </Stack>
+                ))}
+              </SimpleGrid>
+            </Stack>
+          </Container>
+        </Box>
 
-        <section className="features">
-          <div className="container">
-            <h2 className="section-title">Nega aynan Rulda?</h2>
-            <div className="features-grid">
+        <Box component="section" py={60}>
+          <Container size={1180}>
+            <Title order={2} ta="center" mb="xl">
+              Nega aynan Rulda?
+            </Title>
+            <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
               {FEATURES.map((f) => (
-                <div className="feature-card glass-card" key={f.title}>
-                  <div className="feature-icon">{f.icon}</div>
-                  <h3>{f.title}</h3>
-                  <p>{f.text}</p>
-                </div>
+                <Stack key={f.title} className="glass-card" p="lg" gap="xs">
+                  <Text fz={32}>{f.icon}</Text>
+                  <Title order={3} fz="lg">
+                    {f.title}
+                  </Title>
+                  <Text c="dimmed">{f.text}</Text>
+                </Stack>
               ))}
-            </div>
-          </div>
-        </section>
+            </SimpleGrid>
+          </Container>
+        </Box>
 
-        <section className="cta">
-          <div className="container cta-inner glass-card">
-            <h2>Bugundan boshlang</h2>
-            <p>Bepul ro'yxatdan o'ting va zaif tomonlaringizni aniqlashtiring.</p>
-            <Button variant="primary" size="lg" onClick={handlePracticeClick}>
-              Hoziroq boshlash
-            </Button>
-          </div>
-        </section>
-      </main>
+        <Box component="section" py={60}>
+          <Container size={1180}>
+            <Stack align="center" ta="center" gap="md" className="glass-card" p="xl">
+              <Title order={2}>Bugundan boshlang</Title>
+              <Text c="dimmed">Bepul ro'yxatdan o'ting va zaif tomonlaringizni aniqlashtiring.</Text>
+              <Button variant="primary" size="lg" onClick={handlePracticeClick}>
+                Hoziroq boshlash
+              </Button>
+            </Stack>
+          </Container>
+        </Box>
+      </Box>
 
       <Footer />
     </>

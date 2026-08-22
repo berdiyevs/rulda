@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { Card, Group, Stack, Text, Title } from '@mantine/core'
+import { IconArrowRight } from '@tabler/icons-react'
 import { CategoryIcon } from '../../../shared/ui/CategoryIcon/CategoryIcon'
 import { Badge } from '../../../shared/ui/Badge/Badge'
 import './CategoryCard.css'
@@ -11,31 +13,43 @@ export function CategoryCard({ topic, latestAttempt }) {
     : null
 
   return (
-    <Link to={`/quiz?topic=${id}`} className="topic-card slide-up">
-      <div className="topic-card-top">
-        <div className="topic-icon">
+    <Card component={Link} to={`/quiz?topic=${id}`} className="glass-card slide-up category-card" padding="lg">
+      <Stack gap="md" h="100%">
+        <Group justify="space-between">
           <CategoryIcon name={icon} />
-        </div>
-        {scorePercent !== null ? (
-          <Badge variant={scorePercent >= 70 ? 'success' : 'warning'}>{scorePercent}%</Badge>
-        ) : (
-          <Badge>Boshlanmagan</Badge>
-        )}
-      </div>
+          {scorePercent !== null ? (
+            <Badge variant={scorePercent >= 70 ? 'success' : 'warning'}>{scorePercent}%</Badge>
+          ) : (
+            <Badge>Boshlanmagan</Badge>
+          )}
+        </Group>
 
-      <h3>{title}</h3>
-      <p>{description}</p>
+        <Stack gap={4} style={{ flexGrow: 1 }}>
+          <Title order={3} fz="1.15rem">
+            {title}
+          </Title>
+          <Text c="dimmed" fz="sm" lh={1.5}>
+            {description}
+          </Text>
+        </Stack>
 
-      <div className="topic-card-footer">
-        {latestAttempt ? (
-          <span>
-            Oxirgi urinish: {latestAttempt.correctCount}/{latestAttempt.totalQuestions} to'g'ri
-          </span>
-        ) : (
-          <span>Mashq qilishni boshlang</span>
-        )}
-        <span className="topic-arrow">→</span>
-      </div>
-    </Link>
+        <Group
+          justify="space-between"
+          pt="sm"
+          fz="0.82rem"
+          c="dimmed"
+          style={{ borderTop: '1px solid var(--border)' }}
+        >
+          {latestAttempt ? (
+            <span>
+              Oxirgi urinish: {latestAttempt.correctCount}/{latestAttempt.totalQuestions} to'g'ri
+            </span>
+          ) : (
+            <span>Mashq qilishni boshlang</span>
+          )}
+          <IconArrowRight size={18} className="category-arrow" />
+        </Group>
+      </Stack>
+    </Card>
   )
 }

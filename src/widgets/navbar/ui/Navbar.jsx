@@ -1,20 +1,18 @@
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { signOut } from 'firebase/auth'
+import { Box, Group, Text, Avatar, Menu, UnstyledButton } from '@mantine/core'
+import { IconChevronDown, IconLogout, IconList } from '@tabler/icons-react'
 import { auth } from '../../../shared/api/firebase'
 import { useAuth } from '../../../entities/user'
 import { Button } from '../../../shared/ui/Button/Button'
 import { ROUTES } from '../../../shared/config/routes'
-import './Navbar.css'
 
 export function Navbar({ onOpenModal }) {
   const { user, profile } = useAuth()
-  const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
 
   const handleLogout = async () => {
     await signOut(auth)
-    setMenuOpen(false)
     navigate(ROUTES.HOME)
   }
 
@@ -22,35 +20,86 @@ export function Navbar({ onOpenModal }) {
   const initial = displayName ? displayName[0].toUpperCase() : '?'
 
   return (
-    <nav className="navbar">
-      <div className="container navbar-inner">
-        <Link to={ROUTES.HOME} className="logo">
-          <span>Rul</span>da
-        </Link>
+    <Box
+      component="nav"
+      pos="fixed"
+      top={0}
+      left={0}
+      w="100%"
+      h={72}
+      style={{
+        zIndex: 1000,
+        background: 'rgba(10, 12, 18, 0.75)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid var(--mantine-color-dark-4)',
+      }}
+    >
+      <Group h="100%" justify="space-between" className="container">
+        <Text
+          component={Link}
+          to={ROUTES.HOME}
+          ff="Manrope, Inter, sans-serif"
+          fz={24}
+          fw={800}
+          style={{ letterSpacing: '-0.02em', textDecoration: 'none' }}
+        >
+          <Text
+            component="span"
+            variant="gradient"
+            gradient={{ from: 'brand.6', to: 'accent.5', deg: 135 }}
+            inherit
+            fw={800}
+          >
+            Rul
+          </Text>
+          da
+        </Text>
 
-        <div className="nav-menu">
-          {user ? (
-            <div className="user-menu">
-              <button className="user-chip" onClick={() => setMenuOpen((v) => !v)}>
-                <span className="user-avatar">{initial}</span>
-                <span className="user-name">{displayName}</span>
-              </button>
-              {menuOpen && (
-                <div className="user-dropdown fade-in">
-                  <Link to={ROUTES.CATEGORIES} onClick={() => setMenuOpen(false)}>
-                    Mavzular
-                  </Link>
-                  <button onClick={handleLogout}>Chiqish</button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Button variant="primary" onClick={onOpenModal}>
-              Boshlash
-            </Button>
-          )}
-        </div>
-      </div>
-    </nav>
+        {user ? (
+          <Menu shadow="md" width={190} position="bottom-end" withArrow offset={10}>
+            <Menu.Target>
+              <UnstyledButton
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '6px 14px 6px 6px',
+                  borderRadius: 999,
+                  background: 'var(--mantine-color-dark-6)',
+                  border: '1px solid var(--mantine-color-dark-4)',
+                }}
+              >
+                <Avatar
+                  radius="xl"
+                  size={30}
+                  variant="gradient"
+                  gradient={{ from: 'brand.6', to: 'accent.5', deg: 135 }}
+                  color="white"
+                >
+                  {initial}
+                </Avatar>
+                <Text size="sm" fw={600} maw={140} truncate="end">
+                  {displayName}
+                </Text>
+                <IconChevronDown size={14} style={{ opacity: 0.6 }} />
+              </UnstyledButton>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item component={Link} to={ROUTES.CATEGORIES} leftSection={<IconList size={16} />}>
+                Mavzular
+              </Menu.Item>
+              <Menu.Item color="danger" leftSection={<IconLogout size={16} />} onClick={handleLogout}>
+                Chiqish
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        ) : (
+          <Button variant="primary" onClick={onOpenModal}>
+            Boshlash
+          </Button>
+        )}
+      </Group>
+    </Box>
   )
 }

@@ -1,18 +1,8 @@
-.question-card {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
-  width: 100%;
-  max-width: 920px;
+.question-card-shell {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  overflow: hidden;
   box-shadow: var(--shadow-md);
-}
-
-.question-card.with-image {
-  grid-template-columns: 1fr 1.15fr;
 }
 
 .question-image {
@@ -63,6 +53,7 @@
   text-align: left;
   transition: 0.2s ease;
   font-size: 0.95rem;
+  width: 100%;
 }
 
 .option-btn:hover:not(:disabled) {
@@ -110,9 +101,6 @@
 }
 
 @media (max-width: 760px) {
-  .question-card.with-image {
-    grid-template-columns: 1fr;
-  }
   .question-image {
     border-right: none;
     border-bottom: 1px solid var(--border);

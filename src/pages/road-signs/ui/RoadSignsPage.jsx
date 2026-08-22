@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Container, Stack, Group, Title, Text, TextInput, Chip, SimpleGrid, Paper, Image, Skeleton } from '@mantine/core'
+import { IconSearch } from '@tabler/icons-react'
 import { CategoriesNav } from '../../../widgets/sidebar'
 import { fetchRoadSigns, SIGN_CATEGORIES } from '../../../entities/road-sign'
-import { Spinner } from '../../../shared/ui/Spinner/Spinner'
-import './RoadSignsPage.css'
 
 export function RoadSignsPage() {
   const [signs, setSigns] = useState([])
@@ -43,63 +43,62 @@ export function RoadSignsPage() {
     <div className="page-shell">
       <CategoriesNav />
 
-      <div className="container road-signs-page">
-        <div className="road-signs-header">
-          <h1>Yo'l belgilari to'plami</h1>
-          <p>Barcha rasmiy yo'l belgilarini kategoriya bo'yicha ko'rib chiqing.</p>
-        </div>
+      <Container size={1180} py="xl">
+        <Stack gap={4} mb="lg">
+          <Title order={1}>Yo'l belgilari to'plami</Title>
+          <Text c="dimmed">Barcha rasmiy yo'l belgilarini kategoriya bo'yicha ko'rib chiqing.</Text>
+        </Stack>
 
-        <div className="road-signs-controls">
-          <input
-            type="text"
+        <Stack gap="md" mb="xl">
+          <TextInput
             placeholder="Belgi nomini qidirish..."
+            leftSection={<IconSearch size={16} />}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="signs-search"
+            maw={420}
           />
-          <div className="signs-filters">
-            <button
-              className={activeCategory === 'all' ? 'active' : ''}
-              onClick={() => setActiveCategory('all')}
-            >
-              Barchasi
-            </button>
-            {SIGN_CATEGORIES.map((c) => (
-              <button
-                key={c.key}
-                className={activeCategory === c.key ? 'active' : ''}
-                onClick={() => setActiveCategory(c.key)}
-              >
-                {c.nom}
-              </button>
-            ))}
-          </div>
-        </div>
+          <Chip.Group multiple={false} value={activeCategory} onChange={setActiveCategory}>
+            <Group gap="xs">
+              <Chip value="all" variant="light" color="brand">
+                Barchasi
+              </Chip>
+              {SIGN_CATEGORIES.map((c) => (
+                <Chip key={c.key} value={c.key} variant="light" color="brand">
+                  {c.nom}
+                </Chip>
+              ))}
+            </Group>
+          </Chip.Group>
+        </Stack>
 
         {loading && (
-          <div className="road-signs-loading">
-            <Spinner label="Yuklanmoqda..." />
-          </div>
+          <SimpleGrid cols={{ base: 2, sm: 4, lg: 6 }} spacing="md">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <Skeleton key={i} height={140} radius="lg" />
+            ))}
+          </SimpleGrid>
         )}
-        {error && <p className="road-signs-status">{error}</p>}
+        {error && <Text c="danger">{error}</Text>}
 
         {!loading && !error && (
           <>
             {filtered.length === 0 ? (
-              <p className="road-signs-status">Hech narsa topilmadi.</p>
+              <Text c="dimmed">Hech narsa topilmadi.</Text>
             ) : (
-              <div className="signs-grid">
+              <SimpleGrid cols={{ base: 2, sm: 4, lg: 6 }} spacing="md">
                 {filtered.map((b) => (
-                  <div className="sign-card" key={b.id}>
-                    <img src={b.rasm} alt={b.nom || b.id} loading="lazy" />
-                    <p>{b.nom}</p>
-                  </div>
+                  <Paper key={b.id} bg="white" radius="lg" p="sm" ta="center" withBorder>
+                    <Image src={b.rasm} alt={b.nom || b.id} loading="lazy" fit="contain" h={70} mx="auto" />
+                    <Text size="xs" mt={6} c="dark.8">
+                      {b.nom}
+                    </Text>
+                  </Paper>
                 ))}
-              </div>
+              </SimpleGrid>
             )}
           </>
         )}
-      </div>
+      </Container>
     </div>
   )
 }
