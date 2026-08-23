@@ -2,6 +2,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { AuthProvider } from '../entities/user'
+import { QuizStartProvider } from '../widgets/quiz-start'
 import { AppRouter } from './providers/AppRouter'
 import { theme } from './theme'
 import '@mantine/core/styles.css'
@@ -16,7 +17,9 @@ export function App() {
       <Notifications position="top-right" />
       <AuthProvider>
         <BrowserRouter>
-          <AppRouter />
+          <QuizStartProvider>
+            <AppRouter />
+          </QuizStartProvider>
         </BrowserRouter>
       </AuthProvider>
     </MantineProvider>

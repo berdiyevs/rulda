@@ -1,10 +1,10 @@
-import { Box, Flex, Skeleton, Text } from '@mantine/core'
+import { Box, Center, Flex, Skeleton, Text } from '@mantine/core'
 import { QuizNav, QuizSidebar } from '../../../widgets/quiz-sidebar'
 import { QuizResults } from '../../../widgets/quiz-results'
 import { QuestionCard } from '../../../entities/question'
 import { useQuizEngine } from '../../../features/quiz-engine'
 
-export function QuizPlay({ topic, mode, ticketId, onRetry }) {
+export function QuizPlay({ topic, mode, ticketId, questionIds, questionCount, durationMinutes, onRetry }) {
   const {
     loading,
     error,
@@ -19,11 +19,18 @@ export function QuizPlay({ topic, mode, ticketId, onRetry }) {
     correctAnswer,
     handleAnswer,
     timeFormatted,
-  } = useQuizEngine({ topic, mode, ticketId })
+    hasTimeLimit,
+  } = useQuizEngine({ topic, mode, ticketId, questionIds, questionCount, durationMinutes })
 
   return (
     <Box mih="100vh">
-      <QuizNav mode={mode} topic={topic} ticketId={ticketId} timeFormatted={timeFormatted} />
+      <QuizNav
+        mode={mode}
+        topic={topic}
+        ticketId={ticketId}
+        timeFormatted={timeFormatted}
+        showTimer={hasTimeLimit}
+      />
 
       <Flex align="flex-start" gap="lg" px={{ base: 'md', md: 'xl' }} py="lg" wrap="wrap">
         {!finished && (
@@ -34,7 +41,11 @@ export function QuizPlay({ topic, mode, ticketId, onRetry }) {
           {loading && <Skeleton height={420} radius="lg" />}
           {error && <Text c="danger">{error}</Text>}
 
-          {!loading && !error && finished && <QuizResults result={result} onRetry={onRetry} />}
+          {!loading && !error && finished && (
+            <Center mih="70vh">
+              <QuizResults result={result} onRetry={onRetry} />
+            </Center>
+          )}
 
           {!loading && !error && !finished && (
             <QuestionCard

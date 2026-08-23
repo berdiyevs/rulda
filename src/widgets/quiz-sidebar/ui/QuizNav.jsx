@@ -3,6 +3,7 @@ import { Box, Group, Text, Badge, Button, Modal, Stack } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconClock, IconDoorExit } from '@tabler/icons-react'
 import { ROUTES } from '../../../shared/config/routes'
+import { exitFullscreen } from '../../../shared/lib/fullscreen'
 
 const TOPIC_LABELS = {
   all: 'Barcha savollar',
@@ -10,11 +11,12 @@ const TOPIC_LABELS = {
   theory: 'Nazariy savollar',
 }
 
-export function QuizNav({ mode, topic, ticketId, timeFormatted }) {
+export function QuizNav({ mode, topic, ticketId, timeFormatted, showTimer }) {
   const navigate = useNavigate()
   const [confirmOpen, { open: openConfirm, close: closeConfirm }] = useDisclosure(false)
 
   const handleQuit = () => {
+    exitFullscreen()
     navigate(ROUTES.CATEGORIES)
   }
 
@@ -28,8 +30,8 @@ export function QuizNav({ mode, topic, ticketId, timeFormatted }) {
           display: 'flex',
           alignItems: 'center',
           gap: 20,
-          background: 'var(--mantine-color-dark-7)',
-          borderBottom: '1px solid var(--mantine-color-dark-4)',
+          background: 'var(--bg-elevated)',
+          borderBottom: '1px solid var(--border)',
         }}
       >
         <Text ff="Manrope, Inter, sans-serif" fz={19} fw={800}>
@@ -48,11 +50,13 @@ export function QuizNav({ mode, topic, ticketId, timeFormatted }) {
         <Text c="dimmed" fz="0.82rem" tt="uppercase" fw={600} style={{ letterSpacing: '0.06em' }}>
           {mode === 'ticket'
             ? `Bilet ${ticketId} · Imtihon formati`
-            : `${mode === 'exam' ? 'Imtihon rejimi' : "Mashg'ulot"} · ${TOPIC_LABELS[topic] || topic}`}
+            : mode === 'mistakes'
+              ? 'Xatolarim ustida ishlash'
+              : `${mode === 'exam' ? 'Imtihon rejimi' : "Mashg'ulot"} · ${TOPIC_LABELS[topic] || topic}`}
         </Text>
 
         <Group ml="auto" gap={10}>
-          {mode === 'exam' && (
+          {showTimer && (
             <Badge
               size="lg"
               radius="xl"

@@ -12,7 +12,7 @@ export const theme = createTheme({
   shadows: {
     sm: '0 2px 10px rgba(0,0,0,.25)',
     md: '0 8px 30px rgba(0,0,0,.35)',
-    glow: '0 0 0 1px var(--mantine-color-dark-4), 0 20px 50px rgba(109,91,255,.12)',
+    glow: '0 0 0 1px var(--border), 0 20px 50px rgba(109,91,255,.12)',
   },
   colors: {
     brand: [

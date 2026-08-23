@@ -1,0 +1,107 @@
+.daily-question-image-wrap {
+  background: var(--bg-card);
+  border-radius: var(--r-md);
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.daily-question-image-wrap img {
+  max-height: 200px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.daily-question-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 22px;
+}
+
+.daily-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.daily-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  text-align: left;
+  font-size: 0.95rem;
+  transition: 0.2s ease;
+}
+
+.daily-option-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--text-primary);
+}
+
+.daily-option-btn:disabled {
+  cursor: default;
+}
+
+.daily-option-letter {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--overlay-soft);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.daily-option-btn.is-correct {
+  border-color: var(--success);
+  background: var(--success-soft);
+  color: var(--text-primary);
+}
+.daily-option-btn.is-correct .daily-option-letter {
+  background: var(--success);
+  color: #06281f;
+}
+
+.daily-option-btn.is-wrong {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+  color: var(--text-primary);
+}
+.daily-option-btn.is-wrong .daily-option-letter {
+  background: var(--danger);
+  color: #2c0a14;
+}
+
+.daily-question-feedback {
+  margin-top: 18px;
+  padding: 14px 18px;
+  border-radius: var(--r-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.daily-question-feedback.is-correct {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.daily-question-feedback.is-wrong {
+  background: var(--danger-soft);
+  color: var(--danger);
+}

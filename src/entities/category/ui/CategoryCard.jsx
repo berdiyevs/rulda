@@ -1,19 +1,25 @@
-import { Link } from 'react-router-dom'
 import { Card, Group, Stack, Text, Title } from '@mantine/core'
 import { IconArrowRight } from '@tabler/icons-react'
 import { CategoryIcon } from '../../../shared/ui/CategoryIcon/CategoryIcon'
 import { Badge } from '../../../shared/ui/Badge/Badge'
 import './CategoryCard.css'
 
-export function CategoryCard({ topic, latestAttempt }) {
-  const { icon, title, description, id } = topic
+export function CategoryCard({ topic, latestAttempt, onSelect }) {
+  const { icon, title, description } = topic
 
   const scorePercent = latestAttempt
     ? Math.round((latestAttempt.correctCount / latestAttempt.totalQuestions) * 100)
     : null
 
   return (
-    <Card component={Link} to={`/quiz?topic=${id}`} className="glass-card slide-up category-card" padding="lg">
+    <Card
+      component="button"
+      type="button"
+      onClick={onSelect}
+      className="glass-card slide-up category-card"
+      padding="lg"
+      style={{ width: '100%', textAlign: 'left', font: 'inherit', color: 'inherit', cursor: 'pointer' }}
+    >
       <Stack gap="md" h="100%">
         <Group justify="space-between">
           <CategoryIcon name={icon} />

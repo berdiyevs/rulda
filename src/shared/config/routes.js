@@ -4,4 +4,5 @@ export const ROUTES = {
   QUIZ: '/quiz',
   ROAD_SIGNS: '/road-signs',
   TICKETS: '/tickets',
+  STATISTICS: '/statistics',
 }

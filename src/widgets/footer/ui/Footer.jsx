@@ -7,7 +7,7 @@ export function Footer() {
     <Box
       component="footer"
       py={44}
-      style={{ borderTop: '1px solid var(--mantine-color-dark-4)' }}
+      style={{ borderTop: '1px solid var(--border)' }}
     >
       <Stack align="center" gap={18} ta="center" className="container">
         <Text

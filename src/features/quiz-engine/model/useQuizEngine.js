@@ -4,20 +4,28 @@ import { saveAttempt } from '../../../entities/quiz-attempt'
 import { useAuth } from '../../../entities/user'
 import { shuffleArray, pickRandom } from '../../../shared/lib/shuffle'
 import { useCountdown } from '../../../shared/lib/useCountdown'
+import { exitFullscreen } from '../../../shared/lib/fullscreen'
 
 const PRACTICE_SESSION_SIZE = 20
 const EXAM_SESSION_SIZE = 20
-const EXAM_DURATION_SECONDS = 20 * 60
+const EXAM_DURATION_SECONDS = 25 * 60
 const EXAM_MAX_MISTAKES = 2
+const EMPTY_QUESTION_IDS = []
 
-function prepareSession(allQuestions, topic, mode, ticketId) {
+function prepareSession(allQuestions, topic, mode, ticketId, questionIds, questionCount) {
   if (mode === 'ticket') {
     const pool = allQuestions.filter((q) => q.ticketId === Number(ticketId))
     return pool.map((q) => ({ ...q, options: shuffleArray(q.options) }))
   }
 
+  if (mode === 'mistakes') {
+    const idSet = new Set(questionIds)
+    const pool = allQuestions.filter((q) => idSet.has(q.id))
+    return pool.map((q) => ({ ...q, options: shuffleArray(q.options) }))
+  }
+
   const pool = mode === 'exam' ? allQuestions : filterQuestionsByTopic(allQuestions, topic)
-  const size = mode === 'exam' ? EXAM_SESSION_SIZE : Math.min(PRACTICE_SESSION_SIZE, pool.length)
+  const size = mode === 'exam' ? EXAM_SESSION_SIZE : Math.min(questionCount || PRACTICE_SESSION_SIZE, pool.length)
   const picked = pickRandom(pool, size)
   return picked.map((q) => ({
     ...q,
@@ -25,7 +33,14 @@ function prepareSession(allQuestions, topic, mode, ticketId) {
   }))
 }
 
-export function useQuizEngine({ topic, mode, ticketId }) {
+export function useQuizEngine({
+  topic,
+  mode,
+  ticketId,
+  questionIds = EMPTY_QUESTION_IDS,
+  questionCount = PRACTICE_SESSION_SIZE,
+  durationMinutes = 0,
+}) {
   const { user } = useAuth()
   const [sourceQuestions, setSourceQuestions] = useState([])
   const [sessionQuestions, setSessionQuestions] = useState([])
@@ -59,7 +74,11 @@ export function useQuizEngine({ topic, mode, ticketId }) {
 
   useEffect(() => {
     if (sourceQuestions.length === 0) return
-    const session = prepareSession(sourceQuestions, topic, mode, ticketId)
+    const session = prepareSession(sourceQuestions, topic, mode, ticketId, questionIds, questionCount)
+    if (session.length === 0) {
+      setError('Savollar topilmadi.')
+      return
+    }
     setSessionQuestions(session)
     setStepStatuses(Array.from({ length: session.length }, () => 'idle'))
     setCurrentIndex(0)
@@ -68,7 +87,8 @@ export function useQuizEngine({ topic, mode, ticketId }) {
     setFinished(false)
     setResult(null)
     hasSavedRef.current = false
-  }, [sourceQuestions, topic, mode, ticketId])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sourceQuestions, topic, mode, ticketId, questionIds, questionCount])
 
   const finishSession = useCallback(
     (statuses) => {
@@ -77,33 +97,53 @@ export function useQuizEngine({ topic, mode, ticketId }) {
 
       const correctCount = statuses.filter((s) => s === 'completed').length
       const wrongCount = statuses.filter((s) => s === 'wrong').length
-      const totalQuestions = statuses.length
+      const totalQuestions = correctCount + wrongCount
       const passed = mode === 'exam' ? wrongCount <= EXAM_MAX_MISTAKES : correctCount / totalQuestions >= 0.7
-      const attemptTopic = mode === 'ticket' ? `ticket-${ticketId}` : topic
+      const attemptTopic = mode === 'ticket' ? `ticket-${ticketId}` : mode === 'mistakes' ? 'mistakes' : topic
 
-      const summary = { correctCount, wrongCount, totalQuestions, passed, topic: attemptTopic, mode }
+      const wrongQuestionIds = statuses
+        .map((s, i) => (s === 'wrong' ? sessionQuestions[i]?.id : null))
+        .filter((id) => id != null)
+      const correctQuestionIds = statuses
+        .map((s, i) => (s === 'completed' ? sessionQuestions[i]?.id : null))
+        .filter((id) => id != null)
+
+      const summary = {
+        correctCount,
+        wrongCount,
+        totalQuestions,
+        passed,
+        topic: attemptTopic,
+        mode,
+        wrongQuestionIds,
+        correctQuestionIds,
+      }
       setResult(summary)
       setFinished(true)
+      if (mode === 'exam') exitFullscreen()
 
       if (user) {
         saveAttempt(user.uid, summary).catch(() => {})
       }
     },
-    [mode, topic, ticketId, user],
+    [mode, topic, ticketId, user, sessionQuestions],
   )
 
-  const timer = useCountdown(EXAM_DURATION_SECONDS, {
+  const hasTimeLimit = mode === 'exam' || (mode === 'practice' && durationMinutes > 0)
+  const durationSeconds = mode === 'exam' ? EXAM_DURATION_SECONDS : durationMinutes * 60
+
+  const timer = useCountdown(durationSeconds || EXAM_DURATION_SECONDS, {
     autoStart: false,
     onExpire: () => finishSession(stepStatuses),
   })
 
   useEffect(() => {
-    if (mode === 'exam' && sessionQuestions.length > 0 && !finished) {
-      timer.reset(EXAM_DURATION_SECONDS)
+    if (hasTimeLimit && sessionQuestions.length > 0 && !finished) {
+      timer.reset(durationSeconds)
       timer.start()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, sessionQuestions.length])
+  }, [hasTimeLimit, sessionQuestions.length])
 
   const currentQuestion = sessionQuestions[currentIndex]
 
@@ -118,10 +158,15 @@ export function useQuizEngine({ topic, mode, ticketId }) {
       next[currentIndex] = option.is_correct ? 'completed' : 'wrong'
       setStepStatuses(next)
 
+      const wrongSoFar = next.filter((s) => s === 'wrong').length
+      const examFailed = mode === 'exam' && wrongSoFar > EXAM_MAX_MISTAKES
+
       setTimeout(() => {
         const nextIndex = currentIndex + 1
-        if (nextIndex >= sessionQuestions.length) {
-          if (mode === 'exam') timer.stop()
+        const isLastQuestion = nextIndex >= sessionQuestions.length
+
+        if (examFailed || isLastQuestion) {
+          if (hasTimeLimit) timer.stop()
           finishSession(next)
         } else {
           setCurrentIndex(nextIndex)
@@ -137,6 +182,7 @@ export function useQuizEngine({ topic, mode, ticketId }) {
       stepStatuses,
       sessionQuestions.length,
       mode,
+      hasTimeLimit,
       finishSession,
       timer,
     ],
@@ -162,5 +208,6 @@ export function useQuizEngine({ topic, mode, ticketId }) {
     handleAnswer,
     timeFormatted: timer.formatted,
     isExam: mode === 'exam',
+    hasTimeLimit,
   }
 }

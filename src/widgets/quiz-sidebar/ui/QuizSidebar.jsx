@@ -4,9 +4,9 @@ import { useMediaQuery } from '@mantine/hooks'
 function StepBox({ index, isCurrent, status }) {
   const label = index + 1 < 10 ? `0${index + 1}` : `${index + 1}`
 
-  let colors = { bg: 'var(--mantine-color-dark-6)', border: 'var(--mantine-color-dark-4)', text: 'var(--mantine-color-dark-2)' }
+  let colors = { bg: 'var(--bg-card-hover)', border: 'var(--border)', text: 'var(--text-secondary)' }
   if (isCurrent) {
-    colors = { bg: 'var(--mantine-color-dark-6)', border: 'var(--mantine-color-brand-6)', text: 'var(--mantine-color-white)' }
+    colors = { bg: 'var(--bg-card-hover)', border: 'var(--mantine-color-brand-6)', text: 'var(--text-primary)' }
   }
   if (status === 'completed') {
     colors = { bg: 'var(--mantine-color-success-light)', border: 'var(--mantine-color-success-6)', text: 'var(--mantine-color-success-6)' }
@@ -73,8 +73,8 @@ export function QuizSidebar({ totalSteps, currentIndex, stepStatuses }) {
           display: 'flex',
           alignItems: 'center',
           gap: 16,
-          background: 'var(--mantine-color-dark-7)',
-          borderBottom: '1px solid var(--mantine-color-dark-4)',
+          background: 'var(--bg-elevated)',
+          borderBottom: '1px solid var(--border)',
         }}
       >
         <RingProgress
@@ -102,8 +102,8 @@ export function QuizSidebar({ totalSteps, currentIndex, stepStatuses }) {
         flexShrink: 0,
         height: 'calc(100vh - 64px)',
         overflowY: 'auto',
-        background: 'var(--mantine-color-dark-7)',
-        borderRight: '1px solid var(--mantine-color-dark-4)',
+        background: 'var(--bg-elevated)',
+        borderRight: '1px solid var(--border)',
       }}
       p={22}
     >
@@ -117,8 +117,8 @@ export function QuizSidebar({ totalSteps, currentIndex, stepStatuses }) {
         mt="auto"
         p={16}
         style={{
-          background: 'var(--mantine-color-dark-6)',
-          border: '1px solid var(--mantine-color-dark-4)',
+          background: 'var(--bg-card-hover)',
+          border: '1px solid var(--border)',
           borderRadius: 'var(--mantine-radius-md)',
         }}
       >

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { Container, Stack, Title, Text, SimpleGrid, Skeleton, Card, Group } from '@mantine/core'
 import { IconTicket } from '@tabler/icons-react'
 import { CategoriesNav } from '../../../widgets/sidebar'
@@ -7,10 +6,12 @@ import { fetchQuestions } from '../../../entities/question'
 import { groupByTicket } from '../../../entities/ticket'
 import { fetchAllLatestAttempts } from '../../../entities/quiz-attempt'
 import { useAuth } from '../../../entities/user'
+import { useQuizStart } from '../../../widgets/quiz-start'
 import { Badge } from '../../../shared/ui/Badge/Badge'
 
 export function TicketsPage() {
   const { user } = useAuth()
+  const openQuizStart = useQuizStart()
   const [tickets, setTickets] = useState([])
   const [attempts, setAttempts] = useState({})
   const [loading, setLoading] = useState(true)
@@ -48,7 +49,7 @@ export function TicketsPage() {
         <Stack gap={4} mb="xl">
           <Title order={1}>Biletlar</Title>
           <Text c="dimmed">
-            Rasmiy imtihon formatidagi {tickets.length || ''} ta bilet — har birida aynan 10 ta savol.
+            Rasmiy imtihon formatidagi {tickets.length || ''} ta bilet — har birida aynan 20 ta savol.
           </Text>
         </Stack>
 
@@ -69,10 +70,12 @@ export function TicketsPage() {
               return (
                 <Card
                   key={ticketId}
-                  component={Link}
-                  to={`/quiz?ticket=${ticketId}`}
+                  component="button"
+                  type="button"
+                  onClick={() => openQuizStart({ ticketId })}
                   className="glass-card category-card"
                   padding="md"
+                  style={{ width: '100%', textAlign: 'left', font: 'inherit', color: 'inherit', cursor: 'pointer' }}
                 >
                   <Stack gap={6} align="center" ta="center">
                     <IconTicket size={22} color="var(--mantine-color-brand-5)" />

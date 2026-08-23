@@ -4,6 +4,7 @@ import { CategoriesPage } from '../../pages/categories'
 import { QuizPage } from '../../pages/quiz'
 import { RoadSignsPage } from '../../pages/road-signs'
 import { TicketsPage } from '../../pages/tickets'
+import { StatisticsPage } from '../../pages/statistics'
 import { NotFoundPage } from '../../pages/not-found'
 import { ProtectedRoute } from './ProtectedRoute'
 import { ROUTES } from '../../shared/config/routes'
@@ -41,6 +42,14 @@ export function AppRouter() {
         element={
           <ProtectedRoute>
             <TicketsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.STATISTICS}
+        element={
+          <ProtectedRoute>
+            <StatisticsPage />
           </ProtectedRoute>
         }
       />

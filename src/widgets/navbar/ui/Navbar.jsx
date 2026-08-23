@@ -5,6 +5,7 @@ import { IconChevronDown, IconLogout, IconList } from '@tabler/icons-react'
 import { auth } from '../../../shared/api/firebase'
 import { useAuth } from '../../../entities/user'
 import { Button } from '../../../shared/ui/Button/Button'
+import { ThemeToggle } from '../../../shared/ui/ThemeToggle/ThemeToggle'
 import { ROUTES } from '../../../shared/config/routes'
 
 export function Navbar({ onOpenModal }) {
@@ -29,10 +30,10 @@ export function Navbar({ onOpenModal }) {
       h={72}
       style={{
         zIndex: 1000,
-        background: 'rgba(10, 12, 18, 0.75)',
+        background: 'var(--bg-overlay)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid var(--mantine-color-dark-4)',
+        borderBottom: '1px solid var(--border)',
       }}
     >
       <Group h="100%" justify="space-between" className="container">
@@ -56,49 +57,52 @@ export function Navbar({ onOpenModal }) {
           da
         </Text>
 
-        {user ? (
-          <Menu shadow="md" width={190} position="bottom-end" withArrow offset={10}>
-            <Menu.Target>
-              <UnstyledButton
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  padding: '6px 14px 6px 6px',
-                  borderRadius: 999,
-                  background: 'var(--mantine-color-dark-6)',
-                  border: '1px solid var(--mantine-color-dark-4)',
-                }}
-              >
-                <Avatar
-                  radius="xl"
-                  size={30}
-                  variant="gradient"
-                  gradient={{ from: 'brand.6', to: 'accent.5', deg: 135 }}
-                  color="white"
+        <Group gap={12}>
+          <ThemeToggle />
+          {user ? (
+            <Menu shadow="md" width={190} position="bottom-end" withArrow offset={10}>
+              <Menu.Target>
+                <UnstyledButton
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '6px 14px 6px 6px',
+                    borderRadius: 999,
+                    background: 'var(--bg-card-hover)',
+                    border: '1px solid var(--border)',
+                  }}
                 >
-                  {initial}
-                </Avatar>
-                <Text size="sm" fw={600} maw={140} truncate="end">
-                  {displayName}
-                </Text>
-                <IconChevronDown size={14} style={{ opacity: 0.6 }} />
-              </UnstyledButton>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item component={Link} to={ROUTES.CATEGORIES} leftSection={<IconList size={16} />}>
-                Mavzular
-              </Menu.Item>
-              <Menu.Item color="danger" leftSection={<IconLogout size={16} />} onClick={handleLogout}>
-                Chiqish
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        ) : (
-          <Button variant="primary" onClick={onOpenModal}>
-            Boshlash
-          </Button>
-        )}
+                  <Avatar
+                    radius="xl"
+                    size={30}
+                    variant="gradient"
+                    gradient={{ from: 'brand.6', to: 'accent.5', deg: 135 }}
+                    color="white"
+                  >
+                    {initial}
+                  </Avatar>
+                  <Text size="sm" fw={600} maw={140} truncate="end">
+                    {displayName}
+                  </Text>
+                  <IconChevronDown size={14} style={{ opacity: 0.6 }} />
+                </UnstyledButton>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item component={Link} to={ROUTES.CATEGORIES} leftSection={<IconList size={16} />}>
+                  Mavzular
+                </Menu.Item>
+                <Menu.Item color="danger" leftSection={<IconLogout size={16} />} onClick={handleLogout}>
+                  Chiqish
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          ) : (
+            <Button variant="primary" onClick={onOpenModal}>
+              Boshlash
+            </Button>
+          )}
+        </Group>
       </Group>
     </Box>
   )

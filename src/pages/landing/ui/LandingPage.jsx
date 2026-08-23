@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Container, Stack, Group, Title, Text, SimpleGrid, Box } from '@mantine/core'
+import { Container, Stack, Group, Title, Text, SimpleGrid, Box, Accordion } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { Navbar } from '../../../widgets/navbar'
 import { LoginModal } from '../../../widgets/login-modal'
@@ -11,7 +11,7 @@ import { useAuth } from '../../../entities/user'
 import { ROUTES } from '../../../shared/config/routes'
 
 const STATS = [
-  { value: '600+', label: 'Rasmiy savollar' },
+  { value: '1200+', label: 'Rasmiy savollar' },
   { value: '93', label: "Yo'l belgilari" },
   { value: '24/7', label: 'Istalgan vaqtda mashq' },
 ]
@@ -20,7 +20,7 @@ const FEATURES = [
   {
     icon: '🎯',
     title: 'Real imtihon formati',
-    text: "20 ta savol, 20 daqiqa, maksimal 2 ta xato — DAN imtihoniga aynan o'xshash sharoit.",
+    text: "20 ta savol, 25 daqiqa, maksimal 2 ta xato — DAN imtihoniga aynan o'xshash sharoit.",
   },
   {
     icon: '🖼️',
@@ -31,6 +31,38 @@ const FEATURES = [
     icon: '📊',
     title: 'Progress kuzatuvi',
     text: "Har bir urinishingiz saqlanadi — qayerda ko'proq mashq qilish kerakligini bilib boring.",
+  },
+]
+
+const FAQS = [
+  {
+    question: 'Savollar bazasi rasmiymi?',
+    answer:
+      "Ha, saytdagi 1200+ savol O'zbekiston DAN (Davlat Avtomobil Nazorati) rasmiy test bazasiga asoslangan va 2026-yilgi o'zgarishlarga moslab yangilangan.",
+  },
+  {
+    question: 'Imtihon rejimi qanday ishlaydi?',
+    answer:
+      "Rasmiy imtihon rejimida 20 ta tasodifiy savol, 25 daqiqa vaqt beriladi. 2 tadan ortiq xato qilinsa (ya'ni 3-xatoda), real imtihondagi kabi test darhol tugaydi. Erkin mashg'ulot rejimida esa vaqt va xatolar soni cheklanmagan — xohlagancha mashq qilishingiz mumkin.",
+  },
+  {
+    question: 'Foydalanish bepulmi?',
+    answer: "Ha, hozircha barcha savollar, biletlar va yo'l belgilari bo'limi to'liq bepul.",
+  },
+  {
+    question: "Natijalarim saqlanadimi?",
+    answer:
+      "Ha, ro'yxatdan o'tgan har bir foydalanuvchining urinishlari profiliga saqlanadi va har bir mavzu bo'yicha eng so'nggi natijani mavzular sahifasida ko'rish mumkin.",
+  },
+  {
+    question: "Telefon yoki planshetda ishlaydimi?",
+    answer:
+      "Ha, sayt barcha qurilmalarga (telefon, planshet, kompyuter) moslashgan va brauzer orqali qo'shimcha ilova o'rnatmasdan ishlatilaveradi.",
+  },
+  {
+    question: "Ro'yxatdan o'tish shartmi?",
+    answer:
+      "Natijalaringizni saqlash va progressni kuzatish uchun ro'yxatdan o'tish tavsiya etiladi, bu Google hisobingiz orqali bir necha soniyada amalga oshadi.",
   },
 ]
 
@@ -123,6 +155,26 @@ export function LandingPage() {
                 </Stack>
               ))}
             </SimpleGrid>
+          </Container>
+        </Box>
+
+        <Box component="section" py={60}>
+          <Container size={720}>
+            <Title order={2} ta="center" mb="xl">
+              Ko'p so'raladigan savollar
+            </Title>
+            <Accordion variant="separated" radius="lg">
+              {FAQS.map((faq) => (
+                <Accordion.Item key={faq.question} value={faq.question} className="glass-card">
+                  <Accordion.Control>
+                    <Text fw={600}>{faq.question}</Text>
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    <Text c="dimmed">{faq.answer}</Text>
+                  </Accordion.Panel>
+                </Accordion.Item>
+              ))}
+            </Accordion>
           </Container>
         </Box>
 

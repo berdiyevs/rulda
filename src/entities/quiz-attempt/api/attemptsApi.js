@@ -33,3 +33,19 @@ export async function fetchAllLatestAttempts(uid, topics) {
   const results = await Promise.all(topics.map((topic) => fetchLatestAttempt(uid, topic)))
   return Object.fromEntries(topics.map((topic, i) => [topic, results[i]]))
 }
+
+export async function fetchAllAttempts(uid) {
+  const ref = collection(db, 'users', uid, 'attempts')
+  const snap = await getDocs(ref)
+
+  return snap.docs
+    .map((doc) => {
+      const data = doc.data()
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.() ?? null,
+      }
+    })
+    .sort((a, b) => (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0))
+}
