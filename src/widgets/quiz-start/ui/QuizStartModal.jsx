@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Modal, Stack, Title, Text, List, ThemeIcon, Group, SegmentedControl, NumberInput } from '@mantine/core'
+import { Modal, Stack, Title, Text, List, ThemeIcon, Group, SegmentedControl, NumberInput, Center, Box } from '@mantine/core'
 import {
   IconCircleCheck,
   IconClock,
@@ -8,6 +8,8 @@ import {
   IconDeviceFloppy,
   IconInfinity,
   IconRefresh,
+  IconCertificate,
+  IconMaximize,
 } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
 import { Badge } from '../../../shared/ui/Badge/Badge'
@@ -39,6 +41,7 @@ function QuizStartModalBody({ config, onClose }) {
 
   const isExam = mode === 'exam'
   const isPractice = mode === 'practice'
+  const isLockedExam = !isTicket && !isMistakes && config.mode === 'exam'
 
   const info = isTicket
     ? { title: `Bilet ${config.ticketId}`, desc: "Rasmiy imtihon formatidagi 20 ta savoldan iborat aniq to'plam." }
@@ -68,6 +71,64 @@ function QuizStartModalBody({ config, onClose }) {
     if (isExam) requestFullscreen()
     onClose()
     navigate(`/quiz?${params.toString()}`)
+  }
+
+  if (isLockedExam) {
+    return (
+      <Stack gap="md">
+        <Center>
+          <ThemeIcon
+            size={64}
+            radius="xl"
+            variant="gradient"
+            gradient={{ from: 'warning.6', to: 'danger.5', deg: 135 }}
+          >
+            <IconCertificate size={32} />
+          </ThemeIcon>
+        </Center>
+
+        <Stack gap={6} ta="center">
+          <Badge variant="warning">Qat'iy imtihon rejimi</Badge>
+          <Title order={2}>Rasmiy imtihonga tayyormisiz?</Title>
+          <Text c="dimmed" size="sm">
+            Bu yerda faqat rasmiy DAN imtihon formati mavjud — vaqt va xatolar soni real imtihondagidek
+            qat'iy nazorat qilinadi.
+          </Text>
+        </Stack>
+
+        <Box
+          p="md"
+          style={{
+            borderRadius: 'var(--r-md)',
+            border: '1px solid var(--mantine-color-warning-light)',
+            background: 'var(--mantine-color-warning-light)',
+          }}
+        >
+          <List spacing={10} size="sm" center icon={<RuleIcon color="brand" icon={IconCircleCheck} />}>
+            <List.Item>20 ta tasodifiy savol</List.Item>
+            <List.Item icon={<RuleIcon color="brand" icon={IconClock} />}>25 daqiqa vaqt</List.Item>
+            <List.Item icon={<RuleIcon color="danger" icon={IconAlertTriangle} />}>
+              3-xato qilinishi bilan test darhol tugaydi (2 tagacha xatoga ruxsat)
+            </List.Item>
+            <List.Item icon={<RuleIcon color="brand" icon={IconMaximize} />}>
+              To'liq ekran rejimida boshlanadi
+            </List.Item>
+            <List.Item icon={<RuleIcon color="success" icon={IconDeviceFloppy} />}>
+              Natija profilingizga saqlanadi
+            </List.Item>
+          </List>
+        </Box>
+
+        <Group grow mt="sm">
+          <Button variant="secondary" onClick={onClose}>
+            Orqaga
+          </Button>
+          <Button variant="danger" size="lg" onClick={handleStart}>
+            Imtihonni boshlash
+          </Button>
+        </Group>
+      </Stack>
+    )
   }
 
   return (
