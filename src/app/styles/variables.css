@@ -49,6 +49,7 @@
   /* Layout */
   --container-max: 1180px;
   --nav-height: 72px;
+  --bottom-nav-height: 64px;
 
   /* Fonts */
   --font-display: 'Manrope', 'Inter', sans-serif;

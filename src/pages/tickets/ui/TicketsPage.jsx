@@ -42,7 +42,7 @@ export function TicketsPage() {
   }, [user])
 
   return (
-    <div className="page-shell">
+    <div className="page-shell has-tabbar">
       <CategoriesNav />
 
       <Container size={1180} py="xl">

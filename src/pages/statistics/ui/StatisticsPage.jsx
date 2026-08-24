@@ -118,7 +118,7 @@ export function StatisticsPage() {
   const openQuizStart = useQuizStart()
 
   return (
-    <div className="page-shell">
+    <div className="page-shell has-tabbar">
       <CategoriesNav />
 
       <Container size={1180} py="xl">
