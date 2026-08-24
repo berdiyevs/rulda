@@ -124,7 +124,7 @@ function QuizStartModalBody({ config, onClose }) {
             Orqaga
           </Button>
           <Button variant="danger" size="lg" onClick={handleStart}>
-            Imtihonni boshlash
+            Boshlash
           </Button>
         </Group>
       </Stack>
