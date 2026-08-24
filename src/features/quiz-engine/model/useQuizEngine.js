@@ -97,7 +97,7 @@ export function useQuizEngine({
 
       const correctCount = statuses.filter((s) => s === 'completed').length
       const wrongCount = statuses.filter((s) => s === 'wrong').length
-      const totalQuestions = correctCount + wrongCount
+      const totalQuestions = sessionQuestions.length
       const passed = mode === 'exam' ? wrongCount <= EXAM_MAX_MISTAKES : correctCount / totalQuestions >= 0.7
       const attemptTopic = mode === 'ticket' ? `ticket-${ticketId}` : mode === 'mistakes' ? 'mistakes' : topic
 

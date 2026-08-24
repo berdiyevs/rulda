@@ -10,6 +10,8 @@ export function QuizResults({ result, onRetry }) {
 
   const { correctCount, wrongCount, totalQuestions, passed, mode } = result
   const percent = Math.round((correctCount / totalQuestions) * 100)
+  const answeredCount = correctCount + wrongCount
+  const stoppedEarly = answeredCount < totalQuestions
 
   return (
     <Card className="glass-card slide-up" padding={40} w="100%" maw={480} style={{ textAlign: 'center' }}>
@@ -69,9 +71,16 @@ export function QuizResults({ result, onRetry }) {
           </Stack>
         </SimpleGrid>
 
+        {stoppedEarly && (
+          <Text c="dimmed" fz="0.8rem">
+            Ruxsat etilgan xatolar sonidan oshgani uchun test {answeredCount}/{totalQuestions} savolda avtomatik
+            tugadi.
+          </Text>
+        )}
+
         <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="sm" w="100%">
           <Button variant="secondary" as={Link} to={ROUTES.CATEGORIES} fullWidth>
-            Mavzularga qaytish
+            Bosh sahifa
           </Button>
           <Button variant="primary" onClick={onRetry} fullWidth>
             Qayta urinish

@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { Card, Grid } from '@mantine/core'
+import { IconEye } from '@tabler/icons-react'
 import './QuestionCard.css'
 
-export function QuestionCard({ question, selectedOption, isAnswered, correctAnswer, onAnswer }) {
+export function QuestionCard({ question, index, total, selectedOption, isAnswered, correctAnswer, onAnswer }) {
   const [imageError, setImageError] = useState(false)
 
   if (!question) return null
 
   const hasImage = Boolean(question.image_url) && !imageError
+  const showCounter = Number.isInteger(index) && Number.isInteger(total) && total > 0
 
   return (
     <Card
-      className="question-card-shell fade-in"
+      className="question-card-shell slide-up"
       padding={0}
       w="100%"
       maw={920}
@@ -19,17 +21,24 @@ export function QuestionCard({ question, selectedOption, isAnswered, correctAnsw
     >
       <Grid gutter={0}>
         {hasImage && (
-          <Grid.Col span={{ base: 12, sm: 5 }} className="question-image">
-            <img
-              src={question.image_url}
-              alt="Yo'l belgisi"
-              loading="lazy"
-              onError={() => setImageError(true)}
-            />
+          <Grid.Col span={{ base: 12, sm: 5 }} className="question-image-col">
+            <div className="question-image">
+              <img
+                src={question.image_url}
+                alt="Yo'l belgisi"
+                loading="lazy"
+                onError={() => setImageError(true)}
+              />
+            </div>
+            <div className="question-image-caption">
+              <IconEye size={13} stroke={2} />
+              <span>Rasmga diqqat bilan e'tibor bering</span>
+            </div>
           </Grid.Col>
         )}
 
         <Grid.Col span={{ base: 12, sm: hasImage ? 7 : 12 }} className="question-body">
+          {showCounter && <span className="question-counter">Savol {index + 1} / {total}</span>}
           <p className="question-text">{question.question}</p>
 
           <div className="options-list">

@@ -11,7 +11,7 @@ const TOPIC_LABELS = {
   theory: 'Nazariy savollar',
 }
 
-export function QuizNav({ mode, topic, ticketId, timeFormatted, showTimer }) {
+export function QuizNav({ mode, topic, ticketId, timeFormatted, showTimer, currentIndex, totalSteps }) {
   const navigate = useNavigate()
   const [confirmOpen, { open: openConfirm, close: closeConfirm }] = useDisclosure(false)
 
@@ -20,6 +20,10 @@ export function QuizNav({ mode, topic, ticketId, timeFormatted, showTimer }) {
     navigate(ROUTES.CATEGORIES)
   }
 
+  const hasProgress = Number.isInteger(currentIndex) && totalSteps > 0
+  const stepNumber = hasProgress ? Math.min(currentIndex + 1, totalSteps) : 0
+  const progressPercent = hasProgress ? Math.round((currentIndex / totalSteps) * 100) : 0
+
   return (
     <>
       <Box
@@ -27,6 +31,7 @@ export function QuizNav({ mode, topic, ticketId, timeFormatted, showTimer }) {
         h={64}
         px={24}
         style={{
+          position: 'relative',
           display: 'flex',
           alignItems: 'center',
           gap: 20,
@@ -47,13 +52,33 @@ export function QuizNav({ mode, topic, ticketId, timeFormatted, showTimer }) {
           </Text>
         </Text>
 
-        <Text c="dimmed" fz="0.82rem" tt="uppercase" fw={600} style={{ letterSpacing: '0.06em' }}>
+        <Text c="dimmed" fz="0.82rem" tt="uppercase" fw={600} style={{ letterSpacing: '0.06em' }} visibleFrom="sm">
           {mode === 'ticket'
             ? `Bilet ${ticketId} · Imtihon formati`
             : mode === 'mistakes'
               ? 'Xatolarim ustida ishlash'
               : `${mode === 'exam' ? 'Imtihon rejimi' : "Mashg'ulot"} · ${TOPIC_LABELS[topic] || topic}`}
         </Text>
+
+        {hasProgress && (
+          <Box
+            visibleFrom="xs"
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              textAlign: 'center',
+            }}
+          >
+            <Text fz="0.92rem" fw={800} style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {stepNumber} / {totalSteps}
+            </Text>
+            <Text fz="0.66rem" c="dimmed" fw={600}>
+              {progressPercent}% bajarildi
+            </Text>
+          </Box>
+        )}
 
         <Group ml="auto" gap={10}>
           {showTimer && (

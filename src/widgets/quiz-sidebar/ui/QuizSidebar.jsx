@@ -1,12 +1,13 @@
 import { Box, SimpleGrid, Stack, Group, Text, RingProgress, Center } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
+import { IconCheck, IconX } from '@tabler/icons-react'
 
 function StepBox({ index, isCurrent, status }) {
   const label = index + 1 < 10 ? `0${index + 1}` : `${index + 1}`
 
-  let colors = { bg: 'var(--bg-card-hover)', border: 'var(--border)', text: 'var(--text-secondary)' }
+  let colors = { bg: 'var(--bg-card-hover)', border: 'var(--border-strong)', text: 'var(--text-secondary)' }
   if (isCurrent) {
-    colors = { bg: 'var(--bg-card-hover)', border: 'var(--mantine-color-brand-6)', text: 'var(--text-primary)' }
+    colors = { bg: 'var(--primary-soft)', border: 'var(--mantine-color-brand-6)', text: 'var(--text-primary)' }
   }
   if (status === 'completed') {
     colors = { bg: 'var(--mantine-color-success-light)', border: 'var(--mantine-color-success-6)', text: 'var(--mantine-color-success-6)' }
@@ -19,6 +20,7 @@ function StepBox({ index, isCurrent, status }) {
     <Center
       style={{
         aspectRatio: '1',
+        gap: 3,
         borderRadius: 'var(--mantine-radius-sm)',
         fontSize: 12,
         fontWeight: 700,
@@ -29,6 +31,8 @@ function StepBox({ index, isCurrent, status }) {
       }}
     >
       {label}
+      {status === 'completed' && <IconCheck size={11} stroke={3} />}
+      {status === 'wrong' && <IconX size={11} stroke={3} />}
     </Center>
   )
 }
@@ -38,7 +42,7 @@ function useQuizProgress({ totalSteps, stepStatuses }) {
   const wrongCount = stepStatuses.filter((s) => s === 'wrong').length
   const answeredCount = correctCount + wrongCount
   const progressPercent = totalSteps ? Math.round((answeredCount / totalSteps) * 100) : 0
-  return { correctCount, wrongCount, progressPercent }
+  return { correctCount, wrongCount, answeredCount, progressPercent }
 }
 
 function LiveStats({ correctCount, wrongCount }) {
@@ -57,6 +61,28 @@ function LiveStats({ correctCount, wrongCount }) {
         </Text>
       </Group>
     </Group>
+  )
+}
+
+const LEGEND_ITEMS = [
+  { color: 'var(--mantine-color-success-6)', label: "To'g'ri javob" },
+  { color: 'var(--mantine-color-danger-6)', label: "Noto'g'ri javob" },
+  { color: 'var(--mantine-color-brand-6)', label: 'Joriy savol' },
+  { color: 'var(--text-muted)', label: 'Javob berilmagan' },
+]
+
+function Legend() {
+  return (
+    <Stack gap={7}>
+      {LEGEND_ITEMS.map((item) => (
+        <Group key={item.label} gap={7} wrap="nowrap">
+          <Box w={7} h={7} style={{ borderRadius: '50%', background: item.color, flexShrink: 0 }} />
+          <Text fz="0.72rem" c="dimmed">
+            {item.label}
+          </Text>
+        </Group>
+      ))}
+    </Stack>
   )
 }
 
@@ -96,51 +122,28 @@ export function QuizSidebar({ totalSteps, currentIndex, stepStatuses }) {
   return (
     <Stack
       component="aside"
-      gap={24}
+      gap={18}
       w={260}
       style={{
         flexShrink: 0,
-        height: 'calc(100vh - 64px)',
+        height: '100%',
         overflowY: 'auto',
         background: 'var(--bg-elevated)',
         borderRight: '1px solid var(--border)',
       }}
       p={22}
     >
+      <Text c="dimmed" fz="0.72rem" tt="uppercase" fw={700} style={{ letterSpacing: '0.08em' }}>
+        Savollar
+      </Text>
+
       <SimpleGrid cols={4} spacing={10}>
         {Array.from({ length: totalSteps }, (_, i) => (
           <StepBox key={i} index={i} isCurrent={i === currentIndex} status={stepStatuses[i]} />
         ))}
       </SimpleGrid>
 
-      <Box
-        mt="auto"
-        p={16}
-        style={{
-          background: 'var(--bg-card-hover)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--mantine-radius-md)',
-        }}
-      >
-        <Text c="dimmed" fz="0.72rem" tt="uppercase" fw={700} mb={10} style={{ letterSpacing: '0.08em' }}>
-          Jarayon
-        </Text>
-        <Center>
-          <RingProgress
-            size={110}
-            thickness={9}
-            roundCaps
-            sections={[{ value: progressPercent, color: 'brand' }]}
-            label={
-              <Text size={18} fw={700} ta="center">
-                {progressPercent}%
-              </Text>
-            }
-          />
-        </Center>
-      </Box>
-
-      <LiveStats correctCount={correctCount} wrongCount={wrongCount} />
+      <Legend />
     </Stack>
   )
 }
