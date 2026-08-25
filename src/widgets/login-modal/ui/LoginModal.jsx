@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Modal, Tabs, TextInput, PasswordInput, Stack, Text, Divider } from '@mantine/core'
+import { Modal, Tabs, TextInput, PasswordInput, Stack, Text, Divider, Anchor } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconUser, IconMail, IconLock } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
 import { useAuthActions } from '../../../features/auth'
+import { ROUTES } from '../../../shared/config/routes'
 
 export function LoginModal({ isOpen, onClose }) {
   const [tab, setTab] = useState('login')
@@ -51,9 +52,17 @@ export function LoginModal({ isOpen, onClose }) {
   }
 
   return (
-    <Modal opened={isOpen} onClose={handleClose} size={400} centered withCloseButton>
-      <Stack gap="md" align="center" ta="center">
-        <Text fw={800} fz={22} style={{ fontFamily: 'Manrope, Inter, sans-serif' }}>
+    <Modal
+      opened={isOpen}
+      onClose={handleClose}
+      size={400}
+      centered
+      withCloseButton
+      zIndex={10000}
+      overlayProps={{ zIndex: 10000 }}
+    >
+      <Stack gap="xs" align="center" ta="center">
+        <Text fw={800} fz={20} style={{ fontFamily: 'Manrope, Inter, sans-serif' }}>
           <Text span inherit variant="gradient" gradient={{ from: 'brand.6', to: 'accent.5', deg: 135 }}>
             Rul
           </Text>
@@ -74,7 +83,7 @@ export function LoginModal({ isOpen, onClose }) {
         </Text>
 
         <form onSubmit={form.onSubmit(handleSubmit)} style={{ width: '100%' }}>
-          <Stack gap="sm">
+          <Stack gap="xs">
             {tab === 'signup' && (
               <TextInput
                 placeholder="Ismingiz"
@@ -117,6 +126,18 @@ export function LoginModal({ isOpen, onClose }) {
           </svg>
           Google bilan davom etish
         </Button>
+
+        <Text c="dimmed" fz="0.7rem" lh={1.5}>
+          Davom etish orqali siz{' '}
+          <Anchor href={ROUTES.TERMS} target="_blank" rel="noopener noreferrer" fz="0.7rem">
+            Foydalanish shartlari
+          </Anchor>{' '}
+          va{' '}
+          <Anchor href={ROUTES.PRIVACY} target="_blank" rel="noopener noreferrer" fz="0.7rem">
+            Maxfiylik siyosati
+          </Anchor>
+          ni qabul qilgan bo'lasiz.
+        </Text>
       </Stack>
     </Modal>
   )

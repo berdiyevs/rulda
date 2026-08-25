@@ -90,7 +90,7 @@ export function Navbar({ onOpenModal }) {
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Item component={Link} to={ROUTES.CATEGORIES} leftSection={<IconList size={16} />}>
-                  Mavzular
+                  Boshlash
                 </Menu.Item>
                 <Menu.Item color="danger" leftSection={<IconLogout size={16} />} onClick={handleLogout}>
                   Chiqish

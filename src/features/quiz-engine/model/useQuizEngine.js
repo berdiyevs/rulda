@@ -40,6 +40,8 @@ export function useQuizEngine({
   questionIds = EMPTY_QUESTION_IDS,
   questionCount = PRACTICE_SESSION_SIZE,
   durationMinutes = 0,
+  maxMistakes = null,
+  feedbackMode = 'instant',
 }) {
   const { user } = useAuth()
   const [sourceQuestions, setSourceQuestions] = useState([])
@@ -98,7 +100,12 @@ export function useQuizEngine({
       const correctCount = statuses.filter((s) => s === 'completed').length
       const wrongCount = statuses.filter((s) => s === 'wrong').length
       const totalQuestions = sessionQuestions.length
-      const passed = mode === 'exam' ? wrongCount <= EXAM_MAX_MISTAKES : correctCount / totalQuestions >= 0.7
+      const passed =
+        mode === 'exam'
+          ? wrongCount <= EXAM_MAX_MISTAKES
+          : mode !== 'mistakes' && maxMistakes != null
+            ? wrongCount <= maxMistakes
+            : correctCount / totalQuestions >= 0.7
       const attemptTopic = mode === 'ticket' ? `ticket-${ticketId}` : mode === 'mistakes' ? 'mistakes' : topic
 
       const wrongQuestionIds = statuses
@@ -126,10 +133,10 @@ export function useQuizEngine({
         saveAttempt(user.uid, summary).catch(() => {})
       }
     },
-    [mode, topic, ticketId, user, sessionQuestions],
+    [mode, topic, ticketId, user, sessionQuestions, maxMistakes],
   )
 
-  const hasTimeLimit = mode === 'exam' || (mode === 'practice' && durationMinutes > 0)
+  const hasTimeLimit = mode === 'exam' || ((mode === 'practice' || mode === 'ticket') && durationMinutes > 0)
   const durationSeconds = mode === 'exam' ? EXAM_DURATION_SECONDS : durationMinutes * 60
 
   const timer = useCountdown(durationSeconds || EXAM_DURATION_SECONDS, {
@@ -160,20 +167,24 @@ export function useQuizEngine({
 
       const wrongSoFar = next.filter((s) => s === 'wrong').length
       const examFailed = mode === 'exam' && wrongSoFar > EXAM_MAX_MISTAKES
+      const mistakesCapFailed = mode !== 'exam' && mode !== 'mistakes' && maxMistakes != null && wrongSoFar > maxMistakes
 
-      setTimeout(() => {
-        const nextIndex = currentIndex + 1
-        const isLastQuestion = nextIndex >= sessionQuestions.length
+      setTimeout(
+        () => {
+          const nextIndex = currentIndex + 1
+          const isLastQuestion = nextIndex >= sessionQuestions.length
 
-        if (examFailed || isLastQuestion) {
-          if (hasTimeLimit) timer.stop()
-          finishSession(next)
-        } else {
-          setCurrentIndex(nextIndex)
-          setSelectedOption(null)
-          setIsAnswered(false)
-        }
-      }, 700)
+          if (examFailed || mistakesCapFailed || isLastQuestion) {
+            if (hasTimeLimit) timer.stop()
+            finishSession(next)
+          } else {
+            setCurrentIndex(nextIndex)
+            setSelectedOption(null)
+            setIsAnswered(false)
+          }
+        },
+        feedbackMode === 'end' ? 350 : 700,
+      )
     },
     [
       isAnswered,
@@ -182,6 +193,8 @@ export function useQuizEngine({
       stepStatuses,
       sessionQuestions.length,
       mode,
+      maxMistakes,
+      feedbackMode,
       hasTimeLimit,
       finishSession,
       timer,

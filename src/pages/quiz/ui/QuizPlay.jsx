@@ -4,7 +4,17 @@ import { QuizResults } from '../../../widgets/quiz-results'
 import { QuestionCard } from '../../../entities/question'
 import { useQuizEngine } from '../../../features/quiz-engine'
 
-export function QuizPlay({ topic, mode, ticketId, questionIds, questionCount, durationMinutes, onRetry }) {
+export function QuizPlay({
+  topic,
+  mode,
+  ticketId,
+  questionIds,
+  questionCount,
+  durationMinutes,
+  maxMistakes,
+  feedbackMode = 'instant',
+  onRetry,
+}) {
   const {
     loading,
     error,
@@ -20,7 +30,13 @@ export function QuizPlay({ topic, mode, ticketId, questionIds, questionCount, du
     handleAnswer,
     timeFormatted,
     hasTimeLimit,
-  } = useQuizEngine({ topic, mode, ticketId, questionIds, questionCount, durationMinutes })
+  } = useQuizEngine({ topic, mode, ticketId, questionIds, questionCount, durationMinutes, maxMistakes, feedbackMode })
+
+  const revealAnswer = feedbackMode !== 'end'
+  const displayStatuses =
+    feedbackMode === 'end' && !finished
+      ? stepStatuses.map((s) => (s === 'idle' ? 'idle' : 'answered'))
+      : stepStatuses
 
   return (
     <Box
@@ -60,7 +76,7 @@ export function QuizPlay({ topic, mode, ticketId, questionIds, questionCount, du
       <Box style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
         <Flex h="100%" gap="lg" px={{ base: 20, sm: 28, lg: 40 }} py={{ base: 20, sm: 28 }} wrap="wrap">
           {!finished && (
-            <QuizSidebar totalSteps={totalSteps} currentIndex={currentIndex} stepStatuses={stepStatuses} />
+            <QuizSidebar totalSteps={totalSteps} currentIndex={currentIndex} stepStatuses={displayStatuses} />
           )}
 
           <Box
@@ -86,6 +102,7 @@ export function QuizPlay({ topic, mode, ticketId, questionIds, questionCount, du
                 selectedOption={selectedOption}
                 isAnswered={isAnswered}
                 correctAnswer={correctAnswer}
+                revealAnswer={revealAnswer}
                 onAnswer={handleAnswer}
               />
             )}

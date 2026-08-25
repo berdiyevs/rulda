@@ -13,6 +13,8 @@ export function QuizPage() {
   const idsParam = searchParams.get('ids')
   const countParam = searchParams.get('count')
   const durationParam = searchParams.get('duration')
+  const errorsParam = searchParams.get('errors')
+  const feedbackParam = searchParams.get('feedback')
 
   const ticketId = ticketParam ? Number(ticketParam) : null
   const topic = VALID_TOPICS.includes(topicParam) ? topicParam : 'all'
@@ -26,6 +28,8 @@ export function QuizPage() {
   )
   const questionCount = countParam ? Number(countParam) || 20 : 20
   const durationMinutes = durationParam ? Number(durationParam) || 0 : 0
+  const maxMistakes = errorsParam !== null && errorsParam !== '' ? Number(errorsParam) : null
+  const feedbackMode = feedbackParam === 'end' ? 'end' : 'instant'
 
   const [sessionKey, setSessionKey] = useState(0)
 
@@ -39,6 +43,8 @@ export function QuizPage() {
         questionIds={questionIds}
         questionCount={questionCount}
         durationMinutes={durationMinutes}
+        maxMistakes={maxMistakes}
+        feedbackMode={feedbackMode}
         onRetry={() => setSessionKey((k) => k + 1)}
       />
     </Box>

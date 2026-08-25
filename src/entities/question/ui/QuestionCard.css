@@ -141,6 +141,17 @@
   color: white;
 }
 
+.option-btn.is-selected {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.option-btn.is-selected .option-letter {
+  background: var(--primary);
+  color: white;
+}
+
 .option-btn.is-correct {
   border-color: var(--success);
   background: var(--success-soft);

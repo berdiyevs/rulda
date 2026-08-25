@@ -31,10 +31,10 @@ export function Footer() {
         </Text>
 
         <Group gap={22} justify="center" wrap="wrap">
-          <Anchor href="#" c="dimmed" fz="0.88rem">
+          <Anchor component={Link} to={ROUTES.TERMS} c="dimmed" fz="0.88rem">
             Foydalanish shartlari
           </Anchor>
-          <Anchor href="#" c="dimmed" fz="0.88rem">
+          <Anchor component={Link} to={ROUTES.PRIVACY} c="dimmed" fz="0.88rem">
             Maxfiylik siyosati
           </Anchor>
           <Anchor href="#" c="dimmed" fz="0.88rem">

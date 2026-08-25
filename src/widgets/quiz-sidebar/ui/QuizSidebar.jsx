@@ -9,6 +9,9 @@ function StepBox({ index, isCurrent, status }) {
   if (isCurrent) {
     colors = { bg: 'var(--primary-soft)', border: 'var(--mantine-color-brand-6)', text: 'var(--text-primary)' }
   }
+  if (status === 'answered') {
+    colors = { bg: 'var(--bg-card-hover)', border: 'var(--text-muted)', text: 'var(--text-secondary)' }
+  }
   if (status === 'completed') {
     colors = { bg: 'var(--mantine-color-success-light)', border: 'var(--mantine-color-success-6)', text: 'var(--mantine-color-success-6)' }
   }
@@ -33,6 +36,9 @@ function StepBox({ index, isCurrent, status }) {
       {label}
       {status === 'completed' && <IconCheck size={11} stroke={3} />}
       {status === 'wrong' && <IconX size={11} stroke={3} />}
+      {status === 'answered' && (
+        <Box w={5} h={5} style={{ borderRadius: '50%', background: 'var(--text-muted)' }} />
+      )}
     </Center>
   )
 }

@@ -3,7 +3,16 @@ import { Card, Grid } from '@mantine/core'
 import { IconEye } from '@tabler/icons-react'
 import './QuestionCard.css'
 
-export function QuestionCard({ question, index, total, selectedOption, isAnswered, correctAnswer, onAnswer }) {
+export function QuestionCard({
+  question,
+  index,
+  total,
+  selectedOption,
+  isAnswered,
+  correctAnswer,
+  revealAnswer = true,
+  onAnswer,
+}) {
   const [imageError, setImageError] = useState(false)
 
   if (!question) return null
@@ -45,10 +54,14 @@ export function QuestionCard({ question, index, total, selectedOption, isAnswere
             {question.options.map((option, i) => {
               const classNames = ['option-btn']
               if (isAnswered) {
-                if (selectedOption === option) {
-                  classNames.push(option.is_correct ? 'is-correct' : 'is-wrong')
-                } else if (!option.is_correct && correctAnswer === option) {
-                  classNames.push('is-correct')
+                if (revealAnswer) {
+                  if (selectedOption === option) {
+                    classNames.push(option.is_correct ? 'is-correct' : 'is-wrong')
+                  } else if (!option.is_correct && correctAnswer === option) {
+                    classNames.push('is-correct')
+                  }
+                } else if (selectedOption === option) {
+                  classNames.push('is-selected')
                 }
               }
 

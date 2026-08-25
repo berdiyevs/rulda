@@ -5,6 +5,8 @@ import { QuizPage } from '../../pages/quiz'
 import { RoadSignsPage } from '../../pages/road-signs'
 import { TicketsPage } from '../../pages/tickets'
 import { StatisticsPage } from '../../pages/statistics'
+import { TermsPage } from '../../pages/terms'
+import { PrivacyPage } from '../../pages/privacy'
 import { NotFoundPage } from '../../pages/not-found'
 import { ProtectedRoute } from './ProtectedRoute'
 import { ROUTES } from '../../shared/config/routes'
@@ -53,6 +55,8 @@ export function AppRouter() {
           </ProtectedRoute>
         }
       />
+      <Route path={ROUTES.TERMS} element={<TermsPage />} />
+      <Route path={ROUTES.PRIVACY} element={<PrivacyPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )

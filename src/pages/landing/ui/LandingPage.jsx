@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Container, Stack, Group, Title, Text, SimpleGrid, Box, Accordion } from '@mantine/core'
+import { Container, Stack, Group, Title, Text, SimpleGrid, Box, Accordion, ThemeIcon } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
+import { IconTargetArrow, IconPhoto, IconChartBar } from '@tabler/icons-react'
 import { Navbar } from '../../../widgets/navbar'
 import { LoginModal } from '../../../widgets/login-modal'
 import { Footer } from '../../../widgets/footer'
@@ -18,17 +19,17 @@ const STATS = [
 
 const FEATURES = [
   {
-    icon: '🎯',
+    icon: IconTargetArrow,
     title: 'Real imtihon formati',
     text: "20 ta savol, 25 daqiqa, maksimal 2 ta xato — DAN imtihoniga aynan o'xshash sharoit.",
   },
   {
-    icon: '🖼️',
+    icon: IconPhoto,
     title: 'Rasmli savollar',
     text: "Yo'l belgilarini haqiqiy rasmlar orqali o'rganing va eslab qoling.",
   },
   {
-    icon: '📊',
+    icon: IconChartBar,
     title: 'Progress kuzatuvi',
     text: "Har bir urinishingiz saqlanadi — qayerda ko'proq mashq qilish kerakligini bilib boring.",
   },
@@ -147,8 +148,10 @@ export function LandingPage() {
             <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
               {FEATURES.map((f) => (
                 <Stack key={f.title} className="glass-card" p="lg" gap="xs">
-                  <Text fz={32}>{f.icon}</Text>
-                  <Title order={3} fz="lg">
+                  <ThemeIcon size={48} radius="xl" variant="gradient" gradient={{ from: 'brand.6', to: 'accent.5', deg: 135 }}>
+                    <f.icon size={24} stroke={1.8} />
+                  </ThemeIcon>
+                  <Title order={3} fz="lg" mt={4}>
                     {f.title}
                   </Title>
                   <Text c="dimmed">{f.text}</Text>

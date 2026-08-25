@@ -16,7 +16,7 @@ import { ThemeToggle } from '../../../shared/ui/ThemeToggle/ThemeToggle'
 import { ROUTES } from '../../../shared/config/routes'
 
 const LINKS = [
-  { to: ROUTES.CATEGORIES, label: 'Mavzular', end: true, icon: IconLayoutGrid },
+  { to: ROUTES.CATEGORIES, label: 'Asosiy', end: true, icon: IconLayoutGrid },
   { to: ROUTES.TICKETS, label: 'Biletlar', icon: IconTicket },
   { to: ROUTES.ROAD_SIGNS, label: "Belgilar", icon: IconRoadSign },
   { action: 'exam', label: 'Imtihon', icon: IconClock },

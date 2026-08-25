@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Modal, Stack, Title, Text, List, ThemeIcon, Group, SegmentedControl, NumberInput, Center, Box } from '@mantine/core'
+import { Modal, Stack, Title, Text, List, ThemeIcon, Group, SegmentedControl, Menu, Center, Box } from '@mantine/core'
 import {
   IconCircleCheck,
   IconClock,
   IconAlertTriangle,
   IconDeviceFloppy,
-  IconInfinity,
   IconRefresh,
   IconCertificate,
   IconMaximize,
+  IconChevronDown,
 } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
 import { Badge } from '../../../shared/ui/Badge/Badge'
@@ -29,22 +29,59 @@ function RuleIcon({ color, icon: Icon }) {
   )
 }
 
+function DropdownField({ label, value, options, onSelect }) {
+  const current = options.find((o) => o.value === value)
+  return (
+    <div>
+      <Text fz="sm" fw={500} mb={6}>
+        {label}
+      </Text>
+      <Menu shadow="md" width={170} radius="md" position="bottom-start">
+        <Menu.Target>
+          <Button variant="secondary" fullWidth rightSection={<IconChevronDown size={14} />}>
+            {current?.label}
+          </Button>
+        </Menu.Target>
+        <Menu.Dropdown>
+          {options.map((opt) => (
+            <Menu.Item
+              key={String(opt.value)}
+              fw={opt.value === value ? 700 : 400}
+              c={opt.value === value ? 'brand' : undefined}
+              onClick={() => onSelect(opt.value)}
+            >
+              {opt.label}
+            </Menu.Item>
+          ))}
+        </Menu.Dropdown>
+      </Menu>
+    </div>
+  )
+}
+
 function QuizStartModalBody({ config, onClose }) {
   const navigate = useNavigate()
   const isTicket = Boolean(config.ticketId)
   const isMistakes = !isTicket && config.mode === 'mistakes'
   const mistakeCount = config.questionIds?.length ?? 0
 
-  const [mode, setMode] = useState(isTicket ? 'ticket' : isMistakes ? 'mistakes' : config.mode || 'practice')
+  const mode = isTicket ? 'ticket' : isMistakes ? 'mistakes' : config.mode || 'practice'
+  const [practiceMode, setPracticeMode] = useState('strict')
   const [questionCount, setQuestionCount] = useState(20)
   const [durationMinutes, setDurationMinutes] = useState(0)
+  const [maxMistakes, setMaxMistakes] = useState(null)
+  const [feedbackMode, setFeedbackMode] = useState('instant')
 
   const isExam = mode === 'exam'
-  const isPractice = mode === 'practice'
   const isLockedExam = !isTicket && !isMistakes && config.mode === 'exam'
+  const isStrict = practiceMode === 'strict'
+  const isCustom = practiceMode === 'custom'
 
   const info = isTicket
-    ? { title: `Bilet ${config.ticketId}`, desc: "Rasmiy imtihon formatidagi 20 ta savoldan iborat aniq to'plam." }
+    ? {
+        title: `Bilet ${config.ticketId}`,
+        desc: "Rasmiy imtihon formatidagi 20 ta savoldan iborat aniq to'plam — 25 daqiqa vaqt beriladi.",
+      }
     : isMistakes
       ? {
           title: 'Xatolarim ustida ishlash',
@@ -56,6 +93,9 @@ function QuizStartModalBody({ config, onClose }) {
     const params = new URLSearchParams()
     if (isTicket) {
       params.set('ticket', String(config.ticketId))
+      params.set('duration', '25')
+      params.set('errors', maxMistakes == null ? '' : String(maxMistakes))
+      params.set('feedback', feedbackMode)
     } else if (isMistakes) {
       params.set('mode', 'mistakes')
       params.set('ids', (config.questionIds || []).join(','))
@@ -64,8 +104,18 @@ function QuizStartModalBody({ config, onClose }) {
       if (isExam) {
         params.set('mode', 'exam')
       } else {
-        params.set('count', String(questionCount))
-        params.set('duration', String(durationMinutes))
+        params.set('mode', 'practice')
+        if (isStrict) {
+          params.set('count', '20')
+          params.set('duration', '25')
+          params.set('errors', '2')
+          params.set('feedback', 'instant')
+        } else {
+          params.set('count', String(questionCount))
+          params.set('duration', String(durationMinutes))
+          params.set('errors', maxMistakes == null ? '' : String(maxMistakes))
+          params.set('feedback', feedbackMode)
+        }
       }
     }
     if (isExam) requestFullscreen()
@@ -132,84 +182,134 @@ function QuizStartModalBody({ config, onClose }) {
   }
 
   return (
-    <Stack gap="md">
+    <Stack gap="sm">
       <Badge variant="primary">
-        {isTicket ? 'Bilet' : isMistakes ? 'Xatolar' : isExam ? 'Imtihon rejimi' : "Erkin mashg'ulot"}
+        {isTicket ? 'Bilet' : isMistakes ? 'Xatolar' : isStrict ? "Qat'iy rejim" : 'Kengaytirilgan rejim'}
       </Badge>
-      <Title order={2}>{info.title}</Title>
-      <Text c="dimmed">{info.desc}</Text>
+      <Title order={2} fz="1.35rem">
+        {info.title}
+      </Title>
+      <Text c="dimmed" fz="sm">
+        {info.desc}
+      </Text>
 
       {!isTicket && !isMistakes && (
         <SegmentedControl
           fullWidth
-          value={mode}
-          onChange={setMode}
+          value={practiceMode}
+          onChange={setPracticeMode}
           data={[
-            { label: "Erkin mashg'ulot", value: 'practice' },
-            { label: 'Rasmiy imtihon', value: 'exam' },
+            { label: "Qat'iy rejim", value: 'strict' },
+            { label: 'Kengaytirilgan rejim', value: 'custom' },
           ]}
         />
       )}
 
-      {isPractice && (
-        <Stack gap="sm" className="glass-card" p="md">
-          <NumberInput
-            label="Nechta savol"
-            value={questionCount}
-            onChange={(v) => setQuestionCount(Number(v) || 5)}
-            min={5}
-            max={100}
-            step={5}
-            clampBehavior="strict"
-          />
-          <div>
-            <Text fz="sm" fw={500} mb={6}>
-              Vaqt chegarasi
-            </Text>
-            <SegmentedControl
-              fullWidth
-              value={String(durationMinutes)}
-              onChange={(v) => setDurationMinutes(Number(v))}
-              data={[
-                { label: 'Vaqtsiz', value: '0' },
-                { label: '15 daq', value: '15' },
-                { label: '30 daq', value: '30' },
-                { label: '45 daq', value: '45' },
+      {!isTicket && !isMistakes && isCustom && (
+        <Stack gap="sm" className="glass-card" p="sm">
+          <Group grow>
+            <DropdownField
+              label="Nechta savol"
+              value={questionCount}
+              onSelect={setQuestionCount}
+              options={[10, 20, 30, 50, 100].map((n) => ({ value: n, label: `${n} ta savol` }))}
+            />
+            <DropdownField
+              label="Vaqt chegarasi"
+              value={durationMinutes}
+              onSelect={setDurationMinutes}
+              options={[
+                { value: 0, label: 'Vaqtsiz' },
+                ...[15, 30, 45, 60].map((m) => ({ value: m, label: `${m} daqiqa` })),
               ]}
             />
-          </div>
+          </Group>
+
+          <Group grow>
+            <DropdownField
+              label="Ruxsat etilgan xatolar"
+              value={maxMistakes}
+              onSelect={setMaxMistakes}
+              options={[
+                { value: null, label: 'Cheklanmagan' },
+                { value: 0, label: '0 ta xato' },
+                { value: 2, label: '2 ta xato' },
+                { value: 5, label: '5 ta xato' },
+              ]}
+            />
+            <DropdownField
+              label="Javobni ko'rsatish"
+              value={feedbackMode}
+              onSelect={setFeedbackMode}
+              options={[
+                { value: 'instant', label: 'Darhol' },
+                { value: 'end', label: 'Faqat oxirida' },
+              ]}
+            />
+          </Group>
         </Stack>
       )}
 
-      <Stack gap="sm" className="glass-card" p="md">
-        <List spacing="sm" size="sm" center icon={<RuleIcon color="brand" icon={IconCircleCheck} />}>
-          <List.Item>{isTicket || isExam ? '20' : isMistakes ? mistakeCount : questionCount} savol</List.Item>
-          {isExam && (
-            <>
-              <List.Item icon={<RuleIcon color="brand" icon={IconClock} />}>25 daqiqa vaqt</List.Item>
-              <List.Item icon={<RuleIcon color="warning" icon={IconAlertTriangle} />}>
-                3-xato qilinishi bilan test darhol tugaydi (2 tagacha xatoga ruxsat)
-              </List.Item>
-            </>
-          )}
-          {isMistakes && (
-            <List.Item icon={<RuleIcon color="brand" icon={IconRefresh} />}>
-              To'g'ri javob bersangiz, savol xatolar ro'yxatidan chiqadi
-            </List.Item>
-          )}
-          {isPractice && durationMinutes > 0 && (
-            <List.Item icon={<RuleIcon color="brand" icon={IconClock} />}>{durationMinutes} daqiqa vaqt</List.Item>
-          )}
-          {!isExam && !isTicket && !(isPractice && durationMinutes > 0) && (
-            <List.Item icon={<RuleIcon color="success" icon={IconInfinity} />}>
-              {isPractice ? 'Xatolar soni cheklanmagan' : 'Vaqt va xatolar soni cheklanmagan'}
-            </List.Item>
-          )}
-          <List.Item icon={<RuleIcon color="success" icon={IconDeviceFloppy} />}>
+      {isTicket && (
+        <Stack gap="sm" className="glass-card" p="sm">
+          <Group grow>
+            <DropdownField
+              label="Ruxsat etilgan xatolar"
+              value={maxMistakes}
+              onSelect={setMaxMistakes}
+              options={[
+                { value: null, label: 'Cheklanmagan' },
+                { value: 0, label: '0 ta xato' },
+                { value: 2, label: '2 ta xato' },
+                { value: 5, label: '5 ta xato' },
+              ]}
+            />
+            <DropdownField
+              label="Javobni ko'rsatish"
+              value={feedbackMode}
+              onSelect={setFeedbackMode}
+              options={[
+                { value: 'instant', label: 'Darhol' },
+                { value: 'end', label: 'Faqat oxirida' },
+              ]}
+            />
+          </Group>
+        </Stack>
+      )}
+
+      {(isCustom || isTicket) && !isMistakes ? (
+        <Group gap={6} justify="center">
+          <RuleIcon color="success" icon={IconDeviceFloppy} />
+          <Text c="dimmed" fz="xs">
             Natija profilingizga saqlanadi
-          </List.Item>
-        </List>
-      </Stack>
+          </Text>
+        </Group>
+      ) : (
+        <Stack gap="sm" className="glass-card" p="md">
+          <List spacing="sm" size="sm" center icon={<RuleIcon color="brand" icon={IconCircleCheck} />}>
+            <List.Item>{isTicket ? '20' : isMistakes ? mistakeCount : '20'} savol</List.Item>
+
+            {!isTicket && !isMistakes && isStrict && (
+              <>
+                <List.Item icon={<RuleIcon color="brand" icon={IconClock} />}>25 daqiqa vaqt</List.Item>
+                <List.Item icon={<RuleIcon color="warning" icon={IconAlertTriangle} />}>
+                  3-xato qilinishi bilan test darhol tugaydi (2 tagacha xatoga ruxsat)
+                </List.Item>
+              </>
+            )}
+
+            {isMistakes && (
+              <List.Item icon={<RuleIcon color="brand" icon={IconRefresh} />}>
+                To'g'ri javob bersangiz, savol xatolar ro'yxatidan chiqadi
+              </List.Item>
+            )}
+
+            <List.Item icon={<RuleIcon color="success" icon={IconDeviceFloppy} />}>
+              Natija profilingizga saqlanadi
+            </List.Item>
+          </List>
+        </Stack>
+      )}
 
       <Group grow mt="sm">
         <Button variant="secondary" onClick={onClose}>
