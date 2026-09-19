@@ -1,19 +1,17 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { signOut } from 'firebase/auth'
 import { Box, Group, Text, Avatar, Menu, UnstyledButton } from '@mantine/core'
 import { IconChevronDown, IconLogout, IconList } from '@tabler/icons-react'
-import { auth } from '../../../shared/api/firebase'
 import { useAuth } from '../../../entities/user'
 import { Button } from '../../../shared/ui/Button/Button'
 import { ThemeToggle } from '../../../shared/ui/ThemeToggle/ThemeToggle'
 import { ROUTES } from '../../../shared/config/routes'
 
 export function Navbar({ onOpenModal }) {
-  const { user, profile } = useAuth()
+  const { user, profile, logout } = useAuth()
   const navigate = useNavigate()
 
-  const handleLogout = async () => {
-    await signOut(auth)
+  const handleLogout = () => {
+    logout()
     navigate(ROUTES.HOME)
   }
 

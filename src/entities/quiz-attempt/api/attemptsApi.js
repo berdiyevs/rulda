@@ -1,51 +1,54 @@
-import {
-  collection,
-  addDoc,
-  query,
-  where,
-  getDocs,
-  serverTimestamp,
-} from 'firebase/firestore'
-import { db } from '../../../shared/api/firebase'
+import { apiFetch } from '../../../shared/api/client'
 
-export async function saveAttempt(uid, attempt) {
-  const ref = collection(db, 'users', uid, 'attempts')
-  await addDoc(ref, {
-    ...attempt,
-    createdAt: serverTimestamp(),
-  })
+function toApiAttempt(attempt) {
+  return {
+    topic: attempt.topic,
+    mode: attempt.mode,
+    correct_count: attempt.correctCount,
+    wrong_count: attempt.wrongCount,
+    total_questions: attempt.totalQuestions,
+    passed: attempt.passed,
+    wrong_question_ids: attempt.wrongQuestionIds || [],
+    correct_question_ids: attempt.correctQuestionIds || [],
+  }
 }
 
-export async function fetchLatestAttempt(uid, topic) {
-  const ref = collection(db, 'users', uid, 'attempts')
-  const q = query(ref, where('topic', '==', topic))
-  const snap = await getDocs(q)
-  if (snap.empty) return null
-
-  const docs = snap.docs
-    .map((d) => d.data())
-    .sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0))
-
-  return docs[0]
+function fromApiAttempt(data) {
+  return {
+    id: data.id,
+    topic: data.topic,
+    mode: data.mode,
+    correctCount: data.correct_count,
+    wrongCount: data.wrong_count,
+    totalQuestions: data.total_questions,
+    passed: data.passed,
+    wrongQuestionIds: data.wrong_question_ids,
+    correctQuestionIds: data.correct_question_ids,
+    createdAt: data.created_at ? new Date(data.created_at) : null,
+  }
 }
 
-export async function fetchAllLatestAttempts(uid, topics) {
-  const results = await Promise.all(topics.map((topic) => fetchLatestAttempt(uid, topic)))
-  return Object.fromEntries(topics.map((topic, i) => [topic, results[i]]))
+export async function saveAttempt(attempt) {
+  await apiFetch('/attempts', { method: 'POST', body: toApiAttempt(attempt) })
 }
 
-export async function fetchAllAttempts(uid) {
-  const ref = collection(db, 'users', uid, 'attempts')
-  const snap = await getDocs(ref)
+export async function fetchAllAttempts() {
+  const data = await apiFetch('/attempts')
+  return data.map(fromApiAttempt)
+}
 
-  return snap.docs
-    .map((doc) => {
-      const data = doc.data()
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt?.toDate?.() ?? null,
-      }
-    })
-    .sort((a, b) => (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0))
+export async function fetchLatestAttempt(topic) {
+  const attempts = await fetchAllAttempts()
+  const topicAttempts = attempts.filter((a) => a.topic === topic)
+  return topicAttempts.length ? topicAttempts[topicAttempts.length - 1] : null
+}
+
+export async function fetchAllLatestAttempts(topics) {
+  const attempts = await fetchAllAttempts()
+  return Object.fromEntries(
+    topics.map((topic) => {
+      const topicAttempts = attempts.filter((a) => a.topic === topic)
+      return [topic, topicAttempts.length ? topicAttempts[topicAttempts.length - 1] : null]
+    }),
+  )
 }

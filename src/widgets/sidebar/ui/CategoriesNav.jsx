@@ -7,12 +7,13 @@ import {
   IconRoadSign,
   IconClock,
   IconChartBar,
+  IconShieldLock,
+  IconCrown,
 } from '@tabler/icons-react'
-import { signOut } from 'firebase/auth'
-import { auth } from '../../../shared/api/firebase'
 import { useAuth } from '../../../entities/user'
 import { useQuizStart } from '../../../widgets/quiz-start'
 import { ThemeToggle } from '../../../shared/ui/ThemeToggle/ThemeToggle'
+import { Badge } from '../../../shared/ui/Badge/Badge'
 import { ROUTES } from '../../../shared/config/routes'
 
 const LINKS = [
@@ -42,7 +43,7 @@ const actionStyle = {
 }
 
 export function CategoriesNav() {
-  const { profile, user } = useAuth()
+  const { profile, user, logout, isAdmin, isPremiumActive } = useAuth()
   const navigate = useNavigate()
   const openQuizStart = useQuizStart()
 
@@ -50,8 +51,8 @@ export function CategoriesNav() {
     openQuizStart({ topic: 'all', mode: 'exam' })
   }
 
-  const handleLogout = async () => {
-    await signOut(auth)
+  const handleLogout = () => {
+    logout()
     navigate(ROUTES.HOME)
   }
 
@@ -117,7 +118,38 @@ export function CategoriesNav() {
         </Group>
 
         <Group gap={14} fz="0.88rem" c="dimmed" visibleFrom="sm" ml="auto">
+          {isPremiumActive ? (
+            <Badge variant="warning">
+              <Group gap={4} wrap="nowrap">
+                <IconCrown size={12} />
+                Premium
+              </Group>
+            </Badge>
+          ) : (
+            <Button
+              component={Link}
+              to={ROUTES.PREMIUM}
+              variant="subtle"
+              color="warning"
+              size="xs"
+              leftSection={<IconCrown size={14} />}
+            >
+              Premium
+            </Button>
+          )}
           <ThemeToggle />
+          {isAdmin && (
+            <ActionIcon
+              component={Link}
+              to={ROUTES.ADMIN}
+              variant="subtle"
+              color="brand"
+              aria-label="Admin panel"
+              title="Admin panel"
+            >
+              <IconShieldLock size={18} />
+            </ActionIcon>
+          )}
           <Text size="sm" c="dimmed">
             {displayName}
           </Text>
@@ -128,6 +160,17 @@ export function CategoriesNav() {
 
         <Group gap={6} hiddenFrom="sm" ml="auto">
           <ThemeToggle />
+          {isAdmin && (
+            <ActionIcon
+              component={Link}
+              to={ROUTES.ADMIN}
+              variant="subtle"
+              color="brand"
+              aria-label="Admin panel"
+            >
+              <IconShieldLock size={18} />
+            </ActionIcon>
+          )}
           <ActionIcon variant="subtle" color="danger" size="lg" onClick={handleLogout} aria-label="Chiqish">
             <IconLogout size={18} />
           </ActionIcon>

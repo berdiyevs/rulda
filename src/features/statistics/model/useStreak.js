@@ -10,7 +10,7 @@ export function useStreak() {
     if (!user) return
     let isMounted = true
 
-    fetchAllAttempts(user.uid)
+    fetchAllAttempts()
       .then((attempts) => {
         if (isMounted) setStreak(computeStreak(attempts))
       })

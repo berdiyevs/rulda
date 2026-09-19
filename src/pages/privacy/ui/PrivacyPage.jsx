@@ -18,7 +18,7 @@ const SECTIONS = [
     body: ["Ro'yxatdan o'tish va Saytdan foydalanish jarayonida quyidagi ma'lumotlar yig'iladi:"],
     list: [
       "Hisob ma'lumotlari: ismingiz, email manzilingiz va (Google orqali kirilganda) profil rasmingiz",
-      "Autentifikatsiya ma'lumotlari: Firebase Authentication xizmati orqali xavfsiz saqlanadigan kirish ma'lumotlari (parolingizning o'zi bizga ochiq ko'rinishda taqdim etilmaydi va saqlanmaydi)",
+      "Autentifikatsiya ma'lumotlari: parolingiz xavfsiz shifrlangan (hash) ko'rinishda saqlanadi, uning o'zi bizga ochiq ko'rinishda taqdim etilmaydi va saqlanmaydi",
       "Test faoliyati: yechilgan testlar, urinishlar tarixi, to'g'ri/xato javoblar, mavzular bo'yicha natijalar va imtihonga tayyorgarlik statistikasi",
       "Ixtiyoriy ma'lumotlar: agar kiritsangiz, imtihon sanangiz kabi shaxsiy rejalashtirish ma'lumotlari",
     ],
@@ -38,7 +38,7 @@ const SECTIONS = [
     title: 'Ma\'lumotlarni saqlash va xavfsizlik',
     number: '4',
     body: [
-      "Barcha foydalanuvchi ma'lumotlari Google Firebase (Authentication va Firestore) infratuzilmasida, sanoat standartlariga mos xavfsizlik choralari bilan saqlanadi. Ma'lumotlarga faqat autentifikatsiyadan o'tgan foydalanuvchining o'zi kira oladi.",
+      "Barcha foydalanuvchi ma'lumotlari o'z serverimizdagi PostgreSQL ma'lumotlar bazasida, sanoat standartlariga mos xavfsizlik choralari bilan saqlanadi. Ma'lumotlarga faqat autentifikatsiyadan o'tgan foydalanuvchining o'zi kira oladi.",
       "Biz ma'lumotlaringizni ruxsatsiz kirish, o'zgartirish yoki yo'qotilishdan himoya qilish uchun oqilona texnik choralarni ko'ramiz, biroq internet orqali uzatishning mutlaqo xavfsiz usuli yo'qligini yodda tutishingizni so'raymiz.",
     ],
   },
@@ -47,7 +47,7 @@ const SECTIONS = [
     number: '5',
     body: [
       "Rulda foydalanuvchilarning shaxsiy ma'lumotlarini sotmaydi yoki reklama maqsadida uchinchi shaxslarga bermaydi.",
-      "Ma'lumotlar faqat Saytning ishlashi uchun zarur bo'lgan xizmat ko'rsatuvchilarga (masalan, Google Firebase — hosting, autentifikatsiya va ma'lumotlar bazasi uchun, shuningdek Google orqali kirish tanlangan holatda Google autentifikatsiya xizmatiga) uzatiladi. Qonun talab qilgan hollarda ma'lumotlar tegishli davlat organlariga taqdim etilishi mumkin.",
+      "Ma'lumotlar faqat Saytning ishlashi uchun zarur bo'lgan xizmat ko'rsatuvchilarga (Google orqali kirish tanlangan holatda Google autentifikatsiya xizmatiga) uzatiladi. Qonun talab qilgan hollarda ma'lumotlar tegishli davlat organlariga taqdim etilishi mumkin.",
     ],
   },
   {

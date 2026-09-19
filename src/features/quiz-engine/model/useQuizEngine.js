@@ -130,7 +130,7 @@ export function useQuizEngine({
       if (mode === 'exam') exitFullscreen()
 
       if (user) {
-        saveAttempt(user.uid, summary).catch(() => {})
+        saveAttempt(summary).catch(() => {})
       }
     },
     [mode, topic, ticketId, user, sessionQuestions, maxMistakes],

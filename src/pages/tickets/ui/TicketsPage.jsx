@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Container, Stack, Title, Text, SimpleGrid, Skeleton, Card, Group } from '@mantine/core'
-import { IconTicket } from '@tabler/icons-react'
+import { IconTicket, IconLock } from '@tabler/icons-react'
 import { CategoriesNav } from '../../../widgets/sidebar'
 import { fetchQuestions } from '../../../entities/question'
 import { groupByTicket } from '../../../entities/ticket'
@@ -8,9 +9,12 @@ import { fetchAllLatestAttempts } from '../../../entities/quiz-attempt'
 import { useAuth } from '../../../entities/user'
 import { useQuizStart } from '../../../widgets/quiz-start'
 import { Badge } from '../../../shared/ui/Badge/Badge'
+import { isTicketLocked } from '../../../shared/lib/premium'
+import { ROUTES } from '../../../shared/config/routes'
 
 export function TicketsPage() {
-  const { user } = useAuth()
+  const { user, isPremiumActive } = useAuth()
+  const navigate = useNavigate()
   const openQuizStart = useQuizStart()
   const [tickets, setTickets] = useState([])
   const [attempts, setAttempts] = useState({})
@@ -24,10 +28,7 @@ export function TicketsPage() {
         const grouped = groupByTicket(questions)
         setTickets(grouped)
         if (user) {
-          return fetchAllLatestAttempts(
-            user.uid,
-            grouped.map((t) => `ticket-${t.ticketId}`),
-          ).then((data) => {
+          return fetchAllLatestAttempts(grouped.map((t) => `ticket-${t.ticketId}`)).then((data) => {
             if (isMounted) setAttempts(data)
           })
         }
@@ -66,25 +67,42 @@ export function TicketsPage() {
               const scorePercent = attempt
                 ? Math.round((attempt.correctCount / attempt.totalQuestions) * 100)
                 : null
+              const locked = isTicketLocked(ticketId, isPremiumActive)
 
               return (
                 <Card
                   key={ticketId}
                   component="button"
                   type="button"
-                  onClick={() => openQuizStart({ ticketId })}
+                  onClick={() => (locked ? navigate(ROUTES.PREMIUM) : openQuizStart({ ticketId }))}
                   className="glass-card category-card"
                   padding="md"
-                  style={{ width: '100%', textAlign: 'left', font: 'inherit', color: 'inherit', cursor: 'pointer' }}
+                  style={{
+                    width: '100%',
+                    textAlign: 'left',
+                    font: 'inherit',
+                    color: 'inherit',
+                    cursor: 'pointer',
+                    opacity: locked ? 0.6 : 1,
+                    position: 'relative',
+                  }}
                 >
                   <Stack gap={6} align="center" ta="center">
-                    <IconTicket size={22} color="var(--mantine-color-brand-5)" />
+                    {locked ? (
+                      <IconLock size={22} color="var(--mantine-color-warning-6)" />
+                    ) : (
+                      <IconTicket size={22} color="var(--mantine-color-brand-5)" />
+                    )}
                     <Text fw={700}>Bilet {ticketId}</Text>
                     <Text c="dimmed" size="xs">
                       {questions.length} ta savol
                     </Text>
-                    {scorePercent !== null && (
-                      <Badge variant={scorePercent >= 70 ? 'success' : 'warning'}>{scorePercent}%</Badge>
+                    {locked ? (
+                      <Badge variant="warning">Premium</Badge>
+                    ) : (
+                      scorePercent !== null && (
+                        <Badge variant={scorePercent >= 70 ? 'success' : 'warning'}>{scorePercent}%</Badge>
+                      )
                     )}
                   </Stack>
                 </Card>

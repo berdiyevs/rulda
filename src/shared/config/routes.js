@@ -5,6 +5,9 @@ export const ROUTES = {
   ROAD_SIGNS: '/road-signs',
   TICKETS: '/tickets',
   STATISTICS: '/statistics',
+  PREMIUM: '/premium',
   TERMS: '/terms',
   PRIVACY: '/privacy',
+  VERIFY_EMAIL: '/verify-email',
+  ADMIN: '/admin',
 }

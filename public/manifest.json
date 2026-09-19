@@ -1,0 +1,16 @@
+{
+  "name": "Rulda - Yo'l harakati qoidalari",
+  "short_name": "Rulda",
+  "description": "O'zbekiston yo'l harakati qoidalarini o'rganish va DAN imtihoniga tayyorgarlik platformasi",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0c12",
+  "theme_color": "#0a0c12",
+  "lang": "uz",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}

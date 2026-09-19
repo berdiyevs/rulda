@@ -21,10 +21,7 @@ export function CategoriesPage() {
   useEffect(() => {
     if (!user) return
     let isMounted = true
-    fetchAllLatestAttempts(
-      user.uid,
-      TOPICS.map((t) => t.id),
-    )
+    fetchAllLatestAttempts(TOPICS.map((t) => t.id))
       .then((data) => {
         if (isMounted) setAttempts(data)
       })

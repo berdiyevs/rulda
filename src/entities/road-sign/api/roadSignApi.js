@@ -1,9 +1,7 @@
+import { apiFetch } from '../../../shared/api/client'
+
 export async function fetchRoadSigns() {
-  const response = await fetch('/data/road-signs.json')
-  if (!response.ok) {
-    throw new Error("Belgilarni yuklashda xatolik yuz berdi")
-  }
-  return response.json()
+  return apiFetch('/road-signs', { auth: false })
 }
 
 export const SIGN_CATEGORIES = [

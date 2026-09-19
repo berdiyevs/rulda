@@ -5,10 +5,14 @@ import { QuizPage } from '../../pages/quiz'
 import { RoadSignsPage } from '../../pages/road-signs'
 import { TicketsPage } from '../../pages/tickets'
 import { StatisticsPage } from '../../pages/statistics'
+import { PremiumPage } from '../../pages/premium'
 import { TermsPage } from '../../pages/terms'
 import { PrivacyPage } from '../../pages/privacy'
+import { VerifyEmailPage } from '../../pages/verify-email'
+import { AdminPage } from '../../pages/admin'
 import { NotFoundPage } from '../../pages/not-found'
 import { ProtectedRoute } from './ProtectedRoute'
+import { AdminRoute } from './AdminRoute'
 import { ROUTES } from '../../shared/config/routes'
 
 export function AppRouter() {
@@ -55,8 +59,25 @@ export function AppRouter() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path={ROUTES.PREMIUM}
+        element={
+          <ProtectedRoute>
+            <PremiumPage />
+          </ProtectedRoute>
+        }
+      />
       <Route path={ROUTES.TERMS} element={<TermsPage />} />
       <Route path={ROUTES.PRIVACY} element={<PrivacyPage />} />
+      <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmailPage />} />
+      <Route
+        path={ROUTES.ADMIN}
+        element={
+          <AdminRoute>
+            <AdminPage />
+          </AdminRoute>
+        }
+      />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )

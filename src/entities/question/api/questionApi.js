@@ -1,9 +1,7 @@
+import { apiFetch } from '../../../shared/api/client'
+
 export async function fetchQuestions() {
-  const response = await fetch('/data/questions.json')
-  if (!response.ok) {
-    throw new Error('Savollarni yuklashda xatolik yuz berdi')
-  }
-  return response.json()
+  return apiFetch('/questions', { auth: false })
 }
 
 export function filterQuestionsByTopic(questions, topic) {

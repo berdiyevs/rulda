@@ -1,11 +1,17 @@
-import { useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Box } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 import { QuizPlay } from './QuizPlay'
+import { useAuth } from '../../../entities/user'
+import { isTicketLocked } from '../../../shared/lib/premium'
+import { ROUTES } from '../../../shared/config/routes'
 
 const VALID_TOPICS = ['all', 'signs', 'theory']
 
 export function QuizPage() {
+  const navigate = useNavigate()
+  const { isPremiumActive } = useAuth()
   const [searchParams] = useSearchParams()
   const topicParam = searchParams.get('topic')
   const modeParam = searchParams.get('mode')
@@ -32,6 +38,22 @@ export function QuizPage() {
   const feedbackMode = feedbackParam === 'end' ? 'end' : 'instant'
 
   const [sessionKey, setSessionKey] = useState(0)
+
+  const premiumRequired =
+    !isPremiumActive && (mode === 'exam' || mode === 'mistakes' || isTicketLocked(ticketId, isPremiumActive))
+
+  useEffect(() => {
+    if (!premiumRequired) return
+    notifications.show({
+      color: 'warning',
+      title: 'Bu funksiya Premium uchun',
+      message: 'Davom etish uchun Premium sotib oling.',
+    })
+    navigate(ROUTES.PREMIUM, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [premiumRequired])
+
+  if (premiumRequired) return null
 
   return (
     <Box mih="100vh">

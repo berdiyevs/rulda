@@ -12,7 +12,7 @@ function daysUntil(dateStr) {
 }
 
 export function ExamCountdownCard() {
-  const { user, profile } = useAuth()
+  const { user, profile, refreshProfile } = useAuth()
   const examDate = profile?.examDate
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(examDate || '')
@@ -22,7 +22,8 @@ export function ExamCountdownCard() {
     if (!value || !user) return
     setSaving(true)
     try {
-      await updateExamDate(user.uid, value)
+      await updateExamDate(value)
+      await refreshProfile()
       setEditing(false)
     } finally {
       setSaving(false)

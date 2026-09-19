@@ -94,7 +94,7 @@ export function useStatistics() {
     if (!user) return
     let isMounted = true
 
-    Promise.all([fetchAllAttempts(user.uid), fetchQuestions()])
+    Promise.all([fetchAllAttempts(), fetchQuestions()])
       .then(([attempts, questions]) => {
         if (!isMounted) return
         setStats(computeStatistics(attempts, questions))

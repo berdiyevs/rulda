@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rulda
+      POSTGRES_PASSWORD: rulda
+      POSTGRES_DB: rulda
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rulda"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://rulda:rulda@db:5432/rulda
+      SEED_DATA_DIR: /seed_data
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - ./public/data:/seed_data:ro
+
+volumes:
+  pgdata:

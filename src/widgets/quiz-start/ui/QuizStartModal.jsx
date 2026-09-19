@@ -10,10 +10,14 @@ import {
   IconCertificate,
   IconMaximize,
   IconChevronDown,
+  IconLock,
 } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
 import { Badge } from '../../../shared/ui/Badge/Badge'
 import { requestFullscreen } from '../../../shared/lib/fullscreen'
+import { isTicketLocked } from '../../../shared/lib/premium'
+import { useAuth } from '../../../entities/user'
+import { ROUTES } from '../../../shared/config/routes'
 
 const TOPIC_INFO = {
   all: { title: 'Barcha savollar', desc: '1200+ savol bazasidan tasodifiy savollar tanlanadi.' },
@@ -61,6 +65,7 @@ function DropdownField({ label, value, options, onSelect }) {
 
 function QuizStartModalBody({ config, onClose }) {
   const navigate = useNavigate()
+  const { isPremiumActive } = useAuth()
   const isTicket = Boolean(config.ticketId)
   const isMistakes = !isTicket && config.mode === 'mistakes'
   const mistakeCount = config.questionIds?.length ?? 0
@@ -77,6 +82,11 @@ function QuizStartModalBody({ config, onClose }) {
   const isStrict = practiceMode === 'strict'
   const isCustom = practiceMode === 'custom'
 
+  const ticketLocked = isTicket && isTicketLocked(config.ticketId, isPremiumActive)
+  const premiumRequired =
+    !isPremiumActive &&
+    (isExam || isMistakes || ticketLocked || (!isTicket && !isMistakes && isStrict))
+
   const info = isTicket
     ? {
         title: `Bilet ${config.ticketId}`,
@@ -90,6 +100,12 @@ function QuizStartModalBody({ config, onClose }) {
       : TOPIC_INFO[config.topic] || TOPIC_INFO.all
 
   const handleStart = () => {
+    if (premiumRequired) {
+      onClose()
+      navigate(ROUTES.PREMIUM)
+      return
+    }
+
     const params = new URLSearchParams()
     if (isTicket) {
       params.set('ticket', String(config.ticketId))
@@ -138,7 +154,7 @@ function QuizStartModalBody({ config, onClose }) {
         </Center>
 
         <Stack gap={6} ta="center">
-          <Badge variant="warning">Qat'iy imtihon rejimi</Badge>
+          <Badge variant="warning">{premiumRequired ? 'Premium' : "Qat'iy imtihon rejimi"}</Badge>
           <Title order={2}>Rasmiy imtihonga tayyormisiz?</Title>
           <Text c="dimmed" size="sm">
             Bu yerda faqat rasmiy DAN imtihon formati mavjud — vaqt va xatolar soni real imtihondagidek
@@ -173,8 +189,13 @@ function QuizStartModalBody({ config, onClose }) {
           <Button variant="secondary" onClick={onClose}>
             Orqaga
           </Button>
-          <Button variant="danger" size="lg" onClick={handleStart}>
-            Boshlash
+          <Button
+            variant="danger"
+            size="lg"
+            leftSection={premiumRequired ? <IconLock size={16} /> : null}
+            onClick={handleStart}
+          >
+            {premiumRequired ? 'Premium kerak' : 'Boshlash'}
           </Button>
         </Group>
       </Stack>
@@ -192,6 +213,15 @@ function QuizStartModalBody({ config, onClose }) {
       <Text c="dimmed" fz="sm">
         {info.desc}
       </Text>
+
+      {premiumRequired && (
+        <Group gap={6} justify="center">
+          <IconLock size={14} color="var(--mantine-color-warning-6)" />
+          <Text c="warning" fz="xs" fw={600}>
+            Bu funksiya faqat Premium foydalanuvchilar uchun
+          </Text>
+        </Group>
+      )}
 
       {!isTicket && !isMistakes && (
         <SegmentedControl
@@ -315,8 +345,13 @@ function QuizStartModalBody({ config, onClose }) {
         <Button variant="secondary" onClick={onClose}>
           Orqaga
         </Button>
-        <Button variant="primary" size="lg" onClick={handleStart}>
-          Boshlash
+        <Button
+          variant="primary"
+          size="lg"
+          leftSection={premiumRequired ? <IconLock size={16} /> : null}
+          onClick={handleStart}
+        >
+          {premiumRequired ? 'Premium kerak' : 'Boshlash'}
         </Button>
       </Group>
     </Stack>

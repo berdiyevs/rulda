@@ -1,18 +1,13 @@
 import { useNavigate } from 'react-router-dom'
-import {
-  signInWithPopup,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendEmailVerification,
-  signOut,
-} from 'firebase/auth'
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { notifications } from '@mantine/notifications'
-import { auth, googleProvider, db } from '../../../shared/api/firebase'
+import { apiFetch } from '../../../shared/api/client'
+import { getGoogleAccessToken } from '../../../shared/api/googleAuth'
+import { useAuth } from '../../../entities/user'
 import { ROUTES } from '../../../shared/config/routes'
 
 export function useAuthActions() {
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const signUpWithEmail = async ({ name, email, password }) => {
     if (!email || !password || !name) {
@@ -25,25 +20,20 @@ export function useAuthActions() {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-      const user = userCredential.user
-
-      await sendEmailVerification(user)
-
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        displayName: name,
-        email: user.email,
-        isVerified: false,
-        createdAt: serverTimestamp(),
+      const result = await apiFetch('/auth/signup', {
+        method: 'POST',
+        body: { name, email, password },
+        auth: false,
       })
 
       notifications.show({
         color: 'success',
         title: "Ro'yxatdan o'tdingiz",
-        message: 'Tasdiqlash xati yuborildi. Iltimos, pochtangizni tekshiring.',
+        message: result.dev_verification_url
+          ? `Tasdiqlash havolasi: ${result.dev_verification_url}`
+          : 'Tasdiqlash xati yuborildi. Iltimos, pochtangizni tekshiring.',
+        autoClose: result.dev_verification_url ? false : 5000,
       })
-      await signOut(auth)
     } catch (error) {
       notifications.show({
         color: 'danger',
@@ -55,44 +45,39 @@ export function useAuthActions() {
 
   const loginWithEmail = async ({ email, password }) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password)
-      const user = userCredential.user
-
-      if (user.emailVerified) {
-        navigate(ROUTES.CATEGORIES)
-      } else {
+      const result = await apiFetch('/auth/login', {
+        method: 'POST',
+        body: { email, password },
+        auth: false,
+      })
+      await login(result.access_token)
+      navigate(ROUTES.CATEGORIES)
+    } catch (error) {
+      if (error.message.includes('tasdiqlang')) {
         notifications.show({
           color: 'warning',
           title: 'Email tasdiqlanmagan',
-          message: 'Avval emailingizni tasdiqlang! Link yuborilgan.',
+          message: 'Avval emailingizni tasdiqlang!',
         })
-        await signOut(auth)
+      } else {
+        notifications.show({
+          color: 'danger',
+          title: 'Kirishda xatolik',
+          message: "Email yoki parol noto'g'ri!",
+        })
       }
-    } catch (error) {
-      notifications.show({
-        color: 'danger',
-        title: 'Kirishda xatolik',
-        message: "Email yoki parol noto'g'ri!",
-      })
     }
   }
 
   const loginWithGoogle = async () => {
     try {
-      const result = await signInWithPopup(auth, googleProvider)
-      const user = result.user
-
-      await setDoc(
-        doc(db, 'users', user.uid),
-        {
-          uid: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-          lastLogin: serverTimestamp(),
-        },
-        { merge: true },
-      )
-
+      const accessToken = await getGoogleAccessToken()
+      const result = await apiFetch('/auth/google', {
+        method: 'POST',
+        body: { access_token: accessToken },
+        auth: false,
+      })
+      await login(result.access_token)
       navigate(ROUTES.CATEGORIES)
     } catch (error) {
       console.error('Google xatosi:', error)

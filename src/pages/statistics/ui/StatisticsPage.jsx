@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import {
   Container,
   Stack,
@@ -20,12 +21,15 @@ import {
   IconRefresh,
   IconClipboardCheck,
   IconTargetArrow,
+  IconLock,
 } from '@tabler/icons-react'
 import { CategoriesNav } from '../../../widgets/sidebar'
 import { Button } from '../../../shared/ui/Button/Button'
 import { Badge } from '../../../shared/ui/Badge/Badge'
 import { useStatistics } from '../../../features/statistics'
 import { useQuizStart } from '../../../widgets/quiz-start'
+import { useAuth } from '../../../entities/user'
+import { ROUTES } from '../../../shared/config/routes'
 
 function readinessColor(percent) {
   if (percent >= 75) return 'success'
@@ -116,6 +120,8 @@ function TrendChart({ history }) {
 export function StatisticsPage() {
   const { stats, loading, error } = useStatistics()
   const openQuizStart = useQuizStart()
+  const { isPremiumActive } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <div className="page-shell has-tabbar">
@@ -273,7 +279,23 @@ export function StatisticsPage() {
                 Xatolarim
               </Title>
 
-              {stats.mistakeQuestions.length === 0 ? (
+              {!isPremiumActive ? (
+                <Stack align="center" ta="center" gap="md" className="glass-card" p="xl">
+                  <ThemeIcon size={56} radius="xl" variant="light" color="warning">
+                    <IconLock size={28} />
+                  </ThemeIcon>
+                  <Title order={3} fz="1.1rem">
+                    Xatolarim — Premium funksiya
+                  </Title>
+                  <Text c="dimmed">
+                    Xato qilingan savollarni ko'rish va ular bo'yicha maxsus mashq qilish uchun Premium
+                    sotib oling.
+                  </Text>
+                  <Button variant="primary" onClick={() => navigate(ROUTES.PREMIUM)}>
+                    Premium sotib olish
+                  </Button>
+                </Stack>
+              ) : stats.mistakeQuestions.length === 0 ? (
                 <Stack align="center" ta="center" gap="md" className="glass-card" p="xl">
                   <ThemeIcon size={56} radius="xl" variant="light" color="success">
                     <IconMoodSmile size={28} />

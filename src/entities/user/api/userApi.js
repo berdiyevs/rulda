@@ -1,6 +1,8 @@
-import { doc, setDoc } from 'firebase/firestore'
-import { db } from '../../../shared/api/firebase'
+import { apiFetch } from '../../../shared/api/client'
 
-export async function updateExamDate(uid, examDate) {
-  await setDoc(doc(db, 'users', uid), { examDate }, { merge: true })
+export async function updateExamDate(examDate) {
+  return apiFetch('/users/me/exam-date', {
+    method: 'PATCH',
+    body: { exam_date: examDate },
+  })
 }
