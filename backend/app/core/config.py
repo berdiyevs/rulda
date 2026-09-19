@@ -15,8 +15,13 @@ class Settings(BaseSettings):
     click_service_id: str = ""
     click_merchant_id: str = ""
     click_secret_key: str = ""
+    admin_emails: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    @property
+    def admin_email_list(self) -> list[str]:
+        return [email.strip().lower() for email in self.admin_emails.split(",") if email.strip()]
 
     @field_validator("database_url")
     @classmethod

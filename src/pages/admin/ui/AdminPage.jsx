@@ -1,10 +1,11 @@
 import { Container, Tabs, Title, Text, Stack } from '@mantine/core'
-import { IconUsers, IconChartBar, IconHelpCircle, IconRoadSign } from '@tabler/icons-react'
+import { IconUsers, IconChartBar, IconHelpCircle, IconRoadSign, IconCrown } from '@tabler/icons-react'
 import { CategoriesNav } from '../../../widgets/sidebar'
 import { AdminUsersTab } from './AdminUsersTab'
 import { AdminStatsTab } from './AdminStatsTab'
 import { AdminQuestionsTab } from './AdminQuestionsTab'
 import { AdminRoadSignsTab } from './AdminRoadSignsTab'
+import { AdminPlansTab } from './AdminPlansTab'
 
 export function AdminPage() {
   return (
@@ -31,6 +32,9 @@ export function AdminPage() {
             <Tabs.Tab value="road-signs" leftSection={<IconRoadSign size={16} />}>
               Yo'l belgilari
             </Tabs.Tab>
+            <Tabs.Tab value="plans" leftSection={<IconCrown size={16} />}>
+              Tariflar
+            </Tabs.Tab>
           </Tabs.List>
 
           <Tabs.Panel value="stats">
@@ -44,6 +48,9 @@ export function AdminPage() {
           </Tabs.Panel>
           <Tabs.Panel value="road-signs">
             <AdminRoadSignsTab />
+          </Tabs.Panel>
+          <Tabs.Panel value="plans">
+            <AdminPlansTab />
           </Tabs.Panel>
         </Tabs>
       </Container>

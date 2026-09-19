@@ -121,5 +121,9 @@ def google_login(payload: GoogleLoginRequest, db: Session = Depends(get_db)) -> 
 
 
 @router.get("/me", response_model=UserOut)
-def me(current_user: User = Depends(get_current_user)) -> User:
+def me(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> User:
+    if not current_user.is_admin and current_user.email.lower() in settings.admin_email_list:
+        current_user.is_admin = True
+        db.commit()
+        db.refresh(current_user)
     return current_user

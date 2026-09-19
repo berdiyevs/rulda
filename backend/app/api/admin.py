@@ -5,8 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ..db.models import QuizAttempt, Question, RoadSign, User
+from ..db.models import Plan, QuizAttempt, Question, RoadSign, User
 from ..schemas.admin import AdminStats, AdminUserOut, AdminUserUpdate, DailyCount
+from ..schemas.payment import PlanOut, PlanUpdate
 from ..schemas.question import QuestionCreate, QuestionOut, QuestionUpdate
 from ..schemas.road_sign import RoadSignCreate, RoadSignOut, RoadSignUpdate
 from .deps import get_current_admin, get_db
@@ -166,3 +167,20 @@ def delete_road_sign(sign_id: str, db: Session = Depends(get_db)) -> None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Belgi topilmadi")
     db.delete(sign)
     db.commit()
+
+
+@router.get("/plans", response_model=list[PlanOut])
+def list_plans(db: Session = Depends(get_db)) -> list[Plan]:
+    return list(db.scalars(select(Plan).order_by(Plan.sort_order)).all())
+
+
+@router.patch("/plans/{plan_id}", response_model=PlanOut)
+def update_plan(plan_id: str, payload: PlanUpdate, db: Session = Depends(get_db)) -> Plan:
+    plan = db.get(Plan, plan_id)
+    if plan is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tarif topilmadi")
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(plan, field, value)
+    db.commit()
+    db.refresh(plan)
+    return plan

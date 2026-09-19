@@ -63,3 +63,11 @@ export async function updateRoadSign(id, payload) {
 export async function deleteRoadSign(id) {
   await apiFetch(`/admin/road-signs/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
+
+export async function fetchAdminPlans() {
+  return apiFetch('/admin/plans')
+}
+
+export async function updateAdminPlan(planId, payload) {
+  return apiFetch(`/admin/plans/${encodeURIComponent(planId)}`, { method: 'PATCH', body: payload })
+}
