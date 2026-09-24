@@ -11,20 +11,54 @@ function daysUntil(dateStr) {
   return Math.ceil((target - today) / 86400000)
 }
 
+// "2026-12-25" -> "25.12.2026"
+function isoToDisplay(iso) {
+  if (!iso) return ''
+  const [y, m, d] = iso.split('-')
+  return `${d}.${m}.${y}`
+}
+
+// Faqat raqamlarni qoldirib, "kk.oo.yyyy" ko'rinishiga keltiradi.
+function maskDate(raw) {
+  const digits = raw.replace(/\D/g, '').slice(0, 8)
+  const parts = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)].filter(Boolean)
+  return parts.join('.')
+}
+
+// "25.12.2026" -> "2026-12-25"; sana noto'g'ri bo'lsa null.
+function displayToIso(display) {
+  const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(display)
+  if (!match) return null
+  const [, dd, mm, yyyy] = match
+  const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd))
+  const isReal =
+    date.getFullYear() === Number(yyyy) && date.getMonth() === Number(mm) - 1 && date.getDate() === Number(dd)
+  return isReal ? `${yyyy}-${mm}-${dd}` : null
+}
+
 export function ExamCountdownCard() {
   const { user, profile, refreshProfile } = useAuth()
   const examDate = profile?.examDate
   const [editing, setEditing] = useState(false)
-  const [value, setValue] = useState(examDate || '')
+  const [value, setValue] = useState(isoToDisplay(examDate))
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSave = async () => {
-    if (!value || !user) return
+    if (!user) return
+    const iso = displayToIso(value)
+    if (!iso) {
+      setError("Sanani kun.oy.yil ko'rinishida to'g'ri kiriting, masalan: 25.12.2026")
+      return
+    }
+    setError('')
     setSaving(true)
     try {
-      await updateExamDate(value)
+      await updateExamDate(iso)
       await refreshProfile()
       setEditing(false)
+    } catch (err) {
+      setError(err.message)
     } finally {
       setSaving(false)
     }
@@ -43,16 +77,31 @@ export function ExamCountdownCard() {
           </Text>
           <Group gap="sm" wrap="wrap">
             <TextInput
-              type="date"
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={(e) => {
+                setValue(maskDate(e.target.value))
+                setError('')
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSave()
+              }}
+              placeholder="kk.oo.yyyy"
+              inputMode="numeric"
+              aria-label="Imtihon sanasi"
+              error={error || undefined}
               style={{ flex: 1, minWidth: 160 }}
             />
-            <Button variant="primary" onClick={handleSave} disabled={!value || saving}>
+            <Button variant="primary" onClick={handleSave} loading={saving}>
               Saqlash
             </Button>
             {editing && (
-              <Button variant="secondary" onClick={() => setEditing(false)}>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setEditing(false)
+                  setError('')
+                }}
+              >
                 Bekor qilish
               </Button>
             )}
@@ -75,7 +124,7 @@ export function ExamCountdownCard() {
               {isPast ? "Imtihon sanasi o'tib ketdi" : days === 0 ? 'Imtihon bugun!' : `${days} kun qoldi`}
             </Text>
             <Text c="dimmed" fz="sm">
-              Imtihon sanasi: {new Date(`${examDate}T00:00:00`).toLocaleDateString('uz-UZ')}
+              Imtihon sanasi: {isoToDisplay(examDate)}
             </Text>
           </div>
         </Group>
@@ -84,7 +133,7 @@ export function ExamCountdownCard() {
           size="xs"
           leftSection={<IconEdit size={14} />}
           onClick={() => {
-            setValue(examDate)
+            setValue(isoToDisplay(examDate))
             setEditing(true)
           }}
         >
