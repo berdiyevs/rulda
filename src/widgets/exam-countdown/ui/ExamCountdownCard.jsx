@@ -5,10 +5,11 @@ import { Button } from '../../../shared/ui/Button/Button'
 import { useAuth, updateExamDate } from '../../../entities/user'
 import { track } from '../../../shared/lib/analytics'
 import { isoToDisplay, maskDate, displayToIso, daysUntil } from '../../../shared/lib/examDate'
+import { getExamRecommendation } from '../../../shared/lib/examPlan'
 
 // ticketsLeft: foydalanuvchiga ochiq va hali yechilmagan biletlar soni (tavsiya hisoblash uchun).
 export function ExamCountdownCard({ ticketsLeft }) {
-  const { user, profile, refreshProfile } = useAuth()
+  const { user, profile, isPremiumActive, refreshProfile } = useAuth()
   const examDate = profile?.examDate
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(isoToDisplay(examDate))
@@ -87,11 +88,10 @@ export function ExamCountdownCard({ ticketsLeft }) {
   const isPast = days < 0
 
   let recommendation = null
-  if (!isPast && days > 0 && typeof ticketsLeft === 'number') {
-    recommendation =
-      ticketsLeft === 0
-        ? "Ochiq biletlarning hammasini yechib bo'ldingiz. Endi xatolaringiz ustida ishlang."
-        : `Imtihongacha ${days} kun. Kuniga ${Math.ceil(ticketsLeft / days)} ta bilet yechsangiz, hammasini ulgurasiz.`
+  if (isPast) {
+    recommendation = "Qayta topshirmoqchi bo'lsangiz, yangi imtihon sanasini kiriting: tayyorgarlik rejangiz yangilanadi."
+  } else if (days > 0 && typeof ticketsLeft === 'number') {
+    recommendation = getExamRecommendation({ days, ticketsLeft, isPremiumActive })
   }
 
   return (
@@ -101,7 +101,7 @@ export function ExamCountdownCard({ ticketsLeft }) {
           <IconCalendarEvent size={22} color="var(--mantine-color-brand-6)" />
           <div>
             <Text fw={800} fz="1.3rem">
-              {isPast ? "Imtihon sanasi o'tib ketdi" : days === 0 ? 'Imtihon bugun!' : `${days} kun qoldi`}
+              {isPast ? "Imtihoningiz qanday o'tdi?" : days === 0 ? 'Imtihon bugun!' : `${days} kun qoldi`}
             </Text>
             <Text c="dimmed" fz="sm">
               Imtihon sanasi: {isoToDisplay(examDate)}
@@ -109,15 +109,16 @@ export function ExamCountdownCard({ ticketsLeft }) {
           </div>
         </Group>
         <Button
-          variant="secondary"
+          variant={isPast ? 'primary' : 'secondary'}
           size="xs"
           leftSection={<IconEdit size={14} />}
           onClick={() => {
-            setValue(isoToDisplay(examDate))
+            // Sana o'tib ketgan bo'lsa, yangi sana kiritiladi; aks holda mavjud sana tahrirlanadi.
+            setValue(isPast ? '' : isoToDisplay(examDate))
             setEditing(true)
           }}
         >
-          O'zgartirish
+          {isPast ? 'Yangi sana kiritish' : "O'zgartirish"}
         </Button>
       </Group>
       {recommendation && (
