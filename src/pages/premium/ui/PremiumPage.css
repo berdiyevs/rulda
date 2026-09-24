@@ -1,0 +1,15 @@
+/* Telefonda "Mashhur" tarif birinchi ko'rinadi */
+@media (max-width: 47.99em) {
+  .plan-card.is-popular {
+    order: -1;
+  }
+  /* Telefonda tariflar taqqoslash jadvalidan oldin ko'rinadi */
+  .premium-plans-block {
+    order: -1;
+  }
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 10px 8px;
+}

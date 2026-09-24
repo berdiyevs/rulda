@@ -152,12 +152,14 @@ export function CategoriesNav() {
         ) : (
           <Group gap={{ base: 8, lg: 14 }} fz="0.88rem" c="dimmed" visibleFrom="sm" ml="auto" wrap="nowrap">
             {isPremiumActive ? (
-              <Badge variant="warning">
-                <Group gap={4} wrap="nowrap">
-                  <IconCrown size={12} />
-                  Premium
-                </Group>
-              </Badge>
+              <Link to={ROUTES.PREMIUM} title="Premium faol" style={{ textDecoration: 'none' }}>
+                <Badge variant="warning">
+                  <Group gap={4} wrap="nowrap">
+                    <IconCrown size={12} />
+                    Premium ✓
+                  </Group>
+                </Badge>
+              </Link>
             ) : (
               <Button
                 component={Link}
@@ -231,6 +233,23 @@ export function CategoriesNav() {
         ) : (
           <Group gap={6} hiddenFrom="sm" ml="auto">
             <ThemeToggle />
+            {isPremiumActive ? (
+              <Link to={ROUTES.PREMIUM} title="Premium faol" style={{ textDecoration: 'none' }}>
+                <Badge variant="warning">Premium ✓</Badge>
+              </Link>
+            ) : (
+              <ActionIcon
+                component={Link}
+                to={ROUTES.PREMIUM}
+                variant="subtle"
+                color="warning"
+                size="lg"
+                aria-label="Premium"
+                title="Premium"
+              >
+                <IconCrown size={18} />
+              </ActionIcon>
+            )}
             {isAdmin && (
               <ActionIcon
                 component={Link}

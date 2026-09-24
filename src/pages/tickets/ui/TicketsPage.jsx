@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Container, Stack, Title, Text, SimpleGrid, Skeleton, Card, Group } from '@mantine/core'
+import { Container, Stack, Title, Text, SimpleGrid, Skeleton, Card, Modal } from '@mantine/core'
 import { IconTicket, IconLock } from '@tabler/icons-react'
 import { CategoriesNav } from '../../../widgets/sidebar'
 import { fetchQuestions } from '../../../entities/question'
@@ -10,7 +10,10 @@ import { useAuth } from '../../../entities/user'
 import { useQuizStart } from '../../../widgets/quiz-start'
 import { useLoginModal } from '../../../widgets/login-modal'
 import { Badge } from '../../../shared/ui/Badge/Badge'
-import { isTicketLocked, isTicketGuestLocked } from '../../../shared/lib/premium'
+import { Button } from '../../../shared/ui/Button/Button'
+import { fetchPlans } from '../../../entities/payment'
+import { formatPrice } from '../../../shared/lib/formatPrice'
+import { isTicketLocked, isTicketGuestLocked, FREE_TICKET_LIMIT } from '../../../shared/lib/premium'
 import { ROUTES } from '../../../shared/config/routes'
 
 export function TicketsPage() {
@@ -21,6 +24,8 @@ export function TicketsPage() {
   const [tickets, setTickets] = useState([])
   const [attempts, setAttempts] = useState({})
   const [loading, setLoading] = useState(true)
+  const [lockedTicketId, setLockedTicketId] = useState(null)
+  const [cheapestPrice, setCheapestPrice] = useState(null)
 
   useEffect(() => {
     let isMounted = true
@@ -43,6 +48,15 @@ export function TicketsPage() {
       isMounted = false
     }
   }, [user])
+
+  // Qulflangan bilet oynasida "eng arzon narx" ko'rsatish uchun.
+  useEffect(() => {
+    fetchPlans()
+      .then((plans) => {
+        if (plans.length > 0) setCheapestPrice(Math.min(...plans.map((p) => p.amount)))
+      })
+      .catch(() => {})
+  }, [])
 
   return (
     <div className="page-shell has-tabbar">
@@ -80,7 +94,7 @@ export function TicketsPage() {
                     if (guestLocked) {
                       openLogin({ title: `Bilet ${ticketId} ni ochish uchun kiring`, redirectTo: false })
                     } else if (locked) {
-                      navigate(ROUTES.PREMIUM)
+                      setLockedTicketId(ticketId)
                     } else {
                       openQuizStart({ ticketId })
                     }
@@ -121,6 +135,29 @@ export function TicketsPage() {
           </SimpleGrid>
         )}
       </Container>
+
+      <Modal
+        opened={lockedTicketId !== null}
+        onClose={() => setLockedTicketId(null)}
+        title={`Bilet ${lockedTicketId} Premium uchun`}
+        centered
+        size={400}
+      >
+        <Stack gap="md">
+          <Text c="dimmed" size="sm">
+            {`Bepul foydalanuvchilar faqat 1–${FREE_TICKET_LIMIT}-biletlarni yecha oladi. Qolgan biletlar Premium bilan ochiladi.`}
+            {cheapestPrice !== null && ` Premium ${formatPrice(cheapestPrice)} dan boshlanadi.`}
+          </Text>
+          <Stack gap="xs">
+            <Button variant="primary" fullWidth onClick={() => navigate(ROUTES.PREMIUM)}>
+              Premiumni ko'rish
+            </Button>
+            <Button variant="ghost" fullWidth onClick={() => setLockedTicketId(null)}>
+              Yopish
+            </Button>
+          </Stack>
+        </Stack>
+      </Modal>
     </div>
   )
 }
