@@ -177,7 +177,7 @@ export function StatisticsPage() {
                     {stats.streak} kun
                   </Text>
                   <Text c="dimmed" fz="sm">
-                    Ketma-ket mashq qilish
+                    Ketma-ket kunlik maqsad (kuniga 20 savol)
                   </Text>
                 </Stack>
               </Paper>

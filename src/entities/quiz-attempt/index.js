@@ -13,7 +13,7 @@ export {
   REVIEW_SESSION_SIZE_FREE,
   REVIEW_SESSION_SIZE_PREMIUM,
 } from './lib/reviewSchedule'
-export { AttemptsProvider, useAttempts } from './model/AttemptsContext'
+export { AttemptsProvider, useAttempts, useDailyProgress } from './model/AttemptsContext'
 export {
   isResumableMode,
   ownerOf,
@@ -25,4 +25,4 @@ export {
   resumeUrl,
   sessionMatches,
 } from './lib/savedSession'
-export { computeStreak } from './lib/computeStreak'
+export { computeStreak, getTodayProgress, DAILY_GOAL } from './lib/computeStreak'

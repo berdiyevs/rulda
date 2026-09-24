@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Paper, Stack, Group, Title, Text } from '@mantine/core'
+import { Progress } from '@mantine/core'
 import { IconPlayerPlay, IconRefresh, IconLock, IconArrowBackUp, IconRepeat } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
 import { useAuth } from '../../../entities/user'
@@ -10,9 +11,11 @@ import {
   resumeUrl,
   REVIEW_SESSION_SIZE_FREE,
   REVIEW_SESSION_SIZE_PREMIUM,
+  useDailyProgress,
 } from '../../../entities/quiz-attempt'
 import { useQuizStart } from '../../quiz-start'
 import { isTicketLocked } from '../../../shared/lib/premium'
+import { uzHour } from '../../../shared/lib/uzDate'
 import { ROUTES } from '../../../shared/config/routes'
 
 function describeSession(session) {
@@ -28,6 +31,9 @@ export function ContinueCard({ progress }) {
   const openQuizStart = useQuizStart()
   const { user, isPremiumActive } = useAuth()
   const saved = getResumableSession(user)
+  const daily = useDailyProgress()
+  // Kechqurun (18:00 dan keyin) maqsad bajarilmagan va seriya 2 kundan ko'p bo'lsa, eslatma.
+  const showEveningReminder = !daily.met && daily.streak > 2 && uzHour() >= 18
 
   const { lastAttempt, lastTicketId, nextTicketId, mistakeIds, reviewDueIds, reviewedToday } = progress
   const reviewSize = isPremiumActive ? REVIEW_SESSION_SIZE_PREMIUM : REVIEW_SESSION_SIZE_FREE
@@ -65,6 +71,29 @@ export function ContinueCard({ progress }) {
   return (
     <Paper className="glass-card" p="lg">
       <Stack gap="md">
+        <div>
+          <Group justify="space-between" mb={6} gap="xs">
+            <Text fz="xs" fw={700} c={daily.met ? 'success' : 'dimmed'}>
+              {daily.met ? 'Bugungi maqsad bajarildi ✓' : `Bugun: ${daily.answered}/${daily.goal}`}
+            </Text>
+            <Text fz="xs" c="dimmed">
+              Seriya: {daily.streak} kun
+            </Text>
+          </Group>
+          <Progress
+            value={Math.min(100, (daily.answered / daily.goal) * 100)}
+            color={daily.met ? 'success' : 'brand'}
+            size="sm"
+            radius="xl"
+            aria-label={`Bugun: ${daily.answered}/${daily.goal}`}
+          />
+          {showEveningReminder && (
+            <Text fz="sm" fw={600} mt={8} c="warning">
+              Seriyangizni saqlab qoling: yana {daily.remaining} ta savol
+            </Text>
+          )}
+        </div>
+
         <div>
           <Title order={2} fz="1.2rem">
             {title}

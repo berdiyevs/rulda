@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../user'
 import { fetchAllAttempts } from '../api/attemptsApi'
+import { computeStreak, getTodayProgress } from '../lib/computeStreak'
 
 const AttemptsContext = createContext({
   attempts: [],
@@ -56,4 +57,10 @@ export function AttemptsProvider({ children }) {
 
 export function useAttempts() {
   return useContext(AttemptsContext)
+}
+
+// Seriya va bugungi maqsad (kuniga 20 ta savol, O'zbekiston vaqti bo'yicha).
+export function useDailyProgress() {
+  const { attempts } = useAttempts()
+  return useMemo(() => ({ streak: computeStreak(attempts), ...getTodayProgress(attempts) }), [attempts])
 }

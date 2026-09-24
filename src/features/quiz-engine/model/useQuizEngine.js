@@ -11,6 +11,8 @@ import {
   loadSavedSession,
   clearSavedSession,
   sessionMatches,
+  getTodayProgress,
+  computeStreak,
 } from '../../../entities/quiz-attempt'
 import { useAuth } from '../../../entities/user'
 import { shuffleArray, pickRandom } from '../../../shared/lib/shuffle'
@@ -90,7 +92,9 @@ export function useQuizEngine({
   sessionSearch = '',
 }) {
   const { user } = useAuth()
-  const { refresh: refreshAttempts } = useAttempts()
+  const { attempts, refresh: refreshAttempts } = useAttempts()
+  const attemptsRef = useRef(attempts)
+  attemptsRef.current = attempts
   const [sourceQuestions, setSourceQuestions] = useState([])
   const [sessionQuestions, setSessionQuestions] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -195,8 +199,18 @@ export function useQuizEngine({
       if (mode === 'exam') exitFullscreen()
 
       if (user) {
+        // Maqsad shu testda bajarildimi (bugun avval bajarilmagan edi)? Bajarilgan bo'lsa, kichik tabrik.
+        const goalMetBefore = getTodayProgress(attemptsRef.current).met
         saveAttempt(summary)
           .then(() => refreshAttempts())
+          .then((data) => {
+            if (!data || goalMetBefore || !getTodayProgress(data).met) return
+            notifications.show({
+              color: 'success',
+              title: 'Bugungi maqsad bajarildi!',
+              message: `Kuniga 20 ta savol. Seriyangiz: ${computeStreak(data)} kun.`,
+            })
+          })
           .catch((error) => {
             // Masalan, bepul foydalanuvchining kunlik takrorlash cheklovi.
             if (error.status === 403) {

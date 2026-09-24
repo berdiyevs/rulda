@@ -10,8 +10,10 @@ import {
   IconChartBar,
   IconShieldLock,
   IconCrown,
+  IconFlame,
 } from '@tabler/icons-react'
 import { useAuth } from '../../../entities/user'
+import { useDailyProgress } from '../../../entities/quiz-attempt'
 import { useQuizStart } from '../../../widgets/quiz-start'
 import { useLoginModal } from '../../../widgets/login-modal'
 import { ThemeToggle } from '../../../shared/ui/ThemeToggle/ThemeToggle'
@@ -32,6 +34,23 @@ const LINKS = [
   { action: 'exam', label: 'Imtihon', icon: IconClock, reason: 'Imtihon rejimini ochish uchun kiring' },
   { to: ROUTES.STATISTICS, label: 'Statistika', icon: IconChartBar, reason: "Statistikangizni ko'rish uchun kiring" },
 ]
+
+// Seriya: olov belgisi va kunlar soni. Bugungi maqsad bajarilmagan bo'lsa xira ko'rinadi.
+function StreakBadge({ daily }) {
+  const label = `Seriya: ${daily.streak} kun · Bugun: ${Math.min(daily.answered, daily.goal)}/${daily.goal}`
+  return (
+    <Group
+      gap={3}
+      wrap="nowrap"
+      title={label}
+      aria-label={label}
+      style={{ color: daily.met ? 'var(--warning)' : 'var(--text-muted)', fontWeight: 800, fontSize: '0.9rem' }}
+    >
+      <IconFlame size={18} stroke={2.2} />
+      <span>{daily.streak}</span>
+    </Group>
+  )
+}
 
 const linkStyle = ({ isActive }) => ({
   color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
@@ -57,6 +76,7 @@ export function CategoriesNav() {
   const openQuizStart = useQuizStart()
   const openLogin = useLoginModal()
   const isGuest = !user
+  const daily = useDailyProgress()
   const [logoutOpen, { open: openLogout, close: closeLogout }] = useDisclosure(false)
 
   const handleExamClick = () => {
@@ -172,6 +192,7 @@ export function CategoriesNav() {
                 Premium
               </Button>
             )}
+            <StreakBadge daily={daily} />
             <ThemeToggle />
             {isAdmin && (
               <ActionIcon
@@ -232,6 +253,7 @@ export function CategoriesNav() {
           </Group>
         ) : (
           <Group gap={6} hiddenFrom="sm" ml="auto">
+            <StreakBadge daily={daily} />
             <ThemeToggle />
             {isPremiumActive ? (
               <Link to={ROUTES.PREMIUM} title="Premium faol" style={{ textDecoration: 'none' }}>
