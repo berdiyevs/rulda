@@ -27,11 +27,17 @@ export async function apiFetch(path, { method = 'GET', body, auth = true } = {})
     if (token) headers.Authorization = `Bearer ${token}`
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  })
+  let response
+  try {
+    response = await fetch(`${API_URL}${path}`, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    })
+  } catch {
+    // Brauzerning inglizcha "Failed to fetch" xabari o'rniga tushunarli o'zbekcha xabar.
+    throw new Error("Serverga ulanib bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.")
+  }
 
   const data = await response.json().catch(() => null)
 
