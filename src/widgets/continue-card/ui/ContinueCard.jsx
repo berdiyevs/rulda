@@ -1,10 +1,16 @@
 import { useNavigate } from 'react-router-dom'
 import { Paper, Stack, Group, Title, Text } from '@mantine/core'
-import { IconPlayerPlay, IconRefresh, IconLock, IconArrowBackUp } from '@tabler/icons-react'
+import { IconPlayerPlay, IconRefresh, IconLock, IconArrowBackUp, IconRepeat } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
 import { useAuth } from '../../../entities/user'
 import { TOPICS } from '../../../entities/category'
-import { getResumableSession, answeredCountOf, resumeUrl } from '../../../entities/quiz-attempt'
+import {
+  getResumableSession,
+  answeredCountOf,
+  resumeUrl,
+  REVIEW_SESSION_SIZE_FREE,
+  REVIEW_SESSION_SIZE_PREMIUM,
+} from '../../../entities/quiz-attempt'
 import { useQuizStart } from '../../quiz-start'
 import { isTicketLocked } from '../../../shared/lib/premium'
 import { ROUTES } from '../../../shared/config/routes'
@@ -23,7 +29,9 @@ export function ContinueCard({ progress }) {
   const { user, isPremiumActive } = useAuth()
   const saved = getResumableSession(user)
 
-  const { lastAttempt, lastTicketId, nextTicketId, mistakeIds } = progress
+  const { lastAttempt, lastTicketId, nextTicketId, mistakeIds, reviewDueIds, reviewedToday } = progress
+  const reviewSize = isPremiumActive ? REVIEW_SESSION_SIZE_PREMIUM : REVIEW_SESSION_SIZE_FREE
+  const reviewLimitReached = !isPremiumActive && reviewedToday
   const hasStarted = lastTicketId != null
   const targetTicketId = hasStarted ? nextTicketId : 1
   const targetLocked = targetTicketId != null && isTicketLocked(targetTicketId, isPremiumActive)
@@ -33,6 +41,11 @@ export function ContinueCard({ progress }) {
   const startTicket = (ticketId) => {
     if (isTicketLocked(ticketId, isPremiumActive)) navigate(ROUTES.PREMIUM)
     else openQuizStart({ ticketId })
+  }
+
+  const startReview = () => {
+    const ids = reviewDueIds.slice(0, reviewSize).join(',')
+    navigate(`${ROUTES.QUIZ}?mode=review&ids=${ids}`, { state: { from: ROUTES.CATEGORIES } })
   }
 
   const startMistakes = () => {
@@ -65,6 +78,42 @@ export function ContinueCard({ progress }) {
             </Text>
           )}
         </div>
+
+        {reviewDueIds.length > 0 && (
+          <Group
+            justify="space-between"
+            align="center"
+            wrap="wrap"
+            gap="sm"
+            p="sm"
+            style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-md)' }}
+          >
+            <div>
+              <Text fw={700} fz="sm">
+                Bugungi takrorlash: {reviewDueIds.length} ta savol
+              </Text>
+              <Text c="dimmed" fz="xs">
+                {reviewLimitReached
+                  ? 'Bugungi bepul takrorlash bajarildi. Premium bilan cheklovsiz.'
+                  : "Oldin xato qilgan savollaringiz qayta so'raladi."}
+              </Text>
+            </div>
+            {reviewLimitReached ? (
+              <Button
+                variant="secondary"
+                size="xs"
+                leftSection={<IconLock size={14} />}
+                onClick={() => navigate(ROUTES.PREMIUM)}
+              >
+                Premium
+              </Button>
+            ) : (
+              <Button variant="secondary" size="xs" leftSection={<IconRepeat size={14} />} onClick={startReview}>
+                Takrorlash
+              </Button>
+            )}
+          </Group>
+        )}
 
         <Group gap="sm" wrap="wrap">
           {saved && (

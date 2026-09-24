@@ -83,9 +83,11 @@ export function QuizNav({
         <Text c="dimmed" fz="0.82rem" tt="uppercase" fw={600} style={{ letterSpacing: '0.06em' }} visibleFrom="sm">
           {mode === 'ticket'
             ? `Bilet ${ticketId} · Imtihon formati`
-            : mode === 'mistakes'
-              ? 'Xatolarim ustida ishlash'
-              : `${mode === 'exam' ? 'Imtihon rejimi' : "Mashg'ulot"} · ${TOPIC_LABELS[topic] || topic}`}
+            : mode === 'review'
+              ? 'Bugungi takrorlash'
+              : mode === 'mistakes'
+                ? 'Xatolarim ustida ishlash'
+                : `${mode === 'exam' ? 'Imtihon rejimi' : "Mashg'ulot"} · ${TOPIC_LABELS[topic] || topic}`}
         </Text>
 
         {hasProgress && (

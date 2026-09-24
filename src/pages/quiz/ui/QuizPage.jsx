@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { Box } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { QuizPlay } from './QuizPlay'
 import { useAuth } from '../../../entities/user'
+import { useAttempts, hasReviewedToday } from '../../../entities/quiz-attempt'
+import { uzToday } from '../../../shared/lib/uzDate'
 import { isTicketLocked, isTicketGuestLocked } from '../../../shared/lib/premium'
 import { Spinner } from '../../../shared/ui/Spinner/Spinner'
 import { ROUTES } from '../../../shared/config/routes'
@@ -13,6 +15,7 @@ const VALID_TOPICS = ['all', 'signs', 'theory']
 export function QuizPage() {
   const navigate = useNavigate()
   const { user, isAuthReady, isPremiumActive } = useAuth()
+  const { attempts, loaded: attemptsLoaded } = useAttempts()
   const [searchParams] = useSearchParams()
   const topicParam = searchParams.get('topic')
   const modeParam = searchParams.get('mode')
@@ -27,15 +30,18 @@ export function QuizPage() {
   const topic = VALID_TOPICS.includes(topicParam) ? topicParam : 'all'
   const isTicket = Boolean(ticketId)
   const isMistakes = !isTicket && modeParam === 'mistakes'
+  const isReview = !isTicket && modeParam === 'review'
   const mode = isTicket
     ? 'ticket'
     : isMistakes
       ? 'mistakes'
-      : modeParam === 'exam'
-        ? 'exam'
-        : modeParam === 'mini'
-          ? 'mini'
-          : 'practice'
+      : isReview
+        ? 'review'
+        : modeParam === 'exam'
+          ? 'exam'
+          : modeParam === 'mini'
+            ? 'mini'
+            : 'practice'
 
   const questionIds = useMemo(
     () => (idsParam ? idsParam.split(',').map(Number).filter((n) => !Number.isNaN(n)) : []),
@@ -54,6 +60,23 @@ export function QuizPage() {
     params.delete('resume')
     return params.toString()
   }, [searchParams])
+
+  // Bepul foydalanuvchi kuniga bitta takrorlash sessiyasini yecha oladi (server ham tekshiradi).
+  const reviewCheckedRef = useRef(false)
+  useEffect(() => {
+    if (mode !== 'review' || !user || !isAuthReady || isPremiumActive || !attemptsLoaded) return
+    if (reviewCheckedRef.current) return
+    reviewCheckedRef.current = true
+    if (hasReviewedToday(attempts, uzToday())) {
+      notifications.show({
+        color: 'warning',
+        title: 'Bugungi bepul takrorlash bajarilgan',
+        message: 'Premium bilan takrorlashni cheklovsiz yechishingiz mumkin.',
+      })
+      navigate(ROUTES.CATEGORIES, { replace: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, user, isAuthReady, isPremiumActive, attemptsLoaded])
 
   // Mehmon faqat mini-testni va 1-biletni yecha oladi, qolganlari uchun kirish kerak.
   const guestBlocked = !user && !(mode === 'mini' || (mode === 'ticket' && !isTicketGuestLocked(ticketId, true)))

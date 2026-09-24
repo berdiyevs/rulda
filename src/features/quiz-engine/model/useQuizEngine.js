@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
+import { notifications } from '@mantine/notifications'
 import { fetchQuestions, filterQuestionsByTopic } from '../../../entities/question'
 import {
   saveAttempt,
@@ -37,7 +38,7 @@ function prepareSession(allQuestions, topic, mode, ticketId, questionIds, questi
     return pickRandom(pool, MINI_TEST_SIZE).map((q) => ({ ...q, options: shuffleArray(q.options) }))
   }
 
-  if (mode === 'mistakes') {
+  if (mode === 'mistakes' || mode === 'review') {
     const idSet = new Set(questionIds)
     const pool = allQuestions.filter((q) => idSet.has(q.id))
     return pool.map((q) => ({ ...q, options: shuffleArray(q.options) }))
@@ -164,7 +165,7 @@ export function useQuizEngine({
       else if (mode !== 'mistakes' && maxMistakes != null) passed = wrongCount <= maxMistakes
       else passed = correctCount / totalQuestions >= 0.7
       const attemptTopic =
-        mode === 'ticket' ? `ticket-${ticketId}` : mode === 'mistakes' ? 'mistakes' : mode === 'mini' ? 'mini-test' : topic
+        mode === 'ticket' ? `ticket-${ticketId}` : mode === 'mistakes' ? 'mistakes' : mode === 'review' ? 'review' : mode === 'mini' ? 'mini-test' : topic
 
       const wrongQuestionIds = statuses
         .map((s, i) => (s === 'wrong' ? sessionQuestions[i]?.id : null))
@@ -196,7 +197,12 @@ export function useQuizEngine({
       if (user) {
         saveAttempt(summary)
           .then(() => refreshAttempts())
-          .catch(() => {})
+          .catch((error) => {
+            // Masalan, bepul foydalanuvchining kunlik takrorlash cheklovi.
+            if (error.status === 403) {
+              notifications.show({ color: 'warning', title: 'Natija saqlanmadi', message: error.message })
+            }
+          })
       } else {
         addGuestAttempt(summary)
       }

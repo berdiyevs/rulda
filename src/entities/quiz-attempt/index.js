@@ -7,6 +7,12 @@ export {
 } from './api/attemptsApi'
 export { addGuestAttempt } from './lib/guestAttempts'
 export { getMistakeIds } from './lib/mistakes'
+export {
+  getReviewDueIds,
+  hasReviewedToday,
+  REVIEW_SESSION_SIZE_FREE,
+  REVIEW_SESSION_SIZE_PREMIUM,
+} from './lib/reviewSchedule'
 export { AttemptsProvider, useAttempts } from './model/AttemptsContext'
 export {
   isResumableMode,

@@ -52,7 +52,9 @@ export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
               ? passed
                 ? "Siz imtihondan muvaffaqiyatli o'tdingiz."
                 : "Imtihondan o'ta olmadingiz, ruxsat etilgan xatolar sonidan oshib ketdi."
-              : "Mashg'ulot yakunlandi."}
+              : mode === 'review'
+                ? "Takrorlash yakunlandi. To'g'ri javoblar keyingi bosqichga o'tadi, xatolar ertaga qayta chiqadi."
+                : "Mashg'ulot yakunlandi."}
           </Text>
         </div>
 
@@ -140,9 +142,11 @@ export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
           <Button variant="secondary" as={Link} to={backTo} fullWidth>
             {BACK_LABELS[backTo] || 'Orqaga qaytish'}
           </Button>
-          <Button variant="primary" onClick={onRetry} fullWidth>
-            Qayta urinish
-          </Button>
+          {mode !== 'review' && (
+            <Button variant="primary" onClick={onRetry} fullWidth>
+              Qayta urinish
+            </Button>
+          )}
         </SimpleGrid>
       </Stack>
     </Card>

@@ -5,6 +5,7 @@ import { fetchAllAttempts } from '../api/attemptsApi'
 const AttemptsContext = createContext({
   attempts: [],
   loading: false,
+  loaded: false,
   refresh: async () => [],
 })
 
@@ -15,6 +16,7 @@ export function AttemptsProvider({ children }) {
   const uid = user?.uid
   const [attempts, setAttempts] = useState([])
   const [loading, setLoading] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
   const refresh = useCallback(async () => {
     if (!uid) return []
@@ -31,19 +33,24 @@ export function AttemptsProvider({ children }) {
     if (!uid) {
       setAttempts([])
       setLoading(false)
+      setLoaded(false)
       return
     }
     let isMounted = true
     setLoading(true)
+    setLoaded(false)
     refresh().finally(() => {
-      if (isMounted) setLoading(false)
+      if (isMounted) {
+        setLoading(false)
+        setLoaded(true)
+      }
     })
     return () => {
       isMounted = false
     }
   }, [uid, refresh])
 
-  const value = useMemo(() => ({ attempts, loading, refresh }), [attempts, loading, refresh])
+  const value = useMemo(() => ({ attempts, loading, loaded, refresh }), [attempts, loading, loaded, refresh])
   return <AttemptsContext.Provider value={value}>{children}</AttemptsContext.Provider>
 }
 

@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useAttempts, computeStreak, getMistakeIds } from '../../../entities/quiz-attempt'
+import {
+  useAttempts,
+  computeStreak,
+  getMistakeIds,
+  getReviewDueIds,
+  hasReviewedToday,
+} from '../../../entities/quiz-attempt'
+import { uzToday } from '../../../shared/lib/uzDate'
 import { fetchQuestions } from '../../../entities/question'
 import { groupByTicket } from '../../../entities/ticket'
 import { TOPICS } from '../../../entities/category'
@@ -56,6 +63,10 @@ export function useLearningProgress() {
     const questionIds = new Set(questions.map((q) => q.id))
     const mistakeIds = getMistakeIds(attempts).filter((id) => questionIds.has(id))
 
+    // Bugungi takrorlash: muddati kelgan (va hali mavjud) savollar.
+    const today = uzToday()
+    const reviewDueIds = getReviewDueIds(attempts, today).filter((id) => questionIds.has(id))
+
     const latestByTopic = {}
     TOPICS.forEach((topic) => {
       const list = attempts.filter((a) => a.topic === topic.id)
@@ -67,6 +78,8 @@ export function useLearningProgress() {
       lastTicketId,
       nextTicketId,
       mistakeIds,
+      reviewDueIds,
+      reviewedToday: hasReviewedToday(attempts, today),
       latestByTopic,
       streak: computeStreak(attempts),
       // Foydalanuvchiga ochiq va hali yechilmagan biletlar soni (imtihongacha tavsiya uchun).
