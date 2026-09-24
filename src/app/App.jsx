@@ -5,6 +5,7 @@ import { AuthProvider } from '../entities/user'
 import { AttemptsProvider } from '../entities/quiz-attempt'
 import { QuizStartProvider } from '../widgets/quiz-start'
 import { LoginModalProvider } from '../widgets/login-modal'
+import { CookieBanner } from '../widgets/cookie-banner'
 import { GuestAttemptsSync } from '../features/guest-sync'
 import { AppRouter } from './providers/AppRouter'
 import { RouteTracker } from './providers/RouteTracker'
@@ -27,6 +28,7 @@ export function App() {
           <LoginModalProvider>
             <QuizStartProvider>
               <AppRouter />
+              <CookieBanner />
             </QuizStartProvider>
           </LoginModalProvider>
         </BrowserRouter>
