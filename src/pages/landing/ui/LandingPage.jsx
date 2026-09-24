@@ -136,7 +136,7 @@ export function LandingPage() {
                   {isMember ? 'Davom ettirish' : 'Mashq qilishni boshlash'}
                 </Button>
                 <Button variant="secondary" size="lg" onClick={handleSecondaryClick}>
-                  {isMember ? 'Biletlar' : 'Bilet 1 ni yechish'}
+                  {isMember ? 'Biletlar' : 'Imtihonni sinab ko'rish'}
                 </Button>
               </Group>
             </Stack>
