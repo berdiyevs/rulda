@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Modal, Stack, Title, Text, List, ThemeIcon, Group, SegmentedControl, Menu, Center, Box } from '@mantine/core'
+import { Modal, Stack, Title, Text, List, ThemeIcon, Group, SegmentedControl, Menu, Center, Box, SimpleGrid } from '@mantine/core'
 import {
   IconCircleCheck,
   IconClock,
@@ -75,7 +75,8 @@ function QuizStartModalBody({ config, onClose }) {
   const [practiceMode, setPracticeMode] = useState('strict')
   const [questionCount, setQuestionCount] = useState(20)
   const [durationMinutes, setDurationMinutes] = useState(0)
-  const [maxMistakes, setMaxMistakes] = useState(null)
+  // Bilet rasmiy imtihon formatida: standart holda 2 tagacha xatoga ruxsat.
+  const [maxMistakes, setMaxMistakes] = useState(isTicket ? 2 : null)
   const [feedbackMode, setFeedbackMode] = useState('instant')
 
   const isExam = mode === 'exam'
@@ -238,7 +239,7 @@ function QuizStartModalBody({ config, onClose }) {
 
       {!isTicket && !isMistakes && isCustom && (
         <Stack gap="sm" className="glass-card" p="sm">
-          <Group grow>
+          <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="sm">
             <DropdownField
               label="Nechta savol"
               value={questionCount}
@@ -254,9 +255,9 @@ function QuizStartModalBody({ config, onClose }) {
                 ...[15, 30, 45, 60].map((m) => ({ value: m, label: `${m} daqiqa` })),
               ]}
             />
-          </Group>
+          </SimpleGrid>
 
-          <Group grow>
+          <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="sm">
             <DropdownField
               label="Ruxsat etilgan xatolar"
               value={maxMistakes}
@@ -277,13 +278,13 @@ function QuizStartModalBody({ config, onClose }) {
                 { value: 'end', label: 'Faqat oxirida' },
               ]}
             />
-          </Group>
+          </SimpleGrid>
         </Stack>
       )}
 
       {isTicket && (
         <Stack gap="sm" className="glass-card" p="sm">
-          <Group grow>
+          <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="sm">
             <DropdownField
               label="Ruxsat etilgan xatolar"
               value={maxMistakes}
@@ -304,7 +305,7 @@ function QuizStartModalBody({ config, onClose }) {
                 { value: 'end', label: 'Faqat oxirida' },
               ]}
             />
-          </Group>
+          </SimpleGrid>
         </Stack>
       )}
 

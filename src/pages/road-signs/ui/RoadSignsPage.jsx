@@ -89,7 +89,7 @@ export function RoadSignsPage() {
                 {filtered.map((b) => (
                   <Paper key={b.id} bg="white" radius="lg" p="sm" ta="center" withBorder>
                     <Image src={b.rasm} alt={b.nom || b.id} loading="lazy" fit="contain" h={70} mx="auto" />
-                    <Text size="xs" mt={6} c="dark.8">
+                    <Text size="xs" mt={6} c="dark.8" style={{ overflowWrap: 'anywhere' }}>
                       {b.nom}
                     </Text>
                   </Paper>
