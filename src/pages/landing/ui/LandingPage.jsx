@@ -4,6 +4,7 @@ import { Container, Stack, Group, Title, Text, SimpleGrid, Box, Accordion, Theme
 import { notifications } from '@mantine/notifications'
 import { IconTargetArrow, IconPhoto, IconChartBar } from '@tabler/icons-react'
 import { Navbar } from '../../../widgets/navbar'
+import { DailyQuestionCard } from '../../../widgets/daily-question'
 import { useLoginModal } from '../../../widgets/login-modal'
 import { Footer } from '../../../widgets/footer'
 import { Button } from '../../../shared/ui/Button/Button'
@@ -63,7 +64,7 @@ const FAQS = [
   {
     question: "Ro'yxatdan o'tish shartmi?",
     answer:
-      "Ha, mashq qilish uchun ro'yxatdan o'tish kerak. Buni Google hisobingiz yoki email va parol orqali bir necha soniyada qilasiz (email orqali ro'yxatdan o'tganda emailingizni tasdiqlash kerak). Shundan keyin natijalaringiz saqlanadi va progressni kuzatib borasiz.",
+      "Avval ro'yxatdan o'tmasdan sinab ko'rishingiz mumkin: mini-test, Bilet 1 va yo'l belgilari hamma uchun ochiq. Natijalarni hisobingizda saqlash, qolgan biletlar va statistika uchun Google hisobingiz yoki email va parol orqali ro'yxatdan o'tasiz (email orqali bo'lsa, emailni tasdiqlash kerak). Mehmon sifatida yechgan natijalaringiz ro'yxatdan o'tgach hisobingizga ko'chiriladi.",
   },
 ]
 
@@ -83,7 +84,10 @@ export function LandingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state])
 
-  const handlePracticeClick = () => {
+  const isMember = Boolean(user)
+
+  // Kirgan foydalanuvchi ichki sahifaga o'tadi; mehmon ro'yxatdan o'tmasdan mini-testni boshlaydi.
+  const handlePrimaryClick = () => {
     if (!isAuthReady) return
     if (user && isVerified) {
       navigate(ROUTES.CATEGORIES)
@@ -94,7 +98,16 @@ export function LandingPage() {
         message: 'Iltimos, avval emailingizni tasdiqlang. Tasdiqlash xati emailingizga yuborilgan.',
       })
     } else {
-      openLogin()
+      navigate(`${ROUTES.QUIZ}?mode=mini`)
+    }
+  }
+
+  const handleSecondaryClick = () => {
+    if (!isAuthReady) return
+    if (user) {
+      navigate(ROUTES.TICKETS)
+    } else {
+      navigate(`${ROUTES.QUIZ}?ticket=1&duration=25&errors=2&feedback=instant`)
     }
   }
 
@@ -103,7 +116,7 @@ export function LandingPage() {
       <Navbar onOpenModal={() => openLogin()} />
 
       <Box component="main" className="page-shell">
-        <Box component="section" py={80}>
+        <Box component="section" py={{ base: 32, sm: 64 }}>
           <Container size={1180}>
             <Stack align="center" gap="lg" ta="center" maw={720} mx="auto">
               <Badge variant="primary">✦ 2026 test bazasi yangilandi</Badge>
@@ -119,13 +132,20 @@ export function LandingPage() {
                 savollar bazasi, real imtihon rejimi va shaxsiy progress kuzatuvi bilan.
               </Text>
               <Group justify="center">
-                <Button variant="primary" size="lg" onClick={handlePracticeClick}>
-                  Mashq qilishni boshlash
+                <Button variant="primary" size="lg" onClick={handlePrimaryClick}>
+                  {isMember ? 'Davom ettirish' : 'Mashq qilishni boshlash'}
                 </Button>
-                <Button variant="secondary" size="lg" onClick={handlePracticeClick}>
-                  Imtihonni sinab ko'rish
+                <Button variant="secondary" size="lg" onClick={handleSecondaryClick}>
+                  {isMember ? 'Biletlar' : 'Bilet 1 ni yechish'}
                 </Button>
               </Group>
+            </Stack>
+
+            <Box maw={720} mx="auto" mt={{ base: 'lg', sm: 'xl' }}>
+              <DailyQuestionCard />
+            </Box>
+
+            <Stack align="center" ta="center" maw={720} mx="auto" mt={{ base: 'lg', sm: 'xl' }}>
 
               <SimpleGrid cols={3} spacing={{ base: 8, sm: 'xl' }} mt="md">
                 {STATS.map((s) => (
@@ -143,7 +163,7 @@ export function LandingPage() {
           </Container>
         </Box>
 
-        <Box component="section" py={60}>
+        <Box component="section" py={{ base: 32, sm: 60 }}>
           <Container size={1180}>
             <Title order={2} ta="center" mb="xl">
               Nega aynan Rulda?
@@ -164,7 +184,7 @@ export function LandingPage() {
           </Container>
         </Box>
 
-        <Box component="section" py={60}>
+        <Box component="section" py={{ base: 32, sm: 60 }}>
           <Container size={720}>
             <Title order={2} ta="center" mb="xl">
               Ko'p so'raladigan savollar
@@ -184,12 +204,12 @@ export function LandingPage() {
           </Container>
         </Box>
 
-        <Box component="section" py={60}>
+        <Box component="section" py={{ base: 32, sm: 60 }}>
           <Container size={1180}>
             <Stack align="center" ta="center" gap="md" className="glass-card" p="xl">
               <Title order={2}>Bugundan boshlang</Title>
               <Text c="dimmed">Bepul ro'yxatdan o'ting va zaif tomonlaringizni aniqlashtiring.</Text>
-              <Button variant="primary" size="lg" onClick={handlePracticeClick}>
+              <Button variant="primary" size="lg" onClick={handlePrimaryClick}>
                 Hoziroq boshlash
               </Button>
             </Stack>
