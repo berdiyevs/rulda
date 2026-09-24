@@ -7,9 +7,9 @@ import './CategoryCard.css'
 export function CategoryCard({ topic, latestAttempt, onSelect }) {
   const { icon, title, description } = topic
 
-  const scorePercent = latestAttempt
-    ? Math.round((latestAttempt.correctCount / latestAttempt.totalQuestions) * 100)
-    : null
+  // Foiz faqat javob berilgan savollarga nisbatan (1240 ta savolning foizi emas).
+  const answered = latestAttempt ? latestAttempt.correctCount + latestAttempt.wrongCount : 0
+  const scorePercent = answered ? Math.round((latestAttempt.correctCount / answered) * 100) : null
 
   return (
     <Card
@@ -24,7 +24,9 @@ export function CategoryCard({ topic, latestAttempt, onSelect }) {
         <Group justify="space-between">
           <CategoryIcon name={icon} />
           {scorePercent !== null ? (
-            <Badge variant={scorePercent >= 70 ? 'success' : 'warning'}>{scorePercent}%</Badge>
+            <Badge variant={scorePercent >= 70 ? 'success' : 'warning'}>
+              Oxirgi: {latestAttempt.correctCount}/{answered}
+            </Badge>
           ) : (
             <Badge>Boshlanmagan</Badge>
           )}
@@ -48,7 +50,7 @@ export function CategoryCard({ topic, latestAttempt, onSelect }) {
         >
           {latestAttempt ? (
             <span>
-              Oxirgi urinish: {latestAttempt.correctCount}/{latestAttempt.totalQuestions} to'g'ri
+              Oxirgi urinish: {latestAttempt.correctCount}/{answered} to'g'ri · {scorePercent}%
             </span>
           ) : (
             <span>Mashq qilishni boshlang</span>

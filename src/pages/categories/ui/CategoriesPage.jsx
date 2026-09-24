@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react'
 import { Container, Stack, Title, Text, SimpleGrid, Skeleton, Group } from '@mantine/core'
 import { IconFlame } from '@tabler/icons-react'
 import { CategoriesNav } from '../../../widgets/sidebar'
-import { TOPICS, COMING_SOON, CategoryCard, ComingSoonCard } from '../../../entities/category'
-import { fetchAllLatestAttempts } from '../../../entities/quiz-attempt'
+import { TOPICS, CategoryCard } from '../../../entities/category'
 import { useAuth } from '../../../entities/user'
 import { useQuizStart } from '../../../widgets/quiz-start'
-import { useStreak } from '../../../features/statistics'
+import { useLearningProgress } from '../../../features/continue-learning'
+import { ContinueCard } from '../../../widgets/continue-card'
 import { ExamCountdownCard } from '../../../widgets/exam-countdown'
 import { DailyQuestionCard } from '../../../widgets/daily-question'
 import { Badge } from '../../../shared/ui/Badge/Badge'
@@ -14,27 +13,10 @@ import { Badge } from '../../../shared/ui/Badge/Badge'
 export function CategoriesPage() {
   const { user, profile } = useAuth()
   const openQuizStart = useQuizStart()
-  const streak = useStreak()
-  const [attempts, setAttempts] = useState({})
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    if (!user) return
-    let isMounted = true
-    fetchAllLatestAttempts(TOPICS.map((t) => t.id))
-      .then((data) => {
-        if (isMounted) setAttempts(data)
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (isMounted) setLoading(false)
-      })
-    return () => {
-      isMounted = false
-    }
-  }, [user])
+  const { progress, loading } = useLearningProgress()
 
   const displayName = profile?.displayName || user?.displayName || 'Foydalanuvchi'
+  const streak = progress?.streak ?? 0
 
   return (
     <div className="page-shell has-tabbar">
@@ -62,8 +44,10 @@ export function CategoriesPage() {
           )}
         </Group>
 
-        <Stack gap="xl" mb="xl">
+        <Stack gap="lg" mb="xl">
+          {loading || !progress ? <Skeleton height={150} radius="lg" /> : <ContinueCard progress={progress} />}
           <ExamCountdownCard />
+          <DailyQuestionCard />
         </Stack>
 
         {loading ? (
@@ -73,31 +57,16 @@ export function CategoriesPage() {
             ))}
           </SimpleGrid>
         ) : (
-          <>
-            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-              {TOPICS.map((topic) => (
-                <CategoryCard
-                  key={topic.id}
-                  topic={topic}
-                  latestAttempt={attempts[topic.id]}
-                  onSelect={() => openQuizStart({ topic: topic.id, mode: 'practice' })}
-                />
-              ))}
-            </SimpleGrid>
-
-            <Stack mt="xl" mb="xl">
-              <DailyQuestionCard />
-            </Stack>
-
-            <Title order={2} fz="lg" mb="md">
-              Tez kunda qo'shiladi
-            </Title>
-            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-              {COMING_SOON.map((topic) => (
-                <ComingSoonCard key={topic.id} topic={topic} />
-              ))}
-            </SimpleGrid>
-          </>
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+            {TOPICS.map((topic) => (
+              <CategoryCard
+                key={topic.id}
+                topic={topic}
+                latestAttempt={progress?.latestByTopic[topic.id]}
+                onSelect={() => openQuizStart({ topic: topic.id, mode: 'practice' })}
+              />
+            ))}
+          </SimpleGrid>
         )}
       </Container>
     </div>

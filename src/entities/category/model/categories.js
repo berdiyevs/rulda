@@ -21,24 +21,3 @@ export const TOPICS = [
     available: true,
   },
 ]
-
-export const COMING_SOON = [
-  {
-    id: 'priority',
-    icon: 'priority',
-    title: 'Imtiyozli harakatlanish',
-    description: "Chorrahalardan o'tish va yo'l berish tartibi.",
-  },
-  {
-    id: 'vulnerable',
-    icon: 'vulnerable',
-    title: 'Himoyalanmagan qatnashchilar',
-    description: 'Velosipedchilar, piyodalar uchun xavfsizlik qoidalari.',
-  },
-  {
-    id: 'first-aid',
-    icon: 'firstAid',
-    title: 'Birinchi yordam',
-    description: "Hodisa yuz berganda tezkor tibbiy yordam ko'rsatish.",
-  },
-]

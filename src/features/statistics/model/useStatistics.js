@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchAllAttempts, computeStreak } from '../../../entities/quiz-attempt'
+import { fetchAllAttempts, computeStreak, getMistakeIds } from '../../../entities/quiz-attempt'
 import { fetchQuestions } from '../../../entities/question'
 import { TOPICS } from '../../../entities/category'
 import { useAuth } from '../../../entities/user'
@@ -46,20 +46,9 @@ function computeStatistics(attempts, questions) {
     bestPercent: examAttempts.length ? Math.max(...examAttempts.map((a) => percentOf(a) ?? 0)) : 0,
   }
 
-  const latestStatusByQuestion = new Map()
-  attempts.forEach((a) => {
-    const time = a.createdAt?.getTime() ?? 0
-    const applyStatus = (id, correct) => {
-      const prev = latestStatusByQuestion.get(id)
-      if (!prev || time >= prev.time) latestStatusByQuestion.set(id, { correct, time })
-    }
-    ;(a.wrongQuestionIds || []).forEach((id) => applyStatus(id, false))
-    ;(a.correctQuestionIds || []).forEach((id) => applyStatus(id, true))
-  })
   const questionById = new Map(questions.map((q) => [q.id, q]))
-  const mistakeQuestions = Array.from(latestStatusByQuestion.entries())
-    .filter(([, status]) => !status.correct)
-    .map(([id]) => questionById.get(id))
+  const mistakeQuestions = getMistakeIds(attempts)
+    .map((id) => questionById.get(id))
     .filter(Boolean)
 
   const totalAttempts = attempts.length
