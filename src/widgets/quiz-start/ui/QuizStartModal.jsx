@@ -20,7 +20,7 @@ import { useAuth } from '../../../entities/user'
 import { ROUTES } from '../../../shared/config/routes'
 
 const TOPIC_INFO = {
-  all: { title: 'Barcha savollar', desc: '1200+ savol bazasidan tasodifiy savollar tanlanadi.' },
+  all: { title: 'Barcha savollar', desc: '1240 ta savol bazasidan tasodifiy savollar tanlanadi.' },
   signs: { title: "Yo'l belgilari", desc: "Rasm asosidagi savollar bo'yicha mashq." },
   theory: { title: 'Nazariy savollar', desc: 'Faqat matnli, nazariy savollar.' },
 }

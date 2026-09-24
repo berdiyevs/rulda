@@ -12,9 +12,9 @@ import { useAuth } from '../../../entities/user'
 import { ROUTES } from '../../../shared/config/routes'
 
 const STATS = [
-  { value: '1200+', label: 'Rasmiy savollar' },
+  { value: '1240 ta', label: 'Rasmiy savollar' },
   { value: '93', label: "Yo'l belgilari" },
-  { value: '24/7', label: 'Istalgan vaqtda mashq' },
+  { value: '62 ta bilet', label: 'Har birida 20 ta savol' },
 ]
 
 const FEATURES = [
@@ -39,16 +39,16 @@ const FAQS = [
   {
     question: 'Savollar bazasi rasmiymi?',
     answer:
-      "Ha, saytdagi 1200+ savol O'zbekiston DAN (Davlat Avtomobil Nazorati) rasmiy test bazasiga asoslangan va 2026-yilgi o'zgarishlarga moslab yangilangan.",
+      "Ha, saytdagi 1240 ta savol O'zbekiston DAN (Davlat Avtomobil Nazorati) rasmiy test bazasiga asoslangan va 2026-yilgi o'zgarishlarga moslab yangilangan.",
   },
   {
     question: 'Imtihon rejimi qanday ishlaydi?',
     answer:
-      "Rasmiy imtihon rejimida 20 ta tasodifiy savol, 25 daqiqa vaqt beriladi. 2 tadan ortiq xato qilinsa (ya'ni 3-xatoda), real imtihondagi kabi test darhol tugaydi. Erkin mashg'ulot rejimida esa vaqt va xatolar soni cheklanmagan — xohlagancha mashq qilishingiz mumkin.",
+      "Rasmiy imtihon rejimida (Premium) 20 ta tasodifiy savol, 25 daqiqa vaqt beriladi. 2 tadan ortiq xato qilinsa (ya'ni 3-xatoda), real imtihondagi kabi test darhol tugaydi. Kengaytirilgan mashg'ulot rejimida esa savollar sonini, vaqt chegarasini (vaqtsiz ham bo'ladi) va ruxsat etilgan xatolar sonini (cheklanmagan ham bo'ladi) o'zingiz tanlaysiz.",
   },
   {
     question: 'Foydalanish bepulmi?',
-    answer: "Ha, hozircha barcha savollar, biletlar va yo'l belgilari bo'limi to'liq bepul.",
+    answer: "Qisman. Bepul: 1–3-biletlar, kengaytirilgan rejimda mavzular bo'yicha mashq, yo'l belgilari to'plami va statistika. Premium: 4–62-biletlar, qat'iy rejim, rasmiy imtihon rejimi va xatolar ustida ishlash.",
   },
   {
     question: "Natijalarim saqlanadimi?",
@@ -63,7 +63,7 @@ const FAQS = [
   {
     question: "Ro'yxatdan o'tish shartmi?",
     answer:
-      "Natijalaringizni saqlash va progressni kuzatish uchun ro'yxatdan o'tish tavsiya etiladi, bu Google hisobingiz orqali bir necha soniyada amalga oshadi.",
+      "Ha, mashq qilish uchun ro'yxatdan o'tish kerak. Buni Google hisobingiz yoki email va parol orqali bir necha soniyada qilasiz (email orqali ro'yxatdan o'tganda emailingizni tasdiqlash kerak). Shundan keyin natijalaringiz saqlanadi va progressni kuzatib borasiz.",
   },
 ]
 
@@ -124,10 +124,10 @@ export function LandingPage() {
                 </Button>
               </Group>
 
-              <SimpleGrid cols={3} spacing="xl" mt="md">
+              <SimpleGrid cols={3} spacing={{ base: 8, sm: 'xl' }} mt="md">
                 {STATS.map((s) => (
                   <Stack key={s.label} gap={2} align="center">
-                    <Text fz={28} fw={800} className="gradient-text">
+                    <Text fz={{ base: 18, sm: 28 }} fw={800} className="gradient-text" ta="center">
                       {s.value}
                     </Text>
                     <Text c="dimmed" size="sm">

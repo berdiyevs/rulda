@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Paper, Stack, Group, Title, Text, Skeleton } from '@mantine/core'
 import { IconBulb } from '@tabler/icons-react'
 import { fetchQuestions } from '../../../entities/question'
+import { useAuth } from '../../../entities/user'
 import { Badge } from '../../../shared/ui/Badge/Badge'
 import './DailyQuestionCard.css'
 
@@ -15,6 +16,7 @@ function pickDailyQuestion(questions) {
 }
 
 export function DailyQuestionCard() {
+  const { user } = useAuth()
   const [questions, setQuestions] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedOption, setSelectedOption] = useState(null)
@@ -67,9 +69,11 @@ export function DailyQuestionCard() {
           <Title order={2} fz="lg" mb={4}>
             Bugungi savolni yechib ko'ring
           </Title>
-          <Text c="dimmed" fz="sm">
-            Hisobga kirmasdan ham mashq qilishingiz mumkin.
-          </Text>
+          {!user && (
+            <Text c="dimmed" fz="sm">
+              Hisobga kirmasdan ham mashq qilishingiz mumkin.
+            </Text>
+          )}
         </div>
 
         {dailyQuestion.image_url && (
