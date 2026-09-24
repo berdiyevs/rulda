@@ -46,7 +46,11 @@ export function RoadSignsPage() {
       <Container size={1180} py="xl">
         <Stack gap={4} mb="lg">
           <Title order={1}>Yo'l belgilari to'plami</Title>
-          <Text c="dimmed">Barcha rasmiy yo'l belgilarini kategoriya bo'yicha ko'rib chiqing.</Text>
+          <Text c="dimmed">
+            {signs.length > 0
+              ? `${SIGN_CATEGORIES.length} ta guruhdagi ${signs.length} ta yo'l belgisini kategoriya bo'yicha ko'rib chiqing.`
+              : "Yo'l belgilarini kategoriya bo'yicha ko'rib chiqing."}
+          </Text>
         </Stack>
 
         <Stack gap="md" mb="xl">
