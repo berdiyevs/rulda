@@ -1,28 +1,44 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Container, Stack, Title, Text, SimpleGrid, Skeleton, Card, Modal } from '@mantine/core'
-import { IconTicket, IconLock } from '@tabler/icons-react'
+import { Container, Stack, Group, Title, Text, SimpleGrid, Skeleton, Modal, Progress, Paper } from '@mantine/core'
+import { IconCheck, IconX, IconPlayerPlay, IconLock } from '@tabler/icons-react'
 import { CategoriesNav } from '../../../widgets/sidebar'
 import { fetchQuestions } from '../../../entities/question'
 import { groupByTicket } from '../../../entities/ticket'
-import { fetchAllLatestAttempts } from '../../../entities/quiz-attempt'
+import { useAttempts, getResumableSession, sessionMatches } from '../../../entities/quiz-attempt'
 import { useAuth } from '../../../entities/user'
 import { useQuizStart } from '../../../widgets/quiz-start'
 import { useLoginModal } from '../../../widgets/login-modal'
-import { Badge } from '../../../shared/ui/Badge/Badge'
 import { Button } from '../../../shared/ui/Button/Button'
 import { fetchPlans } from '../../../entities/payment'
 import { formatPrice } from '../../../shared/lib/formatPrice'
 import { isTicketLocked, isTicketGuestLocked, FREE_TICKET_LIMIT } from '../../../shared/lib/premium'
 import { ROUTES } from '../../../shared/config/routes'
+import './TicketsPage.css'
+
+const STATUS_LABELS = {
+  passed: "o'tilgan",
+  failed: 'yiqilgan',
+  inprogress: 'boshlangan, tugallanmagan',
+  new: 'yechilmagan',
+  locked: 'qulflangan',
+}
+
+function StatusIcon({ status }) {
+  if (status === 'passed') return <IconCheck size={12} stroke={3} />
+  if (status === 'failed') return <IconX size={12} stroke={3} />
+  if (status === 'inprogress') return <IconPlayerPlay size={11} stroke={3} />
+  if (status === 'locked') return <IconLock size={12} stroke={2.5} />
+  return null
+}
 
 export function TicketsPage() {
   const { user, isAuthReady, isPremiumActive } = useAuth()
+  const { attempts } = useAttempts()
   const navigate = useNavigate()
   const openQuizStart = useQuizStart()
   const openLogin = useLoginModal()
   const [tickets, setTickets] = useState([])
-  const [attempts, setAttempts] = useState({})
   const [loading, setLoading] = useState(true)
   const [lockedTicketId, setLockedTicketId] = useState(null)
   const [cheapestPrice, setCheapestPrice] = useState(null)
@@ -31,14 +47,7 @@ export function TicketsPage() {
     let isMounted = true
     fetchQuestions()
       .then((questions) => {
-        if (!isMounted) return
-        const grouped = groupByTicket(questions)
-        setTickets(grouped)
-        if (user) {
-          return fetchAllLatestAttempts(grouped.map((t) => `ticket-${t.ticketId}`)).then((data) => {
-            if (isMounted) setAttempts(data)
-          })
-        }
+        if (isMounted) setTickets(groupByTicket(questions))
       })
       .catch(() => {})
       .finally(() => {
@@ -47,7 +56,7 @@ export function TicketsPage() {
     return () => {
       isMounted = false
     }
-  }, [user])
+  }, [])
 
   // Qulflangan bilet oynasida "eng arzon narx" ko'rsatish uchun.
   useEffect(() => {
@@ -58,12 +67,47 @@ export function TicketsPage() {
       .catch(() => {})
   }, [])
 
+  const saved = getResumableSession(user)
+
+  // Har bir biletning holati: o'tgan / yiqilgan / boshlangan / yechilmagan / qulflangan.
+  const cells = useMemo(() => {
+    const lastByTicket = new Map()
+    attempts.forEach((a) => {
+      if (a.topic?.startsWith('ticket-')) lastByTicket.set(Number(a.topic.slice('ticket-'.length)), a)
+    })
+    return tickets.map(({ ticketId }) => {
+      const guestLocked = isTicketGuestLocked(ticketId, isAuthReady && !user)
+      const premiumLocked = isTicketLocked(ticketId, isPremiumActive)
+      const locked = guestLocked || premiumLocked
+      const last = lastByTicket.get(ticketId)
+      let status = 'new'
+      if (sessionMatches(saved, { mode: 'ticket', ticketId })) status = 'inprogress'
+      else if (last) status = last.passed ? 'passed' : 'failed'
+      return { ticketId, status, locked, guestLocked, displayStatus: locked ? 'locked' : status }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tickets, attempts, saved?.updatedAt, saved?.ticketId, user, isAuthReady, isPremiumActive])
+
+  const passedCount = cells.filter((c) => c.status === 'passed').length
+  const nextCell = cells.find((c) => !c.locked && c.status !== 'passed')
+
+  const openCell = (cell) => {
+    if (cell.guestLocked) {
+      openLogin({ title: `Bilet ${cell.ticketId} ni ochish uchun kiring`, redirectTo: false })
+    } else if (cell.locked) {
+      setLockedTicketId(cell.ticketId)
+    } else {
+      // Boshlangan bo'lsa, oynada "Davom ettirish" / "Boshidan boshlash" tanlovi chiqadi.
+      openQuizStart({ ticketId: cell.ticketId })
+    }
+  }
+
   return (
     <div className="page-shell has-tabbar">
       <CategoriesNav />
 
       <Container size={1180} py="xl">
-        <Stack gap={4} mb="xl">
+        <Stack gap={4} mb="lg">
           <Title order={1}>Biletlar</Title>
           <Text c="dimmed">
             Rasmiy imtihon formatidagi {tickets.length || ''} ta bilet — har birida aynan 20 ta savol.
@@ -71,68 +115,68 @@ export function TicketsPage() {
         </Stack>
 
         {loading ? (
-          <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing="md">
-            {Array.from({ length: 18 }).map((_, i) => (
-              <Skeleton key={i} height={110} radius="lg" />
+          <SimpleGrid cols={{ base: 5, sm: 8, md: 10, lg: 12 }} spacing="xs">
+            {Array.from({ length: 30 }).map((_, i) => (
+              <Skeleton key={i} height={56} radius="md" />
             ))}
           </SimpleGrid>
         ) : (
-          <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing="md">
-            {tickets.map(({ ticketId, questions }) => {
-              const attempt = attempts[`ticket-${ticketId}`]
-              const answered = attempt ? attempt.correctCount + attempt.wrongCount : 0
-              const scorePercent = answered ? Math.round((attempt.correctCount / answered) * 100) : null
-              const guestLocked = isTicketGuestLocked(ticketId, isAuthReady && !user)
-              const locked = guestLocked || isTicketLocked(ticketId, isPremiumActive)
+          <Stack gap="lg">
+            <Paper className="glass-card" p="md">
+              <Stack gap="sm">
+                <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+                  <Text fw={700}>
+                    {tickets.length} tadan {passedCount} tasi o'tildi
+                  </Text>
+                  {nextCell && (
+                    <Button variant="primary" size="sm" onClick={() => openCell(nextCell)}>
+                      Keyingi bilet: {nextCell.ticketId}
+                    </Button>
+                  )}
+                </Group>
+                <Progress
+                  value={tickets.length ? (passedCount / tickets.length) * 100 : 0}
+                  color="success"
+                  radius="xl"
+                  size="sm"
+                  aria-label={`${tickets.length} tadan ${passedCount} tasi o'tildi`}
+                />
+              </Stack>
+            </Paper>
 
-              return (
-                <Card
-                  key={ticketId}
-                  component="button"
+            <div className="ticket-grid">
+              {cells.map((cell) => (
+                <button
+                  key={cell.ticketId}
                   type="button"
-                  onClick={() => {
-                    if (guestLocked) {
-                      openLogin({ title: `Bilet ${ticketId} ni ochish uchun kiring`, redirectTo: false })
-                    } else if (locked) {
-                      setLockedTicketId(ticketId)
-                    } else {
-                      openQuizStart({ ticketId })
-                    }
-                  }}
-                  className="glass-card category-card"
-                  padding="md"
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    font: 'inherit',
-                    color: 'inherit',
-                    cursor: 'pointer',
-                    opacity: locked ? 0.6 : 1,
-                    position: 'relative',
-                  }}
+                  className={`ticket-cell is-${cell.displayStatus}`}
+                  aria-label={`Bilet ${cell.ticketId}, ${STATUS_LABELS[cell.displayStatus]}`}
+                  onClick={() => openCell(cell)}
                 >
-                  <Stack gap={6} align="center" ta="center">
-                    {locked ? (
-                      <IconLock size={22} color="var(--mantine-color-warning-6)" />
-                    ) : (
-                      <IconTicket size={22} color="var(--mantine-color-brand-5)" />
-                    )}
-                    <Text fw={700}>Bilet {ticketId}</Text>
-                    <Text c="dimmed" size="xs">
-                      {questions.length} ta savol
-                    </Text>
-                    {locked ? (
-                      <Badge variant="warning">{guestLocked ? 'Kirish kerak' : 'Premium'}</Badge>
-                    ) : (
-                      scorePercent !== null && (
-                        <Badge variant={scorePercent >= 70 ? 'success' : 'warning'}>{scorePercent}%</Badge>
-                      )
-                    )}
-                  </Stack>
-                </Card>
-              )
-            })}
-          </SimpleGrid>
+                  <span className="ticket-cell-number">{cell.ticketId}</span>
+                  <span className="ticket-cell-icon">
+                    <StatusIcon status={cell.displayStatus} />
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div className="ticket-legend">
+              <span className="ticket-legend-item is-passed">
+                <IconCheck size={12} stroke={3} /> o'tilgan
+              </span>
+              <span className="ticket-legend-item is-failed">
+                <IconX size={12} stroke={3} /> yiqilgan
+              </span>
+              <span className="ticket-legend-item is-inprogress">
+                <IconPlayerPlay size={11} stroke={3} /> boshlangan
+              </span>
+              <span className="ticket-legend-item is-new">yechilmagan</span>
+              <span className="ticket-legend-item is-locked">
+                <IconLock size={12} stroke={2.5} /> Premium
+              </span>
+            </div>
+          </Stack>
         )}
       </Container>
 
