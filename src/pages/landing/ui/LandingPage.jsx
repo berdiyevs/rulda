@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Container, Stack, Group, Title, Text, SimpleGrid, Box, Accordion, ThemeIcon } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { IconTargetArrow, IconPhoto, IconChartBar } from '@tabler/icons-react'
 import { Navbar } from '../../../widgets/navbar'
-import { LoginModal } from '../../../widgets/login-modal'
+import { useLoginModal } from '../../../widgets/login-modal'
 import { Footer } from '../../../widgets/footer'
 import { Button } from '../../../shared/ui/Button/Button'
 import { Badge } from '../../../shared/ui/Badge/Badge'
@@ -68,15 +68,19 @@ const FAQS = [
 ]
 
 export function LandingPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const openLogin = useLoginModal()
   const { user, isVerified, isAuthReady } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
   useEffect(() => {
-    if (location.state?.requireAuth) {
-      setIsModalOpen(true)
-    }
+    if (!location.state?.requireAuth) return
+    const from = location.state.from
+    openLogin({
+      title: location.state.reason,
+      redirectTo: from ? `${from.pathname}${from.search || ''}` : undefined,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state])
 
   const handlePracticeClick = () => {
@@ -90,14 +94,13 @@ export function LandingPage() {
         message: 'Iltimos, avval emailingizni tasdiqlang. Tasdiqlash xati emailingizga yuborilgan.',
       })
     } else {
-      setIsModalOpen(true)
+      openLogin()
     }
   }
 
   return (
     <>
-      <Navbar onOpenModal={() => setIsModalOpen(true)} />
-      <LoginModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <Navbar onOpenModal={() => openLogin()} />
 
       <Box component="main" className="page-shell">
         <Box component="section" py={80}>

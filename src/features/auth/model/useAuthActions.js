@@ -5,9 +5,15 @@ import { getGoogleAccessToken } from '../../../shared/api/googleAuth'
 import { useAuth } from '../../../entities/user'
 import { ROUTES } from '../../../shared/config/routes'
 
-export function useAuthActions() {
+// redirectTo: berilmasa /categories ga o'tadi, `false` bo'lsa joyida qoladi, satr bo'lsa o'sha manzilga o'tadi.
+export function useAuthActions({ redirectTo } = {}) {
   const navigate = useNavigate()
   const { login } = useAuth()
+
+  const goAfterLogin = () => {
+    if (redirectTo === false) return
+    navigate(redirectTo || ROUTES.CATEGORIES)
+  }
 
   const signUpWithEmail = async ({ name, email, password }) => {
     if (!email || !password || !name) {
@@ -51,7 +57,8 @@ export function useAuthActions() {
         auth: false,
       })
       await login(result.access_token)
-      navigate(ROUTES.CATEGORIES)
+      goAfterLogin()
+      return true
     } catch (error) {
       if (error.message.includes('tasdiqlang')) {
         notifications.show({
@@ -67,6 +74,7 @@ export function useAuthActions() {
         })
       }
     }
+    return false
   }
 
   const loginWithGoogle = async () => {
@@ -78,10 +86,12 @@ export function useAuthActions() {
         auth: false,
       })
       await login(result.access_token)
-      navigate(ROUTES.CATEGORIES)
+      goAfterLogin()
+      return true
     } catch (error) {
       console.error('Google xatosi:', error)
     }
+    return false
   }
 
   return { signUpWithEmail, loginWithEmail, loginWithGoogle }

@@ -3,6 +3,7 @@ import { MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { AuthProvider } from '../entities/user'
 import { QuizStartProvider } from '../widgets/quiz-start'
+import { LoginModalProvider } from '../widgets/login-modal'
 import { AppRouter } from './providers/AppRouter'
 import { theme } from './theme'
 import '@mantine/core/styles.css'
@@ -17,9 +18,11 @@ export function App() {
       <Notifications position="top-right" />
       <AuthProvider>
         <BrowserRouter>
-          <QuizStartProvider>
-            <AppRouter />
-          </QuizStartProvider>
+          <LoginModalProvider>
+            <QuizStartProvider>
+              <AppRouter />
+            </QuizStartProvider>
+          </LoginModalProvider>
         </BrowserRouter>
       </AuthProvider>
     </MantineProvider>

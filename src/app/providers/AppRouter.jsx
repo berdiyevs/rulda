@@ -35,7 +35,7 @@ export function AppRouter() {
       <Route
         path={ROUTES.CATEGORIES}
         element={
-          <ProtectedRoute>
+          <ProtectedRoute reason="Asosiy sahifani ochish uchun kiring">
             <CategoriesPage />
           </ProtectedRoute>
         }
@@ -43,7 +43,7 @@ export function AppRouter() {
       <Route
         path={ROUTES.QUIZ}
         element={
-          <ProtectedRoute>
+          <ProtectedRoute reason="Testni boshlash uchun kiring">
             <QuizPage />
           </ProtectedRoute>
         }
@@ -51,7 +51,7 @@ export function AppRouter() {
       <Route
         path={ROUTES.ROAD_SIGNS}
         element={
-          <ProtectedRoute>
+          <ProtectedRoute reason="Yo'l belgilarini ko'rish uchun kiring">
             <RoadSignsPage />
           </ProtectedRoute>
         }
@@ -59,7 +59,7 @@ export function AppRouter() {
       <Route
         path={ROUTES.TICKETS}
         element={
-          <ProtectedRoute>
+          <ProtectedRoute reason="Biletlarni ochish uchun kiring">
             <TicketsPage />
           </ProtectedRoute>
         }
@@ -67,7 +67,7 @@ export function AppRouter() {
       <Route
         path={ROUTES.STATISTICS}
         element={
-          <ProtectedRoute>
+          <ProtectedRoute reason="Statistikangizni ko'rish uchun kiring">
             <StatisticsPage />
           </ProtectedRoute>
         }
@@ -75,7 +75,7 @@ export function AppRouter() {
       <Route
         path={ROUTES.PREMIUM}
         element={
-          <ProtectedRoute>
+          <ProtectedRoute reason="Premium sotib olish uchun kiring">
             <PremiumPage />
           </ProtectedRoute>
         }

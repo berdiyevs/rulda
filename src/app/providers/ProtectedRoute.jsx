@@ -3,7 +3,7 @@ import { useAuth } from '../../entities/user'
 import { Spinner } from '../../shared/ui/Spinner/Spinner'
 import { ROUTES } from '../../shared/config/routes'
 
-export function ProtectedRoute({ children }) {
+export function ProtectedRoute({ children, reason }) {
   const { user, isAuthReady, isVerified } = useAuth()
   const location = useLocation()
 
@@ -16,7 +16,7 @@ export function ProtectedRoute({ children }) {
   }
 
   if (!user || !isVerified) {
-    return <Navigate to={ROUTES.HOME} state={{ from: location, requireAuth: true }} replace />
+    return <Navigate to={ROUTES.HOME} state={{ from: location, requireAuth: true, reason }} replace />
   }
 
   return children

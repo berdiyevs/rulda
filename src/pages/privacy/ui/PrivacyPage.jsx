@@ -1,7 +1,6 @@
-import { useState } from 'react'
 import { Container, Stack, Title, Text, List, Box } from '@mantine/core'
 import { Navbar } from '../../../widgets/navbar'
-import { LoginModal } from '../../../widgets/login-modal'
+import { useLoginModal } from '../../../widgets/login-modal'
 import { Footer } from '../../../widgets/footer'
 
 const SECTIONS = [
@@ -91,12 +90,11 @@ const SECTIONS = [
 ]
 
 export function PrivacyPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const openLogin = useLoginModal()
 
   return (
     <>
-      <Navbar onOpenModal={() => setIsModalOpen(true)} />
-      <LoginModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <Navbar onOpenModal={() => openLogin()} />
       <Box component="main" className="page-shell">
         <Container size={780} py={{ base: 40, sm: 60 }}>
           <Stack gap={4} mb="xl">
