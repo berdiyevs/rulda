@@ -4,6 +4,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { IconClock, IconDoorExit } from '@tabler/icons-react'
 import { ROUTES } from '../../../shared/config/routes'
 import { exitFullscreen } from '../../../shared/lib/fullscreen'
+import { clearSavedSession } from '../../../entities/quiz-attempt'
 
 const TOPIC_LABELS = {
   all: 'Barcha savollar',
@@ -22,12 +23,20 @@ export function QuizNav({
   totalSteps,
   answeredCount = 0,
   exitTo = ROUTES.CATEGORIES,
+  resumable = false,
   onFinish,
 }) {
   const navigate = useNavigate()
   const [confirmOpen, { open: openConfirm, close: closeConfirm }] = useDisclosure(false)
 
+  // "Saqlamasdan chiqish": saqlangan holat ham o'chadi. "Keyinroq davom ettirish": holat qoladi.
   const handleQuit = () => {
+    if (resumable && hasAnswers) clearSavedSession()
+    exitFullscreen()
+    navigate(exitTo)
+  }
+
+  const handleLater = () => {
     exitFullscreen()
     navigate(exitTo)
   }
@@ -139,6 +148,11 @@ export function QuizNav({
             {hasAnswers && (
               <Button variant="filled" color="brand" fullWidth onClick={handleFinish}>
                 Natijani ko'rish
+              </Button>
+            )}
+            {hasAnswers && resumable && (
+              <Button variant="light" color="brand" fullWidth onClick={handleLater}>
+                Keyinroq davom ettirish
               </Button>
             )}
             <Button variant="light" color="danger" fullWidth onClick={handleQuit}>

@@ -47,6 +47,13 @@ export function QuizPage() {
   const feedbackMode = feedbackParam === 'end' ? 'end' : 'instant'
 
   const [sessionKey, setSessionKey] = useState(0)
+  // Saqlangan testni davom ettirish (?resume=1). "Qayta urinish"da yangi test boshlanadi.
+  const [resume, setResume] = useState(searchParams.get('resume') === '1')
+  const sessionSearch = useMemo(() => {
+    const params = new URLSearchParams(searchParams)
+    params.delete('resume')
+    return params.toString()
+  }, [searchParams])
 
   // Mehmon faqat mini-testni va 1-biletni yecha oladi, qolganlari uchun kirish kerak.
   const guestBlocked = !user && !(mode === 'mini' || (mode === 'ticket' && !isTicketGuestLocked(ticketId, true)))
@@ -92,7 +99,12 @@ export function QuizPage() {
         durationMinutes={durationMinutes}
         maxMistakes={maxMistakes}
         feedbackMode={feedbackMode}
-        onRetry={() => setSessionKey((k) => k + 1)}
+        resume={resume}
+        sessionSearch={sessionSearch}
+        onRetry={() => {
+          setResume(false)
+          setSessionKey((k) => k + 1)
+        }}
       />
     </Box>
   )

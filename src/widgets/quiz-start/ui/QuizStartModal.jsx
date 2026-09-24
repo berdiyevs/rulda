@@ -17,6 +17,7 @@ import { Badge } from '../../../shared/ui/Badge/Badge'
 import { requestFullscreen } from '../../../shared/lib/fullscreen'
 import { isTicketLocked } from '../../../shared/lib/premium'
 import { useAuth } from '../../../entities/user'
+import { getResumableSession, answeredCountOf, resumeUrl, sessionMatches } from '../../../entities/quiz-attempt'
 import { ROUTES } from '../../../shared/config/routes'
 
 const TOPIC_INFO = {
@@ -66,7 +67,7 @@ function DropdownField({ label, value, options, onSelect }) {
 function QuizStartModalBody({ config, onClose }) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { isPremiumActive } = useAuth()
+  const { user, isPremiumActive } = useAuth()
   const isTicket = Boolean(config.ticketId)
   const isMistakes = !isTicket && config.mode === 'mistakes'
   const mistakeCount = config.questionIds?.length ?? 0
@@ -100,6 +101,19 @@ function QuizStartModalBody({ config, onClose }) {
           desc: `Oldingi urinishlaringizda xato qilingan ${mistakeCount} ta savol bo'yicha maxsus mashq.`,
         }
       : TOPIC_INFO[config.topic] || TOPIC_INFO.all
+
+  // Shu bilet/mavzu bo'yicha tugallanmagan test bo'lsa, davom ettirish taklif qilinadi.
+  const savedSession = getResumableSession(user)
+  const canResume =
+    !isMistakes &&
+    !isLockedExam &&
+    !premiumRequired &&
+    sessionMatches(savedSession, { mode: isTicket ? 'ticket' : 'practice', ticketId: config.ticketId, topic: config.topic || 'all' })
+
+  const handleResume = () => {
+    onClose()
+    navigate(resumeUrl(savedSession), { state: { from: location.pathname } })
+  }
 
   const handleStart = () => {
     if (premiumRequired) {
@@ -343,17 +357,28 @@ function QuizStartModalBody({ config, onClose }) {
         </Stack>
       )}
 
+      {canResume && (
+        <Stack gap={6} mt="sm">
+          <Text c="dimmed" fz="xs" ta="center">
+            Bu test boshlangan: {answeredCountOf(savedSession)}/{savedSession.questionIds.length} savol
+          </Text>
+          <Button variant="primary" size="lg" onClick={handleResume}>
+            Davom ettirish
+          </Button>
+        </Stack>
+      )}
+
       <Group grow mt="sm">
         <Button variant="secondary" onClick={onClose}>
           Orqaga
         </Button>
         <Button
-          variant="primary"
+          variant={canResume ? 'secondary' : 'primary'}
           size="lg"
           leftSection={premiumRequired ? <IconLock size={16} /> : null}
           onClick={handleStart}
         >
-          {premiumRequired ? 'Premium kerak' : 'Boshlash'}
+          {premiumRequired ? 'Premium kerak' : canResume ? 'Boshidan boshlash' : 'Boshlash'}
         </Button>
       </Group>
     </Stack>

@@ -7,6 +7,7 @@ import { QuizResults } from '../../../widgets/quiz-results'
 import { QuestionCard } from '../../../entities/question'
 import { useQuizEngine } from '../../../features/quiz-engine'
 import { useAuth } from '../../../entities/user'
+import { isResumableMode } from '../../../entities/quiz-attempt'
 import { ROUTES } from '../../../shared/config/routes'
 
 export function QuizPlay({
@@ -18,6 +19,8 @@ export function QuizPlay({
   durationMinutes,
   maxMistakes,
   feedbackMode = 'instant',
+  resume = false,
+  sessionSearch = '',
   onRetry,
 }) {
   const {
@@ -39,7 +42,18 @@ export function QuizPlay({
     isLastQuestion,
     timeFormatted,
     hasTimeLimit,
-  } = useQuizEngine({ topic, mode, ticketId, questionIds, questionCount, durationMinutes, maxMistakes, feedbackMode })
+  } = useQuizEngine({
+    topic,
+    mode,
+    ticketId,
+    questionIds,
+    questionCount,
+    durationMinutes,
+    maxMistakes,
+    feedbackMode,
+    resume,
+    sessionSearch,
+  })
 
   // Foydalanuvchi testga qayerdan kelgan bo'lsa, chiqqanda o'sha yerga qaytadi.
   const location = useLocation()
@@ -77,6 +91,7 @@ export function QuizPlay({
         finished={finished}
         answeredCount={answeredCount}
         exitTo={backTo}
+        resumable={isResumableMode(mode)}
         onFinish={finishNow}
         currentIndex={finished ? undefined : currentIndex}
         totalSteps={finished ? undefined : totalSteps}

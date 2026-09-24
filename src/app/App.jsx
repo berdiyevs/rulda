@@ -2,6 +2,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { AuthProvider } from '../entities/user'
+import { AttemptsProvider } from '../entities/quiz-attempt'
 import { QuizStartProvider } from '../widgets/quiz-start'
 import { LoginModalProvider } from '../widgets/login-modal'
 import { GuestAttemptsSync } from '../features/guest-sync'
@@ -20,6 +21,7 @@ export function App() {
       <Notifications position="top-right" />
       <AuthProvider>
         <GuestAttemptsSync />
+        <AttemptsProvider>
         <BrowserRouter>
           <RouteTracker />
           <LoginModalProvider>
@@ -28,6 +30,7 @@ export function App() {
             </QuizStartProvider>
           </LoginModalProvider>
         </BrowserRouter>
+        </AttemptsProvider>
       </AuthProvider>
     </MantineProvider>
   )

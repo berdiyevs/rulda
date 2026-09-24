@@ -1,6 +1,16 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import { fetchQuestions, filterQuestionsByTopic } from '../../../entities/question'
-import { saveAttempt, addGuestAttempt } from '../../../entities/quiz-attempt'
+import {
+  saveAttempt,
+  addGuestAttempt,
+  useAttempts,
+  isResumableMode,
+  ownerOf,
+  saveSession,
+  loadSavedSession,
+  clearSavedSession,
+  sessionMatches,
+} from '../../../entities/quiz-attempt'
 import { useAuth } from '../../../entities/user'
 import { shuffleArray, pickRandom } from '../../../shared/lib/shuffle'
 import { useCountdown } from '../../../shared/lib/useCountdown'
@@ -42,6 +52,30 @@ function prepareSession(allQuestions, topic, mode, ticketId, questionIds, questi
   }))
 }
 
+// Saqlangan yozuvdan savollar va variantlarni avvalgi tartibda tiklaydi. Bironta savol topilmasa, null qaytaradi.
+function restoreSession(saved, allQuestions, { mode, ticketId, topic, user }) {
+  if (!sessionMatches(saved, { mode, ticketId, topic })) return null
+  if (saved.owner !== 'guest' && saved.owner !== ownerOf(user)) return null
+
+  const byId = new Map(allQuestions.map((q) => [q.id, q]))
+  const questions = []
+  for (const id of saved.questionIds) {
+    const question = byId.get(id)
+    const order = saved.optionOrders?.[id]
+    if (!question || !order) return null
+    const options = order.map((optionId) => question.options.find((o) => o.id === optionId))
+    if (options.some((o) => !o) || options.length !== question.options.length) return null
+    questions.push({ ...question, options })
+  }
+  if (saved.statuses.length !== questions.length) return null
+  return {
+    questions,
+    statuses: saved.statuses,
+    currentIndex: Math.min(saved.currentIndex, questions.length - 1),
+    remainingSeconds: saved.remainingSeconds,
+  }
+}
+
 export function useQuizEngine({
   topic,
   mode,
@@ -51,8 +85,11 @@ export function useQuizEngine({
   durationMinutes = 0,
   maxMistakes = null,
   feedbackMode = 'instant',
+  resume = false,
+  sessionSearch = '',
 }) {
   const { user } = useAuth()
+  const { refresh: refreshAttempts } = useAttempts()
   const [sourceQuestions, setSourceQuestions] = useState([])
   const [sessionQuestions, setSessionQuestions] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -65,6 +102,7 @@ export function useQuizEngine({
   const [result, setResult] = useState(null)
   const [pendingFinish, setPendingFinish] = useState(null)
   const hasSavedRef = useRef(false)
+  const resumedRemainingRef = useRef(null)
 
   useEffect(() => {
     let isMounted = true
@@ -86,21 +124,26 @@ export function useQuizEngine({
 
   useEffect(() => {
     if (sourceQuestions.length === 0) return
-    const session = prepareSession(sourceQuestions, topic, mode, ticketId, questionIds, questionCount)
+    const saved = resume && isResumableMode(mode) ? loadSavedSession() : null
+    const resumed = saved ? restoreSession(saved, sourceQuestions, { mode, ticketId, topic, user }) : null
+    const session = resumed
+      ? resumed.questions
+      : prepareSession(sourceQuestions, topic, mode, ticketId, questionIds, questionCount)
     if (session.length === 0) {
       setError('Savollar topilmadi.')
       return
     }
+    resumedRemainingRef.current = resumed ? resumed.remainingSeconds : null
     setSessionQuestions(session)
-    setStepStatuses(Array.from({ length: session.length }, () => 'idle'))
-    setCurrentIndex(0)
+    setStepStatuses(resumed ? resumed.statuses : Array.from({ length: session.length }, () => 'idle'))
+    setCurrentIndex(resumed ? resumed.currentIndex : 0)
     setSelectedOption(null)
     setIsAnswered(false)
     setFinished(false)
     setResult(null)
     setPendingFinish(null)
     hasSavedRef.current = false
-    track(mode === 'mini' ? 'mini_test_start' : 'test_start')
+    if (!resumed) track(mode === 'mini' ? 'mini_test_start' : 'test_start')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceQuestions, topic, mode, ticketId, questionIds, questionCount])
 
@@ -108,6 +151,7 @@ export function useQuizEngine({
     (statuses, endReason = 'completed') => {
       if (hasSavedRef.current) return
       hasSavedRef.current = true
+      if (isResumableMode(mode)) clearSavedSession()
 
       const correctCount = statuses.filter((s) => s === 'completed').length
       const wrongCount = statuses.filter((s) => s === 'wrong').length
@@ -150,12 +194,14 @@ export function useQuizEngine({
       if (mode === 'exam') exitFullscreen()
 
       if (user) {
-        saveAttempt(summary).catch(() => {})
+        saveAttempt(summary)
+          .then(() => refreshAttempts())
+          .catch(() => {})
       } else {
         addGuestAttempt(summary)
       }
     },
-    [mode, topic, ticketId, user, sessionQuestions, sourceQuestions, maxMistakes],
+    [mode, topic, ticketId, user, sessionQuestions, sourceQuestions, maxMistakes, refreshAttempts],
   )
 
   const hasTimeLimit = mode === 'exam' || ((mode === 'practice' || mode === 'ticket') && durationMinutes > 0)
@@ -168,7 +214,8 @@ export function useQuizEngine({
 
   useEffect(() => {
     if (hasTimeLimit && sessionQuestions.length > 0 && !finished) {
-      timer.reset(durationSeconds)
+      timer.reset(resumedRemainingRef.current ?? durationSeconds)
+      resumedRemainingRef.current = null
       timer.start()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -209,6 +256,26 @@ export function useQuizEngine({
       const isLastQuestion = currentIndex + 1 >= sessionQuestions.length
       const finishReason = examFailed || mistakesCapFailed ? 'mistakes' : isLastQuestion ? 'completed' : null
 
+      // Tugallanmagan testni davom ettirish uchun har javobdan keyin holat saqlanadi.
+      if (isResumableMode(mode)) {
+        if (finishReason) {
+          clearSavedSession()
+        } else {
+          saveSession({
+            mode,
+            topic,
+            ticketId: ticketId ?? null,
+            search: sessionSearch,
+            owner: ownerOf(user),
+            questionIds: sessionQuestions.map((q) => q.id),
+            optionOrders: Object.fromEntries(sessionQuestions.map((q) => [q.id, q.options.map((o) => o.id)])),
+            statuses: next,
+            currentIndex: currentIndex + 1,
+            remainingSeconds: hasTimeLimit ? timer.secondsLeft : 0,
+          })
+        }
+      }
+
       if (feedbackMode === 'end') {
         setTimeout(() => advance(next, finishReason), 350)
       } else {
@@ -226,6 +293,13 @@ export function useQuizEngine({
       maxMistakes,
       feedbackMode,
       advance,
+      sessionQuestions,
+      sessionSearch,
+      ticketId,
+      topic,
+      user,
+      hasTimeLimit,
+      timer,
     ],
   )
 

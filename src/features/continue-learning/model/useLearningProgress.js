@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { fetchAllAttempts, computeStreak, getMistakeIds } from '../../../entities/quiz-attempt'
+import { useAttempts, computeStreak, getMistakeIds } from '../../../entities/quiz-attempt'
 import { fetchQuestions } from '../../../entities/question'
 import { groupByTicket } from '../../../entities/ticket'
 import { TOPICS } from '../../../entities/category'
@@ -13,28 +13,30 @@ function answeredOf(attempt) {
 // Asosiy sahifa uchun bitta so'rovda hamma narsa: davom ettirish, xatolar, mavzular natijasi, seriya.
 export function useLearningProgress() {
   const { user, isPremiumActive } = useAuth()
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const { attempts, loading: attemptsLoading } = useAttempts()
+  const [questions, setQuestions] = useState(null)
+  const [questionsLoading, setQuestionsLoading] = useState(true)
 
   useEffect(() => {
     if (!user) return
     let isMounted = true
-    Promise.all([fetchAllAttempts(), fetchQuestions()])
-      .then(([attempts, questions]) => {
-        if (isMounted) setData({ attempts, questions })
+    fetchQuestions()
+      .then((data) => {
+        if (isMounted) setQuestions(data)
       })
       .catch(() => {})
       .finally(() => {
-        if (isMounted) setLoading(false)
+        if (isMounted) setQuestionsLoading(false)
       })
     return () => {
       isMounted = false
     }
   }, [user])
 
+  const loading = attemptsLoading || questionsLoading
+
   const progress = useMemo(() => {
-    if (!data) return null
-    const { attempts, questions } = data
+    if (!questions) return null
 
     const ticketIds = groupByTicket(questions).map((t) => t.ticketId)
     const ticketAttempts = attempts.filter((a) => a.topic?.startsWith('ticket-'))
@@ -70,7 +72,7 @@ export function useLearningProgress() {
       // Foydalanuvchiga ochiq va hali yechilmagan biletlar soni (imtihongacha tavsiya uchun).
       unsolvedAvailableCount: unsolved.filter((id) => !isTicketLocked(id, isPremiumActive)).length,
     }
-  }, [data, isPremiumActive])
+  }, [attempts, questions, isPremiumActive])
 
   return { progress, loading }
 }
