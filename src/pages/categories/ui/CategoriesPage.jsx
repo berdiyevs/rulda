@@ -8,6 +8,7 @@ import { useLearningProgress } from '../../../features/continue-learning'
 import { ContinueCard } from '../../../widgets/continue-card'
 import { ExamCountdownCard } from '../../../widgets/exam-countdown'
 import { DailyQuestionCard } from '../../../widgets/daily-question'
+import { AppInstallCard } from '../../../widgets/app-install'
 import { Badge } from '../../../shared/ui/Badge/Badge'
 
 export function CategoriesPage() {
@@ -48,6 +49,7 @@ export function CategoriesPage() {
           {loading || !progress ? <Skeleton height={150} radius="lg" /> : <ContinueCard progress={progress} />}
           <ExamCountdownCard ticketsLeft={progress?.unsolvedAvailableCount} />
           <DailyQuestionCard />
+          <AppInstallCard />
         </Stack>
 
         {loading ? (

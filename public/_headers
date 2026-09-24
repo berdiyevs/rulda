@@ -6,6 +6,10 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
 
+# Service worker fayli har doim yangidan tekshirilsin (yangilanish darhol yetib borsin)
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
 # index.html har doim yangidan tekshirilsin (yangi deploy darhol ko'rinsin)
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
