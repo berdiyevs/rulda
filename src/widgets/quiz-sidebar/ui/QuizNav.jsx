@@ -11,7 +11,7 @@ const TOPIC_LABELS = {
   theory: 'Nazariy savollar',
 }
 
-export function QuizNav({ mode, topic, ticketId, timeFormatted, showTimer, currentIndex, totalSteps }) {
+export function QuizNav({ mode, topic, ticketId, timeFormatted, showTimer, finished, currentIndex, totalSteps }) {
   const navigate = useNavigate()
   const [confirmOpen, { open: openConfirm, close: closeConfirm }] = useDisclosure(false)
 
@@ -94,16 +94,18 @@ export function QuizNav({ mode, topic, ticketId, timeFormatted, showTimer, curre
             </Badge>
           )}
 
-          <Button
-            variant="light"
-            color="danger"
-            size="xs"
-            radius="xl"
-            leftSection={<IconDoorExit size={15} />}
-            onClick={openConfirm}
-          >
-            Tugatish
-          </Button>
+          {!finished && (
+            <Button
+              variant="light"
+              color="danger"
+              size="xs"
+              radius="xl"
+              leftSection={<IconDoorExit size={15} />}
+              onClick={openConfirm}
+            >
+              Tugatish
+            </Button>
+          )}
         </Group>
       </Box>
 

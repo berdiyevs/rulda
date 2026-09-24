@@ -54,7 +54,7 @@ export function useQuizEngine({
   const [error, setError] = useState(null)
   const [finished, setFinished] = useState(false)
   const [result, setResult] = useState(null)
-  const [pendingFinish, setPendingFinish] = useState(false)
+  const [pendingFinish, setPendingFinish] = useState(null)
   const hasSavedRef = useRef(false)
 
   useEffect(() => {
@@ -89,13 +89,13 @@ export function useQuizEngine({
     setIsAnswered(false)
     setFinished(false)
     setResult(null)
-    setPendingFinish(false)
+    setPendingFinish(null)
     hasSavedRef.current = false
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceQuestions, topic, mode, ticketId, questionIds, questionCount])
 
   const finishSession = useCallback(
-    (statuses) => {
+    (statuses, endReason = 'completed') => {
       if (hasSavedRef.current) return
       hasSavedRef.current = true
 
@@ -126,6 +126,7 @@ export function useQuizEngine({
         mode,
         wrongQuestionIds,
         correctQuestionIds,
+        endReason,
       }
       setResult(summary)
       setFinished(true)
@@ -143,7 +144,7 @@ export function useQuizEngine({
 
   const timer = useCountdown(durationSeconds || EXAM_DURATION_SECONDS, {
     autoStart: false,
-    onExpire: () => finishSession(stepStatuses),
+    onExpire: () => finishSession(stepStatuses, 'time'),
   })
 
   useEffect(() => {
@@ -157,15 +158,15 @@ export function useQuizEngine({
   const currentQuestion = sessionQuestions[currentIndex]
 
   const advance = useCallback(
-    (statuses, shouldFinish) => {
-      if (shouldFinish) {
+    (statuses, finishReason) => {
+      if (finishReason) {
         if (hasTimeLimit) timer.stop()
-        finishSession(statuses)
+        finishSession(statuses, finishReason)
       } else {
         setCurrentIndex((i) => i + 1)
         setSelectedOption(null)
         setIsAnswered(false)
-        setPendingFinish(false)
+        setPendingFinish(null)
       }
     },
     [hasTimeLimit, timer, finishSession],
@@ -186,13 +187,13 @@ export function useQuizEngine({
       const examFailed = mode === 'exam' && wrongSoFar > EXAM_MAX_MISTAKES
       const mistakesCapFailed = mode !== 'exam' && mode !== 'mistakes' && maxMistakes != null && wrongSoFar > maxMistakes
       const isLastQuestion = currentIndex + 1 >= sessionQuestions.length
-      const shouldFinish = examFailed || mistakesCapFailed || isLastQuestion
+      const finishReason = examFailed || mistakesCapFailed ? 'mistakes' : isLastQuestion ? 'completed' : null
 
       if (feedbackMode === 'end') {
-        setTimeout(() => advance(next, shouldFinish), 350)
+        setTimeout(() => advance(next, finishReason), 350)
       } else {
         // Javob ko'rsatiladigan rejimda foydalanuvchi "Keyingi savol" tugmasini bosguncha kutamiz.
-        setPendingFinish(shouldFinish)
+        setPendingFinish(finishReason)
       }
     },
     [
@@ -232,7 +233,7 @@ export function useQuizEngine({
     correctAnswer,
     handleAnswer,
     goNext,
-    isLastQuestion: currentIndex + 1 >= sessionQuestions.length || pendingFinish,
+    isLastQuestion: currentIndex + 1 >= sessionQuestions.length || Boolean(pendingFinish),
     timeFormatted: timer.formatted,
     isExam: mode === 'exam',
     hasTimeLimit,

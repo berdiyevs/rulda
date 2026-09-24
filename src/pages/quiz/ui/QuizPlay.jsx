@@ -61,7 +61,8 @@ export function QuizPlay({
         topic={topic}
         ticketId={ticketId}
         timeFormatted={timeFormatted}
-        showTimer={hasTimeLimit}
+        showTimer={hasTimeLimit && !finished}
+        finished={finished}
         currentIndex={finished ? undefined : currentIndex}
         totalSteps={finished ? undefined : totalSteps}
       />
