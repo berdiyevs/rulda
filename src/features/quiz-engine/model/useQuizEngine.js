@@ -54,6 +54,7 @@ export function useQuizEngine({
   const [error, setError] = useState(null)
   const [finished, setFinished] = useState(false)
   const [result, setResult] = useState(null)
+  const [pendingFinish, setPendingFinish] = useState(false)
   const hasSavedRef = useRef(false)
 
   useEffect(() => {
@@ -88,6 +89,7 @@ export function useQuizEngine({
     setIsAnswered(false)
     setFinished(false)
     setResult(null)
+    setPendingFinish(false)
     hasSavedRef.current = false
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceQuestions, topic, mode, ticketId, questionIds, questionCount])
@@ -154,6 +156,21 @@ export function useQuizEngine({
 
   const currentQuestion = sessionQuestions[currentIndex]
 
+  const advance = useCallback(
+    (statuses, shouldFinish) => {
+      if (shouldFinish) {
+        if (hasTimeLimit) timer.stop()
+        finishSession(statuses)
+      } else {
+        setCurrentIndex((i) => i + 1)
+        setSelectedOption(null)
+        setIsAnswered(false)
+        setPendingFinish(false)
+      }
+    },
+    [hasTimeLimit, timer, finishSession],
+  )
+
   const handleAnswer = useCallback(
     (option) => {
       if (isAnswered || !currentQuestion) return
@@ -168,23 +185,15 @@ export function useQuizEngine({
       const wrongSoFar = next.filter((s) => s === 'wrong').length
       const examFailed = mode === 'exam' && wrongSoFar > EXAM_MAX_MISTAKES
       const mistakesCapFailed = mode !== 'exam' && mode !== 'mistakes' && maxMistakes != null && wrongSoFar > maxMistakes
+      const isLastQuestion = currentIndex + 1 >= sessionQuestions.length
+      const shouldFinish = examFailed || mistakesCapFailed || isLastQuestion
 
-      setTimeout(
-        () => {
-          const nextIndex = currentIndex + 1
-          const isLastQuestion = nextIndex >= sessionQuestions.length
-
-          if (examFailed || mistakesCapFailed || isLastQuestion) {
-            if (hasTimeLimit) timer.stop()
-            finishSession(next)
-          } else {
-            setCurrentIndex(nextIndex)
-            setSelectedOption(null)
-            setIsAnswered(false)
-          }
-        },
-        feedbackMode === 'end' ? 350 : 700,
-      )
+      if (feedbackMode === 'end') {
+        setTimeout(() => advance(next, shouldFinish), 350)
+      } else {
+        // Javob ko'rsatiladigan rejimda foydalanuvchi "Keyingi savol" tugmasini bosguncha kutamiz.
+        setPendingFinish(shouldFinish)
+      }
     },
     [
       isAnswered,
@@ -195,11 +204,14 @@ export function useQuizEngine({
       mode,
       maxMistakes,
       feedbackMode,
-      hasTimeLimit,
-      finishSession,
-      timer,
+      advance,
     ],
   )
+
+  const goNext = useCallback(() => {
+    if (!isAnswered) return
+    advance(stepStatuses, pendingFinish)
+  }, [isAnswered, advance, stepStatuses, pendingFinish])
 
   const correctAnswer = useMemo(
     () => currentQuestion?.options.find((o) => o.is_correct),
@@ -219,6 +231,8 @@ export function useQuizEngine({
     isAnswered,
     correctAnswer,
     handleAnswer,
+    goNext,
+    isLastQuestion: currentIndex + 1 >= sessionQuestions.length || pendingFinish,
     timeFormatted: timer.formatted,
     isExam: mode === 'exam',
     hasTimeLimit,

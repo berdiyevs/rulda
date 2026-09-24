@@ -87,7 +87,7 @@ export function DailyQuestionCard() {
               if (isAnswered) {
                 if (selectedOption === option) {
                   classNames.push(option.is_correct ? 'is-correct' : 'is-wrong')
-                } else if (!option.is_correct && correctAnswer === option) {
+                } else if (correctAnswer === option) {
                   classNames.push('is-correct')
                 }
               }

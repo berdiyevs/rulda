@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, Grid } from '@mantine/core'
-import { IconEye } from '@tabler/icons-react'
+import { IconEye, IconArrowRight } from '@tabler/icons-react'
+import { Button } from '../../../shared/ui/Button/Button'
 import './QuestionCard.css'
 
 export function QuestionCard({
@@ -12,6 +13,8 @@ export function QuestionCard({
   correctAnswer,
   revealAnswer = true,
   onAnswer,
+  onNext,
+  nextLabel = 'Keyingi savol',
 }) {
   const [imageError, setImageError] = useState(false)
 
@@ -57,7 +60,7 @@ export function QuestionCard({
                 if (revealAnswer) {
                   if (selectedOption === option) {
                     classNames.push(option.is_correct ? 'is-correct' : 'is-wrong')
-                  } else if (!option.is_correct && correctAnswer === option) {
+                  } else if (correctAnswer === option) {
                     classNames.push('is-correct')
                   }
                 } else if (selectedOption === option) {
@@ -78,6 +81,18 @@ export function QuestionCard({
               )
             })}
           </div>
+
+          {isAnswered && revealAnswer && onNext && (
+            <Button
+              variant="primary"
+              size="md"
+              className="question-next-btn"
+              rightSection={<IconArrowRight size={16} />}
+              onClick={onNext}
+            >
+              {nextLabel}
+            </Button>
+          )}
         </Grid.Col>
       </Grid>
     </Card>

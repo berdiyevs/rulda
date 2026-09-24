@@ -190,3 +190,13 @@
     font-size: 1.08rem;
   }
 }
+
+.question-next-btn {
+  align-self: flex-end;
+}
+
+@media (max-width: 575px) {
+  .question-next-btn {
+    align-self: stretch;
+  }
+}

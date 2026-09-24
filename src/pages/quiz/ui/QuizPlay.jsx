@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { Box, Center, Flex, Skeleton, Text } from '@mantine/core'
 import { QuizNav, QuizSidebar } from '../../../widgets/quiz-sidebar'
 import { QuizResults } from '../../../widgets/quiz-results'
@@ -28,9 +29,16 @@ export function QuizPlay({
     isAnswered,
     correctAnswer,
     handleAnswer,
+    goNext,
+    isLastQuestion,
     timeFormatted,
     hasTimeLimit,
   } = useQuizEngine({ topic, mode, ticketId, questionIds, questionCount, durationMinutes, maxMistakes, feedbackMode })
+
+  const scrollRef = useRef(null)
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 })
+  }, [currentIndex])
 
   const revealAnswer = feedbackMode !== 'end'
   const displayStatuses =
@@ -73,7 +81,7 @@ export function QuizPlay({
         </Box>
       )}
 
-      <Box style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+      <Box ref={scrollRef} style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
         <Flex h="100%" gap="lg" px={{ base: 20, sm: 28, lg: 40 }} py={{ base: 20, sm: 28 }} wrap="wrap">
           {!finished && (
             <QuizSidebar totalSteps={totalSteps} currentIndex={currentIndex} stepStatuses={displayStatuses} />
@@ -104,6 +112,8 @@ export function QuizPlay({
                 correctAnswer={correctAnswer}
                 revealAnswer={revealAnswer}
                 onAnswer={handleAnswer}
+                onNext={goNext}
+                nextLabel={isLastQuestion ? "Natijani ko'rish" : 'Keyingi savol'}
               />
             )}
           </Box>
