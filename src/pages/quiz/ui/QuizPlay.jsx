@@ -5,6 +5,7 @@ import { QuizNav, QuizSidebar } from '../../../widgets/quiz-sidebar'
 import { QuizResults } from '../../../widgets/quiz-results'
 import { QuestionCard } from '../../../entities/question'
 import { useQuizEngine } from '../../../features/quiz-engine'
+import { useAuth } from '../../../entities/user'
 import { ROUTES } from '../../../shared/config/routes'
 
 export function QuizPlay({
@@ -41,7 +42,8 @@ export function QuizPlay({
 
   // Foydalanuvchi testga qayerdan kelgan bo'lsa, chiqqanda o'sha yerga qaytadi.
   const location = useLocation()
-  const backTo = location.state?.from ?? (mode === 'ticket' ? ROUTES.TICKETS : ROUTES.CATEGORIES)
+  const { user } = useAuth()
+  const backTo = location.state?.from ?? (mode === 'ticket' ? ROUTES.TICKETS : user ? ROUTES.CATEGORIES : ROUTES.HOME)
 
   const scrollRef = useRef(null)
   useEffect(() => {

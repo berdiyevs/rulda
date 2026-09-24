@@ -40,30 +40,9 @@ export function AppRouter() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path={ROUTES.QUIZ}
-        element={
-          <ProtectedRoute reason="Testni boshlash uchun kiring">
-            <QuizPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={ROUTES.ROAD_SIGNS}
-        element={
-          <ProtectedRoute reason="Yo'l belgilarini ko'rish uchun kiring">
-            <RoadSignsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={ROUTES.TICKETS}
-        element={
-          <ProtectedRoute reason="Biletlarni ochish uchun kiring">
-            <TicketsPage />
-          </ProtectedRoute>
-        }
-      />
+      <Route path={ROUTES.QUIZ} element={<QuizPage />} />
+      <Route path={ROUTES.ROAD_SIGNS} element={<RoadSignsPage />} />
+      <Route path={ROUTES.TICKETS} element={<TicketsPage />} />
       <Route
         path={ROUTES.STATISTICS}
         element={

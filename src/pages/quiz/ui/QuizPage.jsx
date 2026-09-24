@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { Box } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { QuizPlay } from './QuizPlay'
 import { useAuth } from '../../../entities/user'
-import { isTicketLocked } from '../../../shared/lib/premium'
+import { isTicketLocked, isTicketGuestLocked } from '../../../shared/lib/premium'
+import { Spinner } from '../../../shared/ui/Spinner/Spinner'
 import { ROUTES } from '../../../shared/config/routes'
 
 const VALID_TOPICS = ['all', 'signs', 'theory']
 
 export function QuizPage() {
   const navigate = useNavigate()
-  const { isPremiumActive } = useAuth()
+  const { user, isAuthReady, isPremiumActive } = useAuth()
   const [searchParams] = useSearchParams()
   const topicParam = searchParams.get('topic')
   const modeParam = searchParams.get('mode')
@@ -26,7 +27,15 @@ export function QuizPage() {
   const topic = VALID_TOPICS.includes(topicParam) ? topicParam : 'all'
   const isTicket = Boolean(ticketId)
   const isMistakes = !isTicket && modeParam === 'mistakes'
-  const mode = isTicket ? 'ticket' : isMistakes ? 'mistakes' : modeParam === 'exam' ? 'exam' : 'practice'
+  const mode = isTicket
+    ? 'ticket'
+    : isMistakes
+      ? 'mistakes'
+      : modeParam === 'exam'
+        ? 'exam'
+        : modeParam === 'mini'
+          ? 'mini'
+          : 'practice'
 
   const questionIds = useMemo(
     () => (idsParam ? idsParam.split(',').map(Number).filter((n) => !Number.isNaN(n)) : []),
@@ -39,8 +48,11 @@ export function QuizPage() {
 
   const [sessionKey, setSessionKey] = useState(0)
 
+  // Mehmon faqat mini-testni va 1-biletni yecha oladi, qolganlari uchun kirish kerak.
+  const guestBlocked = !user && !(mode === 'mini' || (mode === 'ticket' && !isTicketGuestLocked(ticketId, true)))
+
   const premiumRequired =
-    !isPremiumActive && (mode === 'exam' || mode === 'mistakes' || isTicketLocked(ticketId, isPremiumActive))
+    Boolean(user) && !isPremiumActive && (mode === 'exam' || mode === 'mistakes' || isTicketLocked(ticketId, isPremiumActive))
 
   useEffect(() => {
     if (!premiumRequired) return
@@ -52,6 +64,19 @@ export function QuizPage() {
     navigate(ROUTES.PREMIUM, { replace: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [premiumRequired])
+
+  if (!isAuthReady) {
+    return (
+      <div className="center-screen">
+        <Spinner label="Tekshirilmoqda..." />
+      </div>
+    )
+  }
+
+  if (guestBlocked) {
+    const reason = isTicket ? `Bilet ${ticketId} ni ochish uchun kiring` : 'Testni boshlash uchun kiring'
+    return <Navigate to="/" state={{ requireAuth: true, reason }} replace />
+  }
 
   if (premiumRequired) return null
 

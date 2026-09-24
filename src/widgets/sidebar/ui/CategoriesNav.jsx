@@ -13,16 +13,24 @@ import {
 } from '@tabler/icons-react'
 import { useAuth } from '../../../entities/user'
 import { useQuizStart } from '../../../widgets/quiz-start'
+import { useLoginModal } from '../../../widgets/login-modal'
 import { ThemeToggle } from '../../../shared/ui/ThemeToggle/ThemeToggle'
 import { Badge } from '../../../shared/ui/Badge/Badge'
 import { ROUTES } from '../../../shared/config/routes'
 
+// guestOk: tizimga kirmagan foydalanuvchiga ochiq. Boshqalarini bosganda kirish oynasi (reason bilan) ochiladi.
 const LINKS = [
-  { to: ROUTES.CATEGORIES, label: 'Asosiy', end: true, icon: IconLayoutGrid },
-  { to: ROUTES.TICKETS, label: 'Biletlar', icon: IconTicket },
-  { to: ROUTES.ROAD_SIGNS, label: "Belgilar", icon: IconRoadSign },
-  { action: 'exam', label: 'Imtihon', icon: IconClock },
-  { to: ROUTES.STATISTICS, label: 'Statistika', icon: IconChartBar },
+  {
+    to: ROUTES.CATEGORIES,
+    label: 'Asosiy',
+    end: true,
+    icon: IconLayoutGrid,
+    reason: 'Asosiy sahifani ochish uchun kiring',
+  },
+  { to: ROUTES.TICKETS, label: 'Biletlar', icon: IconTicket, guestOk: true },
+  { to: ROUTES.ROAD_SIGNS, label: "Belgilar", icon: IconRoadSign, guestOk: true },
+  { action: 'exam', label: 'Imtihon', icon: IconClock, reason: 'Imtihon rejimini ochish uchun kiring' },
+  { to: ROUTES.STATISTICS, label: 'Statistika', icon: IconChartBar, reason: "Statistikangizni ko'rish uchun kiring" },
 ]
 
 const linkStyle = ({ isActive }) => ({
@@ -44,9 +52,11 @@ const actionStyle = {
 }
 
 export function CategoriesNav() {
-  const { profile, user, logout, isAdmin, isPremiumActive } = useAuth()
+  const { profile, user, isAuthReady, logout, isAdmin, isPremiumActive } = useAuth()
   const navigate = useNavigate()
   const openQuizStart = useQuizStart()
+  const openLogin = useLoginModal()
+  const isGuest = !user
   const [logoutOpen, { open: openLogout, close: closeLogout }] = useDisclosure(false)
 
   const handleExamClick = () => {
@@ -57,6 +67,13 @@ export function CategoriesNav() {
     closeLogout()
     logout()
     navigate(ROUTES.HOME)
+  }
+
+  // Mehmon uchun yopiq bo'limlar kirish oynasini ochadi.
+  const getAction = (link) => {
+    if (isGuest && !link.guestOk) return () => openLogin({ title: link.reason })
+    if (link.action === 'exam') return handleExamClick
+    return null
   }
 
   const displayName = profile?.displayName || user?.displayName || user?.email?.split('@')[0]
@@ -103,142 +120,162 @@ export function CategoriesNav() {
         </Text>
 
         <Group gap={{ base: 16, lg: 26 }} mr="auto" visibleFrom="sm" wrap="nowrap">
-          {LINKS.map((link) =>
-            link.action === 'exam' ? (
-              <button key="exam" type="button" onClick={handleExamClick} style={actionStyle}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <Box component="span" visibleFrom="md" style={{ display: 'inline-flex' }}>
-                    <link.icon size={16} stroke={2} />
-                  </Box>
-                  {link.label}
-                </span>
+          {LINKS.map((link) => {
+            const label = (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <Box component="span" visibleFrom="md" style={{ display: 'inline-flex' }}>
+                  <link.icon size={16} stroke={2} />
+                </Box>
+                {link.label}
+              </span>
+            )
+            const onClick = getAction(link)
+            return onClick ? (
+              <button key={link.label} type="button" onClick={onClick} style={actionStyle}>
+                {label}
               </button>
             ) : (
-              <NavLink key={link.to} to={link.to} end={link.end} style={linkStyle}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <Box component="span" visibleFrom="md" style={{ display: 'inline-flex' }}>
-                    <link.icon size={16} stroke={2} />
-                  </Box>
-                  {link.label}
-                </span>
+              <NavLink key={link.label} to={link.to} end={link.end} style={linkStyle}>
+                {label}
               </NavLink>
-            ),
-          )}
+            )
+          })}
         </Group>
 
-        <Group gap={{ base: 8, lg: 14 }} fz="0.88rem" c="dimmed" visibleFrom="sm" ml="auto" wrap="nowrap">
-          {isPremiumActive ? (
-            <Badge variant="warning">
-              <Group gap={4} wrap="nowrap">
-                <IconCrown size={12} />
-                Premium
-              </Group>
-            </Badge>
-          ) : (
-            <Button
-              component={Link}
-              to={ROUTES.PREMIUM}
-              variant="subtle"
-              color="warning"
-              size="xs"
-              leftSection={<IconCrown size={14} />}
-            >
-              Premium
+        {!isAuthReady ? null : isGuest ? (
+          <Group gap={12} visibleFrom="sm" ml="auto" wrap="nowrap">
+            <ThemeToggle />
+            <Button variant="primary" size="sm" onClick={() => openLogin()}>
+              Kirish
             </Button>
-          )}
-          <ThemeToggle />
-          {isAdmin && (
-            <ActionIcon
-              component={Link}
-              to={ROUTES.ADMIN}
-              variant="subtle"
-              color="brand"
-              aria-label="Admin panel"
-              title="Admin panel"
+          </Group>
+        ) : (
+          <Group gap={{ base: 8, lg: 14 }} fz="0.88rem" c="dimmed" visibleFrom="sm" ml="auto" wrap="nowrap">
+            {isPremiumActive ? (
+              <Badge variant="warning">
+                <Group gap={4} wrap="nowrap">
+                  <IconCrown size={12} />
+                  Premium
+                </Group>
+              </Badge>
+            ) : (
+              <Button
+                component={Link}
+                to={ROUTES.PREMIUM}
+                variant="subtle"
+                color="warning"
+                size="xs"
+                leftSection={<IconCrown size={14} />}
+              >
+                Premium
+              </Button>
+            )}
+            <ThemeToggle />
+            {isAdmin && (
+              <ActionIcon
+                component={Link}
+                to={ROUTES.ADMIN}
+                variant="subtle"
+                color="brand"
+                aria-label="Admin panel"
+                title="Admin panel"
+              >
+                <IconShieldLock size={18} />
+              </ActionIcon>
+            )}
+            <Avatar
+              radius="xl"
+              size={30}
+              variant="gradient"
+              gradient={{ from: 'brand.6', to: 'accent.5', deg: 135 }}
+              color="white"
+              title={displayName}
+              aria-label={displayName}
             >
-              <IconShieldLock size={18} />
+              {initial}
+            </Avatar>
+            <Text size="sm" c="dimmed" visibleFrom="lg">
+              {displayName}
+            </Text>
+            <Button
+              variant="subtle"
+              color="danger"
+              size="xs"
+              onClick={openLogout}
+              leftSection={<IconLogout size={15} />}
+              visibleFrom="lg"
+            >
+              Chiqish
+            </Button>
+            <ActionIcon
+              variant="subtle"
+              color="danger"
+              size="lg"
+              onClick={openLogout}
+              aria-label="Chiqish"
+              title="Chiqish"
+              hiddenFrom="lg"
+            >
+              <IconLogout size={18} />
             </ActionIcon>
-          )}
-          <Avatar
-            radius="xl"
-            size={30}
-            variant="gradient"
-            gradient={{ from: 'brand.6', to: 'accent.5', deg: 135 }}
-            color="white"
-            title={displayName}
-            aria-label={displayName}
-          >
-            {initial}
-          </Avatar>
-          <Text size="sm" c="dimmed" visibleFrom="lg">
-            {displayName}
-          </Text>
-          <Button
-            variant="subtle"
-            color="danger"
-            size="xs"
-            onClick={openLogout}
-            leftSection={<IconLogout size={15} />}
-            visibleFrom="lg"
-          >
-            Chiqish
-          </Button>
-          <ActionIcon
-            variant="subtle"
-            color="danger"
-            size="lg"
-            onClick={openLogout}
-            aria-label="Chiqish"
-            title="Chiqish"
-            hiddenFrom="lg"
-          >
-            <IconLogout size={18} />
-          </ActionIcon>
-        </Group>
+          </Group>
+        )}
 
-        <Group gap={6} hiddenFrom="sm" ml="auto">
-          <ThemeToggle />
-          {isAdmin && (
-            <ActionIcon
-              component={Link}
-              to={ROUTES.ADMIN}
-              variant="subtle"
-              color="brand"
-              aria-label="Admin panel"
-              title="Admin panel"
-            >
-              <IconShieldLock size={18} />
+        {!isAuthReady ? null : isGuest ? (
+          <Group gap={6} hiddenFrom="sm" ml="auto" wrap="nowrap">
+            <ThemeToggle />
+            <Button variant="primary" size="xs" onClick={() => openLogin()}>
+              Kirish
+            </Button>
+          </Group>
+        ) : (
+          <Group gap={6} hiddenFrom="sm" ml="auto">
+            <ThemeToggle />
+            {isAdmin && (
+              <ActionIcon
+                component={Link}
+                to={ROUTES.ADMIN}
+                variant="subtle"
+                color="brand"
+                aria-label="Admin panel"
+                title="Admin panel"
+              >
+                <IconShieldLock size={18} />
+              </ActionIcon>
+            )}
+            <ActionIcon variant="subtle" color="danger" size="lg" onClick={openLogout} aria-label="Chiqish" title="Chiqish">
+              <IconLogout size={18} />
             </ActionIcon>
-          )}
-          <ActionIcon variant="subtle" color="danger" size="lg" onClick={openLogout} aria-label="Chiqish" title="Chiqish">
-            <IconLogout size={18} />
-          </ActionIcon>
-        </Group>
+          </Group>
+        )}
       </Box>
 
       <Box component="nav" className="mobile-tabbar" hiddenFrom="sm">
-        {LINKS.map((link) =>
-          link.action === 'exam' ? (
-            <button key="exam" type="button" className="mobile-tabbar-item" onClick={handleExamClick}>
+        {LINKS.map((link) => {
+          const content = (
+            <>
               <span className="mobile-tabbar-icon">
                 <link.icon size={21} stroke={2} />
               </span>
               <span>{link.label}</span>
+            </>
+          )
+          const onClick = getAction(link)
+          return onClick ? (
+            <button key={link.label} type="button" className="mobile-tabbar-item" onClick={onClick}>
+              {content}
             </button>
           ) : (
             <NavLink
-              key={link.to}
+              key={link.label}
               to={link.to}
               end={link.end}
               className={({ isActive }) => `mobile-tabbar-item${isActive ? ' is-active' : ''}`}
             >
-              <span className="mobile-tabbar-icon">
-                <link.icon size={21} stroke={2} />
-              </span>
-              <span>{link.label}</span>
+              {content}
             </NavLink>
-          ),
-        )}
+          )
+        })}
       </Box>
 
       <Modal opened={logoutOpen} onClose={closeLogout} title="Hisobdan chiqish" centered size={380}>

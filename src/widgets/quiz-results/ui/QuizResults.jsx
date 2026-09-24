@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom'
 import { Card, Stack, Text, Title, RingProgress, SimpleGrid, ThemeIcon, Badge } from '@mantine/core'
-import { IconCheck, IconX } from '@tabler/icons-react'
+import { IconCheck, IconX, IconCircleCheck } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
+import { GoogleButton } from '../../../shared/ui/GoogleButton/GoogleButton'
+import { useAuth } from '../../../entities/user'
+import { useAuthActions } from '../../../features/auth'
+import { useLoginModal } from '../../login-modal'
 import { ROUTES } from '../../../shared/config/routes'
 
 // Telefonda kichik katakchalarda yozuv kesilmasligi uchun.
@@ -9,13 +13,18 @@ const LABEL_STYLES = { overflow: 'visible', textOverflow: 'clip' }
 
 const BACK_LABELS = {
   [ROUTES.CATEGORIES]: 'Bosh sahifa',
+  [ROUTES.HOME]: 'Bosh sahifa',
   [ROUTES.TICKETS]: 'Biletlarga qaytish',
 }
 
 export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
+  const { user } = useAuth()
+  const openLogin = useLoginModal()
+  const { loginWithGoogle } = useAuthActions({ redirectTo: false })
+
   if (!result) return null
 
-  const { correctCount, wrongCount, totalQuestions, passed, mode, endReason } = result
+  const { correctCount, wrongCount, totalQuestions, passed, mode, endReason, isGuest, ticketCount } = result
   const answeredCount = correctCount + wrongCount
   const percent = answeredCount ? Math.round((correctCount / answeredCount) * 100) : 0
   const stoppedEarly = answeredCount < totalQuestions
@@ -92,6 +101,36 @@ export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
           <Text c="dimmed" fz="0.8rem">
             {endReasonText}
           </Text>
+        )}
+
+        {!user && (
+          <Stack gap="xs" w="100%" p="md" className="glass-card" ta="center">
+            <Text fw={700} fz="0.95rem" lh={1.4}>
+              Natijangiz {correctCount}/{totalQuestions}. Saqlab qolish va {ticketCount || 62} ta biletni ochish uchun
+              hisobga kiring
+            </Text>
+            <GoogleButton size="md" onClick={loginWithGoogle} />
+            <Button
+              variant="ghost"
+              size="sm"
+              fullWidth
+              onClick={() => openLogin({ title: 'Natijangizni saqlash uchun kiring', redirectTo: false })}
+            >
+              Email orqali kirish
+            </Button>
+          </Stack>
+        )}
+
+        {user && isGuest && (
+          <Stack gap="xs" w="100%" p="md" className="glass-card" align="center" ta="center">
+            <IconCircleCheck size={28} color="var(--mantine-color-success-6)" />
+            <Text fw={700} fz="0.95rem">
+              Natijangiz hisobingizga saqlandi
+            </Text>
+            <Button variant="secondary" size="sm" as={Link} to={ROUTES.CATEGORIES} fullWidth>
+              Asosiy sahifaga o'tish
+            </Button>
+          </Stack>
         )}
 
         <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="sm" w="100%">

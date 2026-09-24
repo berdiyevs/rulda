@@ -8,14 +8,16 @@ import { groupByTicket } from '../../../entities/ticket'
 import { fetchAllLatestAttempts } from '../../../entities/quiz-attempt'
 import { useAuth } from '../../../entities/user'
 import { useQuizStart } from '../../../widgets/quiz-start'
+import { useLoginModal } from '../../../widgets/login-modal'
 import { Badge } from '../../../shared/ui/Badge/Badge'
-import { isTicketLocked } from '../../../shared/lib/premium'
+import { isTicketLocked, isTicketGuestLocked } from '../../../shared/lib/premium'
 import { ROUTES } from '../../../shared/config/routes'
 
 export function TicketsPage() {
-  const { user, isPremiumActive } = useAuth()
+  const { user, isAuthReady, isPremiumActive } = useAuth()
   const navigate = useNavigate()
   const openQuizStart = useQuizStart()
+  const openLogin = useLoginModal()
   const [tickets, setTickets] = useState([])
   const [attempts, setAttempts] = useState({})
   const [loading, setLoading] = useState(true)
@@ -66,14 +68,23 @@ export function TicketsPage() {
               const attempt = attempts[`ticket-${ticketId}`]
               const answered = attempt ? attempt.correctCount + attempt.wrongCount : 0
               const scorePercent = answered ? Math.round((attempt.correctCount / answered) * 100) : null
-              const locked = isTicketLocked(ticketId, isPremiumActive)
+              const guestLocked = isTicketGuestLocked(ticketId, isAuthReady && !user)
+              const locked = guestLocked || isTicketLocked(ticketId, isPremiumActive)
 
               return (
                 <Card
                   key={ticketId}
                   component="button"
                   type="button"
-                  onClick={() => (locked ? navigate(ROUTES.PREMIUM) : openQuizStart({ ticketId }))}
+                  onClick={() => {
+                    if (guestLocked) {
+                      openLogin({ title: `Bilet ${ticketId} ni ochish uchun kiring`, redirectTo: false })
+                    } else if (locked) {
+                      navigate(ROUTES.PREMIUM)
+                    } else {
+                      openQuizStart({ ticketId })
+                    }
+                  }}
                   className="glass-card category-card"
                   padding="md"
                   style={{
@@ -97,7 +108,7 @@ export function TicketsPage() {
                       {questions.length} ta savol
                     </Text>
                     {locked ? (
-                      <Badge variant="warning">Premium</Badge>
+                      <Badge variant="warning">{guestLocked ? 'Kirish kerak' : 'Premium'}</Badge>
                     ) : (
                       scorePercent !== null && (
                         <Badge variant={scorePercent >= 70 ? 'success' : 'warning'}>{scorePercent}%</Badge>

@@ -36,7 +36,9 @@ export async function apiFetch(path, { method = 'GET', body, auth = true } = {})
   const data = await response.json().catch(() => null)
 
   if (!response.ok) {
-    throw new Error(extractErrorMessage(data))
+    const error = new Error(extractErrorMessage(data))
+    error.status = response.status
+    throw error
   }
 
   return data

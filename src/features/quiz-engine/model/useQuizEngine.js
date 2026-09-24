@@ -1,21 +1,29 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import { fetchQuestions, filterQuestionsByTopic } from '../../../entities/question'
-import { saveAttempt } from '../../../entities/quiz-attempt'
+import { saveAttempt, addGuestAttempt } from '../../../entities/quiz-attempt'
 import { useAuth } from '../../../entities/user'
 import { shuffleArray, pickRandom } from '../../../shared/lib/shuffle'
 import { useCountdown } from '../../../shared/lib/useCountdown'
 import { exitFullscreen } from '../../../shared/lib/fullscreen'
+import { FREE_TICKET_LIMIT } from '../../../shared/lib/premium'
 
 const PRACTICE_SESSION_SIZE = 20
 const EXAM_SESSION_SIZE = 20
 const EXAM_DURATION_SECONDS = 25 * 60
 const EXAM_MAX_MISTAKES = 2
+const MINI_TEST_SIZE = 10
 const EMPTY_QUESTION_IDS = []
 
 function prepareSession(allQuestions, topic, mode, ticketId, questionIds, questionCount) {
   if (mode === 'ticket') {
     const pool = allQuestions.filter((q) => q.ticketId === Number(ticketId))
     return pool.map((q) => ({ ...q, options: shuffleArray(q.options) }))
+  }
+
+  if (mode === 'mini') {
+    // Mehmon uchun mini-test: faqat bepul (1–3) biletlardagi savollardan tasodifiy tanlanadi.
+    const pool = allQuestions.filter((q) => q.ticketId >= 1 && q.ticketId <= FREE_TICKET_LIMIT)
+    return pickRandom(pool, MINI_TEST_SIZE).map((q) => ({ ...q, options: shuffleArray(q.options) }))
   }
 
   if (mode === 'mistakes') {
@@ -109,7 +117,8 @@ export function useQuizEngine({
       else if (mode === 'exam') passed = wrongCount <= EXAM_MAX_MISTAKES
       else if (mode !== 'mistakes' && maxMistakes != null) passed = wrongCount <= maxMistakes
       else passed = correctCount / totalQuestions >= 0.7
-      const attemptTopic = mode === 'ticket' ? `ticket-${ticketId}` : mode === 'mistakes' ? 'mistakes' : topic
+      const attemptTopic =
+        mode === 'ticket' ? `ticket-${ticketId}` : mode === 'mistakes' ? 'mistakes' : mode === 'mini' ? 'mini-test' : topic
 
       const wrongQuestionIds = statuses
         .map((s, i) => (s === 'wrong' ? sessionQuestions[i]?.id : null))
@@ -124,10 +133,14 @@ export function useQuizEngine({
         totalQuestions,
         passed,
         topic: attemptTopic,
-        mode,
+        mode: mode === 'mini' ? 'practice' : mode,
         wrongQuestionIds,
         correctQuestionIds,
+        // Quyidagi maydonlar faqat natija sahifasi uchun, backend'ga yuborilmaydi.
         endReason,
+        isMini: mode === 'mini',
+        isGuest: !user,
+        ticketCount: new Set(sourceQuestions.map((q) => q.ticketId)).size,
       }
       setResult(summary)
       setFinished(true)
@@ -135,9 +148,11 @@ export function useQuizEngine({
 
       if (user) {
         saveAttempt(summary).catch(() => {})
+      } else {
+        addGuestAttempt(summary)
       }
     },
-    [mode, topic, ticketId, user, sessionQuestions, maxMistakes],
+    [mode, topic, ticketId, user, sessionQuestions, sourceQuestions, maxMistakes],
   )
 
   const hasTimeLimit = mode === 'exam' || ((mode === 'practice' || mode === 'ticket') && durationMinutes > 0)

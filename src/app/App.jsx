@@ -4,6 +4,7 @@ import { Notifications } from '@mantine/notifications'
 import { AuthProvider } from '../entities/user'
 import { QuizStartProvider } from '../widgets/quiz-start'
 import { LoginModalProvider } from '../widgets/login-modal'
+import { GuestAttemptsSync } from '../features/guest-sync'
 import { AppRouter } from './providers/AppRouter'
 import { theme } from './theme'
 import '@mantine/core/styles.css'
@@ -17,6 +18,7 @@ export function App() {
     <MantineProvider theme={theme} defaultColorScheme="dark">
       <Notifications position="top-right" />
       <AuthProvider>
+        <GuestAttemptsSync />
         <BrowserRouter>
           <LoginModalProvider>
             <QuizStartProvider>
