@@ -968,7 +968,7 @@
   },
   {
     "id": 40,
-    "question": "Kunning qorong'i vaqtida sun'iy yoritilmagan yo'llarda yoki yetarli ko'rinmaslik sharoitida yonmaydigan orqa gabarit chiroglari bilan to'xtab turish yoki ta'mirlash joyiga borishga ruxsat etiladimi?",
+    "question": "Kunning qorong'i vaqtida sun'iy yoritilmagan yo'llarda yoki yetarli ko'rinmaslik sharoitida yonmaydigan orqa gabarit chiroqlari bilan to'xtab turish yoki ta'mirlash joyiga borishga ruxsat etiladimi?",
     "image_url": "",
     "options": [
       {
@@ -2057,7 +2057,7 @@
       },
       {
         "id": 3,
-        "text": "Agar quvib o'tilayotgan transport vositasi 40 km/ soadan kam tezlik bilan harakatlanayotgan bo'lsa, ruxsat etiladi",
+        "text": "Agar quvib o'tilayotgan transport vositasi 40 km/ soatdan kam tezlik bilan harakatlanayotgan bo'lsa, ruxsat etiladi",
         "is_correct": false
       }
     ],
@@ -2266,7 +2266,7 @@
       },
       {
         "id": 2,
-        "text": "Tezlikni pasaytirishi va boshqa qatorga o'tish bilan bog'lik keskin manyovrlarga yo'l qo'ymasdan harakatni davom ettirishi",
+        "text": "Tezlikni pasaytirishi va boshqa qatorga o'tish bilan bog'liq keskin manyovrlarga yo'l qo'ymasdan harakatni davom ettirishi",
         "is_correct": false
       },
       {
@@ -3293,7 +3293,7 @@
       },
       {
         "id": 3,
-        "text": "Haydovchining hohishiga ko'ra",
+        "text": "Haydovchining xohishiga ko'ra",
         "is_correct": false
       }
     ],
@@ -3758,7 +3758,7 @@
   },
   {
     "id": 150,
-    "question": "To'xtab turish tormoz tizimi qanchadan kam bo'lgan qiyaliqda M toifadagi avtotransport vositalarini harakatsiz holatda ushlab tura olmasa, bu transport vositalaridan foydalanish taqiqlanadi.",
+    "question": "To'xtab turish tormoz tizimi qanchadan kam bo'lgan qiyalikda M toifadagi avtotransport vositalarini harakatsiz holatda ushlab tura olmasa, bu transport vositalaridan foydalanish taqiqlanadi.",
     "image_url": "",
     "options": [
       {
@@ -4102,7 +4102,7 @@
   },
   {
     "id": 163,
-    "question": "Qaysi belgi garbarit uzunligi belgisida ko'rsatilganidan uzunroq bo'lgan transport vositalarining harakatlanishini taqiqlaydi?",
+    "question": "Qaysi belgi gabarit uzunligi belgisida ko'rsatilganidan uzunroq bo'lgan transport vositalarining harakatlanishini taqiqlaydi?",
     "image_url": "/assets/quest-image/i17_3.webp",
     "options": [
       {
@@ -5041,7 +5041,7 @@
     "options": [
       {
         "id": 1,
-        "text": "Yo'l yoqasida yoki qatnov kismining chetida to'xtash",
+        "text": "Yo'l yoqasida yoki qatnov qismining chetida to'xtash",
         "is_correct": false
       },
       {
@@ -5059,7 +5059,7 @@
     "options": [
       {
         "id": 1,
-        "text": "Belgining amal qilish hududida foto va video moslamalardan foydalanish ta'qiqlanadi",
+        "text": "Belgining amal qilish hududida foto va video moslamalardan foydalanish taqiqlanadi",
         "is_correct": false
       },
       {
@@ -5281,7 +5281,7 @@
       },
       {
         "id": 3,
-        "text": "Agar avtobus belgilangan yo'nalish bo'yicha yursa, tuxsat etiladi",
+        "text": "Agar avtobus belgilangan yo'nalish bo'yicha yursa, ruxsat etiladi",
         "is_correct": false
       }
     ],
@@ -6458,7 +6458,7 @@
   },
   {
     "id": 260,
-    "question": "Sanab o'tilgan qaysi xollarda transport vositasidan foydalanish mumkin?",
+    "question": "Sanab o'tilgan qaysi hollarda transport vositasidan foydalanish mumkin?",
     "image_url": "",
     "options": [
       {
@@ -6468,7 +6468,7 @@
       },
       {
         "id": 2,
-        "text": "Ishlab chiqarilishi to'xtatilgan yengil avtomobillarga boshqa turdagi va rusmdagi transport vositalarining tashqi yoritgichlari o'rnatilgan",
+        "text": "Ishlab chiqarilishi to'xtatilgan yengil avtomobillarga boshqa turdagi va rasmdagi transport vositalarining tashqi yoritgichlari o'rnatilgan",
         "is_correct": true
       },
       {
@@ -6912,7 +6912,7 @@
   },
   {
     "id": 278,
-    "question": "Yengil avtomobil haydovchisi, aholi yashash punktlaridan tashqaridagi yo'llarda haratlanishda, belgilangan tezlikni oshirish, qaysi vaziyatlarda taqiqlanadi?",
+    "question": "Yengil avtomobil haydovchisi, aholi yashash punktlaridan tashqaridagi yo'llarda harakatlanishda, belgilangan tezlikni oshirish, qaysi vaziyatlarda taqiqlanadi?",
     "image_url": "",
     "options": [
       {
@@ -7433,7 +7433,7 @@
   },
   {
     "id": 300,
-    "question": "Ta'qiqlovchi belgi tagiga o'rnatilgan qo'shimcha axborot belgisi nima maqsadda qo'yilgan?",
+    "question": "Taqiqlovchi belgi tagiga o'rnatilgan qo'shimcha axborot belgisi nima maqsadda qo'yilgan?",
     "image_url": "/assets/quest-image/i30_10a.webp",
     "options": [
       {
@@ -7918,7 +7918,7 @@
     "options": [
       {
         "id": 1,
-        "text": "7 yoshdan kichiq bo'lmagan bolalarni tashishga ruxsat etiladi",
+        "text": "7 yoshdan kichik bo'lmagan bolalarni tashishga ruxsat etiladi",
         "is_correct": false
       },
       {
@@ -8145,7 +8145,7 @@
     "options": [
       {
         "id": 1,
-        "text": "Tormoz tepksini keskin kuchli bosish - ulagichni ajratgan holda",
+        "text": "Tormoz tepkisini keskin kuchli bosish - ulagichni ajratgan holda",
         "is_correct": false
       },
       {
@@ -9171,7 +9171,7 @@
       },
       {
         "id": 2,
-        "text": "Haydovchining hohishiga ko'ra shu shart bilanki, bu xavf-xatardan xoli bo'lsa va boshqa harakat qatnashchilariga xalaqit bermasa",
+        "text": "Haydovchining xohishiga ko'ra shu shart bilanki, bu xavf-xatardan xoli bo'lsa va boshqa harakat qatnashchilariga xalaqit bermasa",
         "is_correct": false
       },
       {
@@ -11088,7 +11088,7 @@
       },
       {
         "id": 3,
-        "text": "Nosozlikni o'sha joyda bartaraf etishga, agar buning iloji bo'lmasa, zarur ehtiyoj choralariga rioya qilgan holda to'xtab turish yoki ta'mirlash joyiga evakuator yoki shatakka olish orqali olib borishga",
+        "text": "Nosozlikni o'sha joyda bartaraf etishga, agar buning iloji bo'lmasa, zarur ehtiyot choralariga rioya qilgan holda to'xtab turish yoki ta'mirlash joyiga evakuator yoki shatakka olish orqali olib borishga",
         "is_correct": true
       }
     ],
@@ -12901,7 +12901,7 @@
       },
       {
         "id": 4,
-        "text": "Transport vositisida tashiladigan yukning ishlab chiqargan korxona yo'l qo'ygan texnik tavsifnomasi sifatida belgilanadigan vazni",
+        "text": "Transport vositasida tashiladigan yukning ishlab chiqargan korxona yo'l qo'ygan texnik tavsifnomasi sifatida belgilanadigan vazni",
         "is_correct": false
       }
     ],
@@ -15456,7 +15456,7 @@
   },
   {
     "id": 626,
-    "question": "Agar transport vositisida «Tezlik cheklangan» taniqlik belgisi o'rnatilgan bo'lsa, bu transport vositasining haydovchisiga:",
+    "question": "Agar transport vositasida «Tezlik cheklangan» taniqlik belgisi o'rnatilgan bo'lsa, bu transport vositasining haydovchisiga:",
     "image_url": "",
     "options": [
       {
@@ -15512,7 +15512,7 @@
       },
       {
         "id": 2,
-        "text": "Hohlagan tasma bo'ylab",
+        "text": "Xohlagan tasma bo'ylab",
         "is_correct": false
       },
       {
@@ -15788,7 +15788,7 @@
   },
   {
     "id": 640,
-    "question": "Ikkinchi daraja ta'mirlash yo'li bilan tiklangan shinalarni M1 toifadagi avtotranspor vositalariga o'rnatishga ruxsat etiladimi?",
+    "question": "Ikkinchi daraja ta'mirlash yo'li bilan tiklangan shinalarni M1 toifadagi avtotransport vositalariga o'rnatishga ruxsat etiladimi?",
     "image_url": "",
     "options": [
       {
@@ -16255,7 +16255,7 @@
     "options": [
       {
         "id": 1,
-        "text": "Kiyim-boshni yechishni jarohatlan qo'ldan boshlash, so'ng sog' qo'lni bo'shatish",
+        "text": "Kiyim-boshni yechishni jarohatlangan qo'ldan boshlash, so'ng sog' qo'lni bo'shatish",
         "is_correct": false
       },
       {
@@ -16265,7 +16265,7 @@
       },
       {
         "id": 3,
-        "text": "Kiyim-boshni yechishni sog' qo'ldan boshlash, so'ng jarohatlan qo'lni bo'shatish",
+        "text": "Kiyim-boshni yechishni sog' qo'ldan boshlash, so'ng jarohatlangan qo'lni bo'shatish",
         "is_correct": true
       }
     ],
@@ -16459,7 +16459,7 @@
       },
       {
         "id": 2,
-        "text": "Haydovchi maxsus tovushli ishoralarini yoqqan holda yaqinlashib kelayotgan transport vositalariga yo'l berishlari, zarur bo'lgan hollarda ularniing to'siqsiz o'tib ketishlari uchun o'zlarini yo'lning o'ng tomoniga olib to'xtashlari shart",
+        "text": "Haydovchi maxsus tovushli ishoralarini yoqqan holda yaqinlashib kelayotgan transport vositalariga yo'l berishlari, zarur bo'lgan hollarda ularning to'siqsiz o'tib ketishlari uchun o'zlarini yo'lning o'ng tomoniga olib to'xtashlari shart",
         "is_correct": true
       }
     ],
@@ -17355,7 +17355,7 @@
       },
       {
         "id": 3,
-        "text": "Yo'l yaxmalak, sirpanchiq bo'lgan xollarda",
+        "text": "Yo'l yaxmalak, sirpanchiq bo'lgan hollarda",
         "is_correct": true
       },
       {
@@ -17442,7 +17442,7 @@
     "options": [
       {
         "id": 1,
-        "text": "Qizil avtomobil yo'l berayotganiga ishonch xosil qilib chorrahadan birinchi o'tish",
+        "text": "Qizil avtomobil yo'l berayotganiga ishonch hosil qilib chorrahadan birinchi o'tish",
         "is_correct": true
       },
       {
@@ -18068,7 +18068,7 @@
   },
   {
     "id": 735,
-    "question": "Svetofor (ishoralari) qaysi guruh yo'l belgilarini bekor qiladi (miltilovchi sariq ishoradan tashqari)?",
+    "question": "Svetofor (ishoralari) qaysi guruh yo'l belgilarini bekor qiladi (miltillovchi sariq ishoradan tashqari)?",
     "image_url": "",
     "options": [
       {
@@ -18078,7 +18078,7 @@
       },
       {
         "id": 2,
-        "text": "Ta'qiqlovchi belgilar",
+        "text": "Taqiqlovchi belgilar",
         "is_correct": false
       },
       {
@@ -19269,7 +19269,7 @@
   },
   {
     "id": 787,
-    "question": "Sizga ko'satilgan joyda yengil avtomobilda to'xtashga ruxsat etiladimi?",
+    "question": "Sizga ko'rsatilgan joyda yengil avtomobilda to'xtashga ruxsat etiladimi?",
     "image_url": "/assets/quest-image/i79_7a.webp",
     "options": [
       {
@@ -19499,7 +19499,7 @@
     "options": [
       {
         "id": 1,
-        "text": "Tezlikni o'zgartirmasdan harakatni davom etttirishi",
+        "text": "Tezlikni o'zgartirmasdan harakatni davom ettirishi",
         "is_correct": false
       },
       {
@@ -19614,7 +19614,7 @@
       },
       {
         "id": 2,
-        "text": "Oldinda transport vositalari orasida xavsfsiz oraliqni ta'minlash haqida ogohlantiradi",
+        "text": "Oldinda transport vositalari orasida xavfsiz oraliqni ta'minlash haqida ogohlantiradi",
         "is_correct": false
       },
       {
@@ -19783,7 +19783,7 @@
   },
   {
     "id": 810,
-    "question": "Siz chorrahada chapga burilishda qaysi transport vositasia yo'l berishingiz kerak?",
+    "question": "Siz chorrahada chapga burilishda qaysi transport vositasiga yo'l berishingiz kerak?",
     "image_url": "/assets/quest-image/i81_10a.webp",
     "options": [
       {
@@ -20411,7 +20411,7 @@
   },
   {
     "id": 836,
-    "question": "Trasport vositalarini qatnov qismining kengaytirilmagan joylarida qanday tartibda to'xtash va to'xtab turishiga ruxsat etiladi?",
+    "question": "Transport vositalarini qatnov qismining kengaytirilmagan joylarida qanday tartibda to'xtash va to'xtab turishiga ruxsat etiladi?",
     "image_url": "",
     "options": [
       {
@@ -20715,7 +20715,7 @@
   },
   {
     "id": 849,
-    "question": "Sekinlashish bo'lagi bo'lgan yo'llarda burlmoqchi bo'lgan haydovchi qachon tezlikni kamaytirishi lozim?",
+    "question": "Sekinlashish bo'lagi bo'lgan yo'llarda burilmoqchi bo'lgan haydovchi qachon tezlikni kamaytirishi lozim?",
     "image_url": "",
     "options": [
       {
@@ -20930,7 +20930,7 @@
     "options": [
       {
         "id": 1,
-        "text": "Yo'l harakati qatnashchilariga nisbatan imtiyozi bo'lgan boshka yo'l harakati katnashchisining harakat yo'nalishi yoki tezligini o'zgartirishga majbur etishi mumkin bo'lgan hollarda harakatni davom ettirmasligini yoki boshlamasligini, biror-bir manyovr bajarishi mumkin emasligini bildiruvchi talab",
+        "text": "Yo'l harakati qatnashchilariga nisbatan imtiyozi bo'lgan boshqa yo'l harakati qatnashchisining harakat yo'nalishi yoki tezligini o'zgartirishga majbur etishi mumkin bo'lgan hollarda harakatni davom ettirmasligini yoki boshlamasligini, biror-bir manyovr bajarishi mumkin emasligini bildiruvchi talab",
         "is_correct": false
       },
       {
@@ -20979,7 +20979,7 @@
   },
   {
     "id": 862,
-    "question": "Ushbu belgi nimani bidiradi?",
+    "question": "Ushbu belgi nimani bildiradi?",
     "image_url": "/assets/quest-image/i87_2.webp",
     "options": [
       {
@@ -21048,7 +21048,7 @@
   },
   {
     "id": 865,
-    "question": "Tormoz yo'li deb nimga aytiladi?",
+    "question": "Tormoz yo'li deb nimaga aytiladi?",
     "image_url": "",
     "options": [
       {
@@ -21112,7 +21112,7 @@
   },
   {
     "id": 868,
-    "question": "Aholi punktlaridan tashqarida tirkamali yuk avtomabillari qanday yuqori tezlik bilan harakatlanishi mumkin?",
+    "question": "Aholi punktlaridan tashqarida tirkamali yuk avtomobillari qanday yuqori tezlik bilan harakatlanishi mumkin?",
     "image_url": "",
     "options": [
       {
@@ -21316,7 +21316,7 @@
       },
       {
         "id": 2,
-        "text": "Jarohatlangan odamni tinchlantirib, jarohatlangan joy soxasini sovuk suv, muz kuyish yo'llari bilan sovitish, ogriqni susaytirish va kon ketishini kamaytirish",
+        "text": "Jarohatlangan odamni tinchlantirib, jarohatlangan joy soxasini sovuq suv, muz kuyish yo'llari bilan sovitish, ogriqni susaytirish va kon ketishini kamaytirish",
         "is_correct": false
       },
       {
@@ -21615,7 +21615,7 @@
       },
       {
         "id": 2,
-        "text": "Jarohatlangan joyda shish paydo bo'ladi, og'riq seziladi, ba'zan shu joyda mayda kappiliyar qon tomirlari yorilib, qon quyilishni natijasida ko'karish paydo bo'ladi",
+        "text": "Jarohatlangan joyda shish paydo bo'ladi, og'riq seziladi, ba'zan shu joyda mayda kapillyar qon tomirlari yorilib, qon quyilishni natijasida ko'karish paydo bo'ladi",
         "is_correct": true
       }
     ],
@@ -21664,7 +21664,7 @@
   },
   {
     "id": 892,
-    "question": "Tumanga qarshi old chiroqlrni qorong'i vaqtda, yo'lning yoritilmagan qismlarida uzoqni yoki yaqinni yorituvchi chiroqlar bilan birga qo'llash mumkinmi?",
+    "question": "Tumanga qarshi old chiroqlarni qorong'i vaqtda, yo'lning yoritilmagan qismlarida uzoqni yoki yaqinni yorituvchi chiroqlar bilan birga qo'llash mumkinmi?",
     "image_url": "",
     "options": [
       {
@@ -22088,7 +22088,7 @@
       },
       {
         "id": 2,
-        "text": "Yo'l harakati katnashchilariga nisbatan imtiyozi bo'lgan boshqa yo'l harakati katnashchisining harakat yo'nalishi yoki tezligini o'zgartirishga majbur etishi mumkin bo'lgan hollarda harakatni davom ettirmasligini yoki boshlamasligini, biror-bir manyovr bajarishi mumkin emasligini bildiruvchi talab",
+        "text": "Yo'l harakati qatnashchilariga nisbatan imtiyozi bo'lgan boshqa yo'l harakati qatnashchisining harakat yo'nalishi yoki tezligini o'zgartirishga majbur etishi mumkin bo'lgan hollarda harakatni davom ettirmasligini yoki boshlamasligini, biror-bir manyovr bajarishi mumkin emasligini bildiruvchi talab",
         "is_correct": false
       }
     ],
@@ -22287,7 +22287,7 @@
       },
       {
         "id": 2,
-        "text": "Harakat yo'nalishi boyicha va burilayotgan ko'chani kesib o'tayotgan piyodalarga hamda boshqa transport vositalariga yo'l berasiz",
+        "text": "Harakat yo'nalishi bo'yicha va burilayotgan ko'chani kesib o'tayotgan piyodalarga hamda boshqa transport vositalariga yo'l berasiz",
         "is_correct": true
       },
       {
@@ -22517,7 +22517,7 @@
   },
   {
     "id": 928,
-    "question": "Yo'nalishli bo'lmagan transport vositalari «A» xarfi bilan belgilangan o'ng tasmada qaysi holatlarda harakatlanishlari mumkin?",
+    "question": "Yo'nalishli bo'lmagan transport vositalari «A» harfi bilan belgilangan o'ng tasmada qaysi holatlarda harakatlanishlari mumkin?",
     "image_url": "/assets/quest-image/i93_8a.webp",
     "options": [
       {
@@ -23260,7 +23260,7 @@
   },
   {
     "id": 959,
-    "question": "Balandlika yo'l chetida to'siq mavjud bo'lganda to'xtagan avtomobilni joyidan g'ildirab ketishini oldini olish uchun oldingi g'ildiraklarni burib qo'yish usuli qaysi javobda to'g'ri ko'rsatilgan?",
+    "question": "Balandlikda yo'l chetida to'siq mavjud bo'lganda to'xtagan avtomobilni joyidan g'ildirab ketishini oldini olish uchun oldingi g'ildiraklarni burib qo'yish usuli qaysi javobda to'g'ri ko'rsatilgan?",
     "image_url": "/assets/quest-image/i96_9.webp",
     "options": [
       {
@@ -23648,7 +23648,7 @@
   },
   {
     "id": 975,
-    "question": "Ko'rsatilgan qaysi yo'l belgisi yengil yo'nalishsiz taksilarga yo'lovchilarni tushurish-chiqarish (yuklarni ortish-tushurish) vaqtida ta'sir qilmaydi?",
+    "question": "Ko'rsatilgan qaysi yo'l belgisi yengil yo'nalishsiz taksilarga yo'lovchilarni tushirish-chiqarish (yuklarni ortish-tushirish) vaqtida ta'sir qilmaydi?",
     "image_url": "/assets/quest-image/i98_5.webp",
     "options": [
       {
@@ -24067,7 +24067,7 @@
   },
   {
     "id": 993,
-    "question": "Chorrahdan birinchi bo'lib kesib o'tadi",
+    "question": "Chorrahadan birinchi bo'lib kesib o'tadi",
     "image_url": "/assets/quest-image/i100_3a.webp",
     "options": [
       {
@@ -24317,7 +24317,7 @@
       },
       {
         "id": 2,
-        "text": "Quvib o'tish va aylanib o'lishda",
+        "text": "Quvib o'tish va aylanib o'tishda",
         "is_correct": false
       },
       {
@@ -24409,7 +24409,7 @@
   },
   {
     "id": 1007,
-    "question": "Kesishayotgan qatnov qismi chetiga qanchadan kam masofa qolganda ta'xtash taqiqlanadi?",
+    "question": "Kesishayotgan qatnov qismi chetiga qanchadan kam masofa qolganda to'xtash taqiqlanadi?",
     "image_url": "",
     "options": [
       {
@@ -24858,7 +24858,7 @@
   },
   {
     "id": 1025,
-    "question": "Quyidagi shaxslarga xavfsizlik kamarini (kanstruksiyasida xavfsizlik kamari nazarda tutilgan transport vositalarida)taqmaslikga ruxsat beriladi:",
+    "question": "Quyidagi shaxslarga xavfsizlik kamarini (konstruksiyasida xavfsizlik kamari nazarda tutilgan transport vositalarida)taqmaslikka ruxsat beriladi:",
     "image_url": "",
     "options": [
       {
@@ -25552,7 +25552,7 @@
       },
       {
         "id": 3,
-        "text": "Teng ahamyatli yo'llar kesishgan chorrahada deb hisoblashi kerak",
+        "text": "Teng ahamiyatli yo'llar kesishgan chorrahada deb hisoblashi kerak",
         "is_correct": false
       }
     ],
@@ -25749,7 +25749,7 @@
   },
   {
     "id": 1062,
-    "question": "Tramvay reelssiz transport vositalariga nisbatan imtiyozga ega bo'lmagan holat:",
+    "question": "Tramvay relssiz transport vositalariga nisbatan imtiyozga ega bo'lmagan holat:",
     "image_url": "",
     "options": [
       {
@@ -25782,7 +25782,7 @@
     "options": [
       {
         "id": 1,
-        "text": "Birinchi o'tish huquuqiga egaman",
+        "text": "Birinchi o'tish huquqiga egaman",
         "is_correct": false
       },
       {
@@ -25823,7 +25823,7 @@
     "options": [
       {
         "id": 1,
-        "text": "Suniy notekislik",
+        "text": "Sun'iy notekislik",
         "is_correct": false
       },
       {
@@ -26492,7 +26492,7 @@
   },
   {
     "id": 1093,
-    "question": "Qaysi transport vositalariga yo'lovchilarni tushurishga ruxsat etiladi?",
+    "question": "Qaysi transport vositalariga yo'lovchilarni tushirishga ruxsat etiladi?",
     "image_url": "/assets/quest-image/i110_3.webp",
     "options": [
       {
@@ -26856,7 +26856,7 @@
       },
       {
         "id": 2,
-        "text": "Fagat birinchi va uchinchi rasmlarda",
+        "text": "Faqat birinchi va uchinchi rasmlarda",
         "is_correct": false
       },
       {
@@ -26866,7 +26866,7 @@
       },
       {
         "id": 4,
-        "text": "Fagat birinchi rasmda",
+        "text": "Faqat birinchi rasmda",
         "is_correct": false
       },
       {
@@ -27073,7 +27073,7 @@
   },
   {
     "id": 1115,
-    "question": "Imtiyoz belgilari qaysi jaylarda harakatlanish navbatini belgilaydi?",
+    "question": "Imtiyoz belgilari qaysi joylarda harakatlanish navbatini belgilaydi?",
     "image_url": "",
     "options": [
       {
@@ -28183,7 +28183,7 @@
   },
   {
     "id": 1160,
-    "question": "Vazirlar Mahkamasining 172 - sonli qarori muvofik, Yo'l harakati qoidalari nechta banddan iborat?",
+    "question": "Vazirlar Mahkamasining 172 - sonli qarori muvofiq, Yo'l harakati qoidalari nechta banddan iborat?",
     "image_url": "",
     "options": [
       {
@@ -29120,7 +29120,7 @@
   },
   {
     "id": 1199,
-    "question": "Mexanik transport vositasining egasi yonida haydochilik guvohnomasi bo'lmaganida qanday hujjat bilan boshqarishga ruxsat etiladi?",
+    "question": "Mexanik transport vositasining egasi yonida haydovchilik guvohnomasi bo'lmaganida qanday hujjat bilan boshqarishga ruxsat etiladi?",
     "image_url": "",
     "options": [
       {
@@ -29166,7 +29166,7 @@
   },
   {
     "id": 1201,
-    "question": "Ushbu yo'l belgisi chorahalarda o'nga burilayotgan relezsiz transport voisitalariga svetoforning qaysi ishorasida harakatlanishga ruxsat etiladi ?",
+    "question": "Ushbu yo'l belgisi chorrahalarda o'nga burilayotgan relezsiz transport vositalariga svetoforning qaysi ishorasida harakatlanishga ruxsat etiladi ?",
     "image_url": "/assets/quest-image/i121_1.webp",
     "options": [
       {
@@ -29194,12 +29194,12 @@
   },
   {
     "id": 1202,
-    "question": "Yo'l patrul xizmat hodimlariga yo'l harakat qatnashchilari bilan o'zaro munosabatlari va maxsus moslamalardan foydalanishda nizom to'grisidagi qonunda qanday tartib qo'yilgan ?",
+    "question": "Yo'l patrul xizmat xodimlariga yo'l harakat qatnashchilari bilan o'zaro munosabatlari va maxsus moslamalardan foydalanishda nizom to'g'risidagi qonunda qanday tartib qo'yilgan ?",
     "image_url": "/assets/quest-image/i121_2.webp",
     "options": [
       {
         "id": 1,
-        "text": "Yo'l transport hodisasini oldini olish va harakat havfsizligini taminlash",
+        "text": "Yo'l transport hodisasini oldini olish va harakat xavfsizligini ta'minlash",
         "is_correct": false
       },
       {
@@ -29275,7 +29275,7 @@
       },
       {
         "id": 5,
-        "text": "Barcha javoblar to'gri",
+        "text": "Barcha javoblar to'g'ri",
         "is_correct": false
       }
     ],
