@@ -162,6 +162,9 @@ export function StatisticsPage() {
                       </Text>
                     }
                   />
+                  <Text c="dimmed" fz="xs">
+                    Har bir mavzu bo'yicha oxirgi urinish natijalarining o'rtacha foizi.
+                  </Text>
                 </Stack>
               </Paper>
 

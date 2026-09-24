@@ -4,9 +4,16 @@ import { fetchQuestions } from '../../../entities/question'
 import { TOPICS } from '../../../entities/category'
 import { useAuth } from '../../../entities/user'
 
+// Faqat haqiqatda javob berilgan savollar hisobga olinadi (tugallanmagan urinishlarda ham to'g'ri chiqadi).
+function answeredOf(attempt) {
+  return (attempt.correctCount || 0) + (attempt.wrongCount || 0)
+}
+
 function percentOf(attempt) {
-  if (!attempt || !attempt.totalQuestions) return null
-  return Math.round((attempt.correctCount / attempt.totalQuestions) * 100)
+  if (!attempt) return null
+  const answered = answeredOf(attempt)
+  if (!answered) return null
+  return Math.round((attempt.correctCount / answered) * 100)
 }
 
 function computeStatistics(attempts, questions) {
@@ -29,7 +36,7 @@ function computeStatistics(attempts, questions) {
 
   const weakestTopic =
     topicBreakdown
-      .filter((t) => t.percent != null)
+      .filter((t) => t.id !== 'all' && t.percent != null)
       .sort((a, b) => a.percent - b.percent)[0] || null
 
   const examAttempts = attempts.filter((a) => a.mode === 'exam')
@@ -56,7 +63,7 @@ function computeStatistics(attempts, questions) {
     .filter(Boolean)
 
   const totalAttempts = attempts.length
-  const totalQuestionsAnswered = attempts.reduce((sum, a) => sum + (a.totalQuestions || 0), 0)
+  const totalQuestionsAnswered = attempts.reduce((sum, a) => sum + answeredOf(a), 0)
   const totalCorrect = attempts.reduce((sum, a) => sum + (a.correctCount || 0), 0)
   const overallAccuracy = totalQuestionsAnswered
     ? Math.round((totalCorrect / totalQuestionsAnswered) * 100)
