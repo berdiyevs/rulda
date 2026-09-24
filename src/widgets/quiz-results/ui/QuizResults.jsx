@@ -7,6 +7,7 @@ import { useAuth } from '../../../entities/user'
 import { useAuthActions } from '../../../features/auth'
 import { useLoginModal } from '../../login-modal'
 import { ExamPromptCard } from '../../exam-prompt'
+import { ShareResult } from './ShareResult'
 import { ROUTES } from '../../../shared/config/routes'
 
 // Telefonda kichik katakchalarda yozuv kesilmasligi uchun.
@@ -106,6 +107,8 @@ export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
           </Text>
         )}
 
+        {passed && answeredCount > 0 && <ShareResult result={result} prominent />}
+
         {user && answeredCount > 0 && <ExamPromptCard />}
 
         {!user && (
@@ -148,6 +151,8 @@ export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
             </Button>
           )}
         </SimpleGrid>
+
+        {!passed && answeredCount > 0 && <ShareResult result={result} />}
       </Stack>
     </Card>
   )
