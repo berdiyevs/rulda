@@ -11,14 +11,33 @@ const TOPIC_LABELS = {
   theory: 'Nazariy savollar',
 }
 
-export function QuizNav({ mode, topic, ticketId, timeFormatted, showTimer, finished, currentIndex, totalSteps }) {
+export function QuizNav({
+  mode,
+  topic,
+  ticketId,
+  timeFormatted,
+  showTimer,
+  finished,
+  currentIndex,
+  totalSteps,
+  answeredCount = 0,
+  exitTo = ROUTES.CATEGORIES,
+  onFinish,
+}) {
   const navigate = useNavigate()
   const [confirmOpen, { open: openConfirm, close: closeConfirm }] = useDisclosure(false)
 
   const handleQuit = () => {
     exitFullscreen()
-    navigate(ROUTES.CATEGORIES)
+    navigate(exitTo)
   }
+
+  const handleFinish = () => {
+    closeConfirm()
+    onFinish?.()
+  }
+
+  const hasAnswers = answeredCount > 0
 
   const hasProgress = Number.isInteger(currentIndex) && totalSteps > 0
   const stepNumber = hasProgress ? Math.min(currentIndex + 1, totalSteps) : 0
@@ -112,16 +131,20 @@ export function QuizNav({ mode, topic, ticketId, timeFormatted, showTimer, finis
       <Modal opened={confirmOpen} onClose={closeConfirm} title="Testni tugatish" centered size={400}>
         <Stack gap="lg">
           <Text c="dimmed" size="sm">
-            Testni tark etmoqchimisiz? Joriy urinish saqlanmaydi.
+            {hasAnswers
+              ? `Siz ${answeredCount} ta savolga javob berdingiz. Natijani ko'rsangiz, urinish saqlanadi.`
+              : "Siz hali birorta savolga javob bermadingiz. Chiqsangiz, hech narsa saqlanmaydi."}
           </Text>
-          <Group justify="flex-end" gap="sm">
-            <Button variant="subtle" color="gray" onClick={closeConfirm}>
-              Bekor qilish
+          <Stack gap="xs">
+            {hasAnswers && (
+              <Button variant="filled" color="brand" fullWidth onClick={handleFinish}>
+                Natijani ko'rish
+              </Button>
+            )}
+            <Button variant="light" color="danger" fullWidth onClick={handleQuit}>
+              {hasAnswers ? 'Saqlamasdan chiqish' : 'Chiqish'}
             </Button>
-            <Button variant="filled" color="danger" onClick={handleQuit}>
-              Ha, tugatish
-            </Button>
-          </Group>
+          </Stack>
         </Stack>
       </Modal>
     </>

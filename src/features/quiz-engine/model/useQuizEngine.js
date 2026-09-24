@@ -102,12 +102,13 @@ export function useQuizEngine({
       const correctCount = statuses.filter((s) => s === 'completed').length
       const wrongCount = statuses.filter((s) => s === 'wrong').length
       const totalQuestions = sessionQuestions.length
-      const passed =
-        mode === 'exam'
-          ? wrongCount <= EXAM_MAX_MISTAKES
-          : mode !== 'mistakes' && maxMistakes != null
-            ? wrongCount <= maxMistakes
-            : correctCount / totalQuestions >= 0.7
+      const answeredCount = correctCount + wrongCount
+      // Tugallanmagan (qisman yoki vaqti tugagan) urinish hech qachon "o'tdi" hisoblanmaydi.
+      let passed
+      if (answeredCount < totalQuestions) passed = false
+      else if (mode === 'exam') passed = wrongCount <= EXAM_MAX_MISTAKES
+      else if (mode !== 'mistakes' && maxMistakes != null) passed = wrongCount <= maxMistakes
+      else passed = correctCount / totalQuestions >= 0.7
       const attemptTopic = mode === 'ticket' ? `ticket-${ticketId}` : mode === 'mistakes' ? 'mistakes' : topic
 
       const wrongQuestionIds = statuses
@@ -214,6 +215,14 @@ export function useQuizEngine({
     advance(stepStatuses, pendingFinish)
   }, [isAnswered, advance, stepStatuses, pendingFinish])
 
+  const answeredCount = stepStatuses.filter((s) => s === 'completed' || s === 'wrong').length
+
+  const finishNow = useCallback(() => {
+    if (answeredCount < 1) return
+    if (hasTimeLimit) timer.stop()
+    finishSession(stepStatuses, 'manual')
+  }, [answeredCount, hasTimeLimit, timer, finishSession, stepStatuses])
+
   const correctAnswer = useMemo(
     () => currentQuestion?.options.find((o) => o.is_correct),
     [currentQuestion],
@@ -233,6 +242,8 @@ export function useQuizEngine({
     correctAnswer,
     handleAnswer,
     goNext,
+    finishNow,
+    answeredCount,
     isLastQuestion: currentIndex + 1 >= sessionQuestions.length || Boolean(pendingFinish),
     timeFormatted: timer.formatted,
     isExam: mode === 'exam',

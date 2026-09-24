@@ -7,7 +7,12 @@ import { ROUTES } from '../../../shared/config/routes'
 // Telefonda kichik katakchalarda yozuv kesilmasligi uchun.
 const LABEL_STYLES = { overflow: 'visible', textOverflow: 'clip' }
 
-export function QuizResults({ result, onRetry }) {
+const BACK_LABELS = {
+  [ROUTES.CATEGORIES]: 'Bosh sahifa',
+  [ROUTES.TICKETS]: 'Biletlarga qaytish',
+}
+
+export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
   if (!result) return null
 
   const { correctCount, wrongCount, totalQuestions, passed, mode, endReason } = result
@@ -90,8 +95,8 @@ export function QuizResults({ result, onRetry }) {
         )}
 
         <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="sm" w="100%">
-          <Button variant="secondary" as={Link} to={ROUTES.CATEGORIES} fullWidth>
-            Bosh sahifa
+          <Button variant="secondary" as={Link} to={backTo} fullWidth>
+            {BACK_LABELS[backTo] || 'Orqaga qaytish'}
           </Button>
           <Button variant="primary" onClick={onRetry} fullWidth>
             Qayta urinish

@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Box, Center, Flex, Skeleton, Text } from '@mantine/core'
 import { QuizNav, QuizSidebar } from '../../../widgets/quiz-sidebar'
 import { QuizResults } from '../../../widgets/quiz-results'
 import { QuestionCard } from '../../../entities/question'
 import { useQuizEngine } from '../../../features/quiz-engine'
+import { ROUTES } from '../../../shared/config/routes'
 
 export function QuizPlay({
   topic,
@@ -30,10 +32,16 @@ export function QuizPlay({
     correctAnswer,
     handleAnswer,
     goNext,
+    finishNow,
+    answeredCount,
     isLastQuestion,
     timeFormatted,
     hasTimeLimit,
   } = useQuizEngine({ topic, mode, ticketId, questionIds, questionCount, durationMinutes, maxMistakes, feedbackMode })
+
+  // Foydalanuvchi testga qayerdan kelgan bo'lsa, chiqqanda o'sha yerga qaytadi.
+  const location = useLocation()
+  const backTo = location.state?.from ?? (mode === 'ticket' ? ROUTES.TICKETS : ROUTES.CATEGORIES)
 
   const scrollRef = useRef(null)
   useEffect(() => {
@@ -63,6 +71,9 @@ export function QuizPlay({
         timeFormatted={timeFormatted}
         showTimer={hasTimeLimit && !finished}
         finished={finished}
+        answeredCount={answeredCount}
+        exitTo={backTo}
+        onFinish={finishNow}
         currentIndex={finished ? undefined : currentIndex}
         totalSteps={finished ? undefined : totalSteps}
       />
@@ -98,7 +109,7 @@ export function QuizPlay({
 
             {!loading && !error && finished && (
               <Center w="100%">
-                <QuizResults result={result} onRetry={onRetry} />
+                <QuizResults result={result} onRetry={onRetry} backTo={backTo} />
               </Center>
             )}
 

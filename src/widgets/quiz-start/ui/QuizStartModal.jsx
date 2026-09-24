@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Modal, Stack, Title, Text, List, ThemeIcon, Group, SegmentedControl, Menu, Center, Box } from '@mantine/core'
 import {
   IconCircleCheck,
@@ -65,6 +65,7 @@ function DropdownField({ label, value, options, onSelect }) {
 
 function QuizStartModalBody({ config, onClose }) {
   const navigate = useNavigate()
+  const location = useLocation()
   const { isPremiumActive } = useAuth()
   const isTicket = Boolean(config.ticketId)
   const isMistakes = !isTicket && config.mode === 'mistakes'
@@ -136,7 +137,7 @@ function QuizStartModalBody({ config, onClose }) {
     }
     if (isExam) requestFullscreen()
     onClose()
-    navigate(`/quiz?${params.toString()}`)
+    navigate(`/quiz?${params.toString()}`, { state: { from: location.pathname } })
   }
 
   if (isLockedExam) {

@@ -64,9 +64,8 @@ export function TicketsPage() {
           <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing="md">
             {tickets.map(({ ticketId, questions }) => {
               const attempt = attempts[`ticket-${ticketId}`]
-              const scorePercent = attempt
-                ? Math.round((attempt.correctCount / attempt.totalQuestions) * 100)
-                : null
+              const answered = attempt ? attempt.correctCount + attempt.wrongCount : 0
+              const scorePercent = answered ? Math.round((attempt.correctCount / answered) * 100) : null
               const locked = isTicketLocked(ticketId, isPremiumActive)
 
               return (
