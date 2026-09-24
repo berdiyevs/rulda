@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Modal, Tabs, TextInput, PasswordInput, Stack, Text, Title, Divider, Anchor } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconUser, IconMail, IconLock } from '@tabler/icons-react'
@@ -6,6 +6,7 @@ import { Button } from '../../../shared/ui/Button/Button'
 import { GoogleButton } from '../../../shared/ui/GoogleButton/GoogleButton'
 import { useAuthActions } from '../../../features/auth'
 import { ROUTES } from '../../../shared/config/routes'
+import { track } from '../../../shared/lib/analytics'
 
 export function LoginModal({ isOpen, onClose, title, redirectTo }) {
   const [tab, setTab] = useState('login')
@@ -21,6 +22,10 @@ export function LoginModal({ isOpen, onClose, title, redirectTo }) {
         value.length < 6 ? "Parol kamida 6 ta belgidan iborat bo'lishi kerak" : null,
     },
   })
+
+  useEffect(() => {
+    if (isOpen) track('signup_open')
+  }, [isOpen])
 
   const handleClose = () => {
     form.reset()

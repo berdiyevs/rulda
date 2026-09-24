@@ -6,6 +6,7 @@ import { shuffleArray, pickRandom } from '../../../shared/lib/shuffle'
 import { useCountdown } from '../../../shared/lib/useCountdown'
 import { exitFullscreen } from '../../../shared/lib/fullscreen'
 import { FREE_TICKET_LIMIT } from '../../../shared/lib/premium'
+import { track } from '../../../shared/lib/analytics'
 
 const PRACTICE_SESSION_SIZE = 20
 const EXAM_SESSION_SIZE = 20
@@ -99,6 +100,7 @@ export function useQuizEngine({
     setResult(null)
     setPendingFinish(null)
     hasSavedRef.current = false
+    track(mode === 'mini' ? 'mini_test_start' : 'test_start')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceQuestions, topic, mode, ticketId, questionIds, questionCount])
 
@@ -144,6 +146,7 @@ export function useQuizEngine({
       }
       setResult(summary)
       setFinished(true)
+      track(mode === 'mini' ? 'mini_test_finish' : 'test_finish')
       if (mode === 'exam') exitFullscreen()
 
       if (user) {
@@ -192,6 +195,7 @@ export function useQuizEngine({
     (option) => {
       if (isAnswered || !currentQuestion) return
 
+      track('first_answer')
       setSelectedOption(option)
       setIsAnswered(true)
 

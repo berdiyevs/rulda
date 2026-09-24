@@ -50,10 +50,11 @@ const SECTIONS = [
     ],
   },
   {
-    title: 'Cookie va lokal saqlash',
+    title: 'Cookie, lokal saqlash va tahlil',
     number: '6',
     body: [
-      "Sayt sessiyangizni saqlash va tizimga kirgan holatingizni eslab qolish uchun brauzeringizning lokal saqlash (local storage) imkoniyatidan foydalanadi. Bu ma'lumotlar reklama maqsadida ishlatilmaydi.",
+      "Sayt sessiyangizni saqlash va tizimga kirgan holatingizni eslab qolish uchun brauzeringizning lokal saqlash (local storage) imkoniyatidan foydalanadi. Ro'yxatdan o'tmasdan yechgan testlaringiz natijalari ham shu yerda saqlanadi va ro'yxatdan o'tganingizdan keyin hisobingizga ko'chiriladi. Bu ma'lumotlar reklama maqsadida ishlatilmaydi.",
+      "Sayt qanday ishlatilayotganini tushunish va uni yaxshilash uchun Yandex Metrica tahlil xizmatidan foydalanadi. U sahifalarga tashrif, bosilgan tugmalar va qurilma turi haqida umumlashtirilgan (shaxsni aniqlamaydigan) ma'lumotlarni to'playdi va buning uchun cookie fayllaridan foydalanadi. Bu ma'lumotlar reklama maqsadida ishlatilmaydi. Cookie'larni brauzer sozlamalaridan o'chirib qo'yishingiz mumkin.",
     ],
   },
   {

@@ -4,6 +4,7 @@ import { IconCalendarEvent } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications'
 import { Button } from '../../../shared/ui/Button/Button'
 import { useAuth, updateExamDate } from '../../../entities/user'
+import { track } from '../../../shared/lib/analytics'
 import { addDaysFromToday, addMonthsFromToday, displayToIso, maskDate } from '../../../shared/lib/examDate'
 
 const REASK_AFTER_MS = 7 * 24 * 60 * 60 * 1000
@@ -65,6 +66,7 @@ export function ExamPromptCard() {
     try {
       await updateExamDate(iso)
       await refreshProfile()
+      track('exam_date_set')
       notifications.show({
         color: 'success',
         title: 'Imtihon sanasi saqlandi',

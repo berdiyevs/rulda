@@ -10,6 +10,7 @@ import { useAuth } from '../../../entities/user'
 import { fetchPlans, createClickPayment } from '../../../entities/payment'
 import { FREE_TICKET_LIMIT } from '../../../shared/lib/premium'
 import { formatPrice } from '../../../shared/lib/formatPrice'
+import { track } from '../../../shared/lib/analytics'
 import { isoToDisplay } from '../../../shared/lib/examDate'
 import { ROUTES } from '../../../shared/config/routes'
 import './PremiumPage.css'
@@ -52,6 +53,10 @@ export function PremiumPage() {
   const [buyingPlan, setBuyingPlan] = useState(null)
 
   useEffect(() => {
+    track('premium_view')
+  }, [])
+
+  useEffect(() => {
     fetchPlans()
       .then(setPlans)
       .catch(() => {})
@@ -71,6 +76,7 @@ export function PremiumPage() {
   }, [])
 
   const handleBuy = async (planId) => {
+    track('premium_click', { plan: planId })
     setBuyingPlan(planId)
     try {
       const { payment_url: paymentUrl } = await createClickPayment(planId)

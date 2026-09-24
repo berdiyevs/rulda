@@ -3,6 +3,7 @@ import { Paper, Stack, Group, Text, TextInput } from '@mantine/core'
 import { IconCalendarEvent, IconEdit } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
 import { useAuth, updateExamDate } from '../../../entities/user'
+import { track } from '../../../shared/lib/analytics'
 import { isoToDisplay, maskDate, displayToIso, daysUntil } from '../../../shared/lib/examDate'
 
 // ticketsLeft: foydalanuvchiga ochiq va hali yechilmagan biletlar soni (tavsiya hisoblash uchun).
@@ -26,6 +27,7 @@ export function ExamCountdownCard({ ticketsLeft }) {
     try {
       await updateExamDate(iso)
       await refreshProfile()
+      track('exam_date_set')
       setEditing(false)
     } catch (err) {
       setError(err.message)

@@ -6,6 +6,7 @@ import { QuizStartProvider } from '../widgets/quiz-start'
 import { LoginModalProvider } from '../widgets/login-modal'
 import { GuestAttemptsSync } from '../features/guest-sync'
 import { AppRouter } from './providers/AppRouter'
+import { RouteTracker } from './providers/RouteTracker'
 import { theme } from './theme'
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
@@ -20,6 +21,7 @@ export function App() {
       <AuthProvider>
         <GuestAttemptsSync />
         <BrowserRouter>
+          <RouteTracker />
           <LoginModalProvider>
             <QuizStartProvider>
               <AppRouter />

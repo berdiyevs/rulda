@@ -43,7 +43,10 @@ npm run preview
 ```
 VITE_API_URL=http://localhost:8000
 VITE_GOOGLE_CLIENT_ID=<Google Cloud Console'dan olingan OAuth Web Client ID>
+VITE_YM_ID=<Yandex Metrica hisoblagich raqami, ixtiyoriy>
 ```
+
+`VITE_YM_ID` bo'sh bo'lsa analitika yuklanmaydi (xato ham bermaydi). U faqat production build'da ishlaydi: `npm run dev` da doim o'chiq. Kod bitta joyda: `src/shared/lib/analytics.js`, hodisalar `track('nomi')` orqali yuboriladi.
 
 Email tasdiqlash hozircha soddalashtirilgan rejimda ishlaydi (`SIMPLE_EMAIL_MODE=true`): real email yuborilmaydi, tasdiqlash havolasi ro'yxatdan o'tish javobida (va backend loglarida) qaytariladi. Productionga chiqishdan oldin `backend/app/api/auth.py`dagi `signup` funksiyasiga real SMTP/email xizmati ulanishi kerak.
 
@@ -71,7 +74,7 @@ Click kabinetida Prepare/Complete URL'lari: `https://<api-domen>/payments/click/
 
 ### Frontend (Netlify)
 
-`netlify.toml` build sozlamalarini, `public/_headers` xavfsizlik va kesh headerlarini, `public/_redirects` SPA yo'naltirishni beradi. Netlify → Environment variables'da `VITE_API_URL` (backend manzili, https) va `VITE_GOOGLE_CLIENT_ID` ni belgilang: ular bo'lmasa build ataylab xato beradi.
+`netlify.toml` build sozlamalarini, `public/_headers` xavfsizlik va kesh headerlarini, `public/_redirects` SPA yo'naltirishni beradi. Netlify → Environment variables'da `VITE_API_URL` (backend manzili, https) va `VITE_GOOGLE_CLIENT_ID` ni belgilang: ular bo'lmasa build ataylab xato beradi. Yandex Metrica uchun `VITE_YM_ID` ni ham qo'shing (ixtiyoriy).
 
 Google Cloud Console → OAuth client → Authorized JavaScript origins'ga `https://rulda.page` qo'shing.
 
@@ -84,6 +87,7 @@ Google Cloud Console → OAuth client → Authorized JavaScript origins'ga `http
 - **Rasmiy imtihon** — alohida kirish nuqtasi (navbardagi "Imtihon" tugmasi): 20 ta tasodifiy savol, 25 daqiqa, 2 tadan ortiq xatoda yiqilish, to'liq ekran rejimida boshlanadi.
 - **Biletlar** — 62 ta rasmiy bilet, har biri aynan 20 ta belgilangan savoldan iborat, 25 daqiqalik majburiy taymer bilan; xatolar soni va javob ko'rsatish tartibi shu yerda ham sozlanadi.
 - **Xatolarim** — statistika sahifasidan avvalgi urinishlarda xato qilingan savollar bo'yicha maxsus mashq sessiyasi ochiladi.
+- **Mehmon rejimi** — ro'yxatdan o'tmasdan mini-test (1–3-biletlardan 10 ta savol), Bilet 1 va yo'l belgilari ochiq. Mehmon natijalari brauzerda (`localStorage`) saqlanadi va kirgandan keyin hisobga bir marta ko'chiriladi.
 - **Yo'l belgilari** — 93 ta rasmiy belgi, qidiruv va kategoriya bo'yicha filtr.
 - **Statistika** — imtihonga tayyorgarlik foizi, mavzular bo'yicha natija, urinishlar dinamikasi grafigi, xatolar ro'yxati.
 - **Mobil ilova tajribasi** — kichik ekranlarda pastki tab-bar navigatsiya (Asosiy / Biletlar / Belgilar / Imtihon / Statistika), test ekranida scroll'siz, to'liq balandlikka moslashgan layout.

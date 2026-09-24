@@ -4,6 +4,7 @@ import { apiFetch } from '../../../shared/api/client'
 import { getGoogleAccessToken } from '../../../shared/api/googleAuth'
 import { useAuth } from '../../../entities/user'
 import { ROUTES } from '../../../shared/config/routes'
+import { track } from '../../../shared/lib/analytics'
 
 // redirectTo: berilmasa /categories ga o'tadi, `false` bo'lsa joyida qoladi, satr bo'lsa o'sha manzilga o'tadi.
 export function useAuthActions({ redirectTo } = {}) {
@@ -32,6 +33,7 @@ export function useAuthActions({ redirectTo } = {}) {
         auth: false,
       })
 
+      track('signup_success')
       notifications.show({
         color: 'success',
         title: "Ro'yxatdan o'tdingiz",
@@ -57,6 +59,7 @@ export function useAuthActions({ redirectTo } = {}) {
         auth: false,
       })
       await login(result.access_token)
+      track('login_success')
       goAfterLogin()
       return true
     } catch (error) {
@@ -86,6 +89,9 @@ export function useAuthActions({ redirectTo } = {}) {
         auth: false,
       })
       await login(result.access_token)
+      // Backend Google'da yangi va eski hisobni ajratmaydi: 2 daqiqadan yangi hisob "ro'yxatdan o'tish" deb hisoblanadi.
+      const createdAt = result.user?.created_at ? new Date(result.user.created_at).getTime() : 0
+      track(Date.now() - createdAt < 2 * 60 * 1000 ? 'signup_success' : 'login_success')
       goAfterLogin()
       return true
     } catch (error) {
