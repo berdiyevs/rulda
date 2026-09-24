@@ -1,0 +1,23 @@
+# Netlify: barcha sahifalar uchun xavfsizlik headerlari
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+
+# index.html har doim yangidan tekshirilsin (yangi deploy darhol ko'rinsin)
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Vite build'dagi hash nomli JS/CSS fayllar hech qachon o'zgarmaydi
+/assets/*.js
+  Cache-Control: public, max-age=31536000, immutable
+/assets/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Savol va belgi rasmlari (nomida hash yo'q, shuning uchun 1 hafta)
+/assets/images/*
+  Cache-Control: public, max-age=604800
+/assets/quest-image/*
+  Cache-Control: public, max-age=604800

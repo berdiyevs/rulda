@@ -10,7 +10,7 @@ O'zbekiston yo'l harakati qoidalarini o'rganish va DAN (Davlat Avtomobil Nazorat
 docker compose up --build
 ```
 
-Bu `db` (PostgreSQL) va `api` (FastAPI, `http://localhost:8000`) konteynerlarini ishga tushiradi va migratsiyalarni avtomatik qo'llaydi. Google login uchun `backend/.env` faylida `GOOGLE_CLIENT_ID` ni to'ldiring (frontenddagi `VITE_GOOGLE_CLIENT_ID` bilan bir xil bo'lishi shart emas, backend uni hozircha tekshirmaydi — token to'g'ridan-to'g'ri Google'ning `userinfo` endpointi orqali tasdiqlanadi).
+Bu `db` (PostgreSQL) va `api` (FastAPI, `http://localhost:8000`) konteynerlarini ishga tushiradi va migratsiyalarni avtomatik qo'llaydi. `backend/.env` faylini `backend/.env.example`dan nusxalang va `JWT_SECRET` (kamida 32 belgi) hamda `GOOGLE_CLIENT_ID` ni to'ldiring. `GOOGLE_CLIENT_ID` frontenddagi `VITE_GOOGLE_CLIENT_ID` bilan bir xil bo'lishi kerak: backend Google tokeni aynan shu ilova uchun berilganini tekshiradi.
 
 Docker'siz ishga tushirish uchun:
 
@@ -46,6 +46,34 @@ VITE_GOOGLE_CLIENT_ID=<Google Cloud Console'dan olingan OAuth Web Client ID>
 ```
 
 Email tasdiqlash hozircha soddalashtirilgan rejimda ishlaydi (`SIMPLE_EMAIL_MODE=true`): real email yuborilmaydi, tasdiqlash havolasi ro'yxatdan o'tish javobida (va backend loglarida) qaytariladi. Productionga chiqishdan oldin `backend/app/api/auth.py`dagi `signup` funksiyasiga real SMTP/email xizmati ulanishi kerak.
+
+## Production'ga chiqarish
+
+### Backend (Heroku yoki boshqa Docker hosting)
+
+Majburiy environment o'zgaruvchilari:
+
+| O'zgaruvchi | Qiymat |
+|---|---|
+| `ENVIRONMENT` | `production` (Swagger `/docs` o'chadi, xavfli sozlamalar startda tekshiriladi) |
+| `DATABASE_URL` | Postgres manzili (Heroku avtomatik beradi) |
+| `JWT_SECRET` | `python -c "import secrets; print(secrets.token_urlsafe(48))"` natijasi |
+| `GOOGLE_CLIENT_ID` | Frontenddagi `VITE_GOOGLE_CLIENT_ID` bilan **aynan bir xil** |
+| `CORS_ORIGINS` | `https://rulda.page,https://www.rulda.page` |
+| `FRONTEND_URL` | `https://rulda.page` |
+| `SIMPLE_EMAIL_MODE` | `false` (real email xizmati ulangandan keyin) |
+| `CLICK_SERVICE_ID`, `CLICK_MERCHANT_ID`, `CLICK_SECRET_KEY` | Click kabinetidan; bo'sh bo'lsa to'lovlar rad etiladi |
+| `ADMIN_EMAILS` | Admin email(lar)i |
+
+Server noto'g'ri sozlanganda (qisqa `JWT_SECRET`, production'da `GOOGLE_CLIENT_ID` yo'q yoki `CORS_ORIGINS`da localhost) ishga tushmaydi va sababini logda yozadi.
+
+Click kabinetida Prepare/Complete URL'lari: `https://<api-domen>/payments/click/prepare` va `https://<api-domen>/payments/click/complete`.
+
+### Frontend (Netlify)
+
+`netlify.toml` build sozlamalarini, `public/_headers` xavfsizlik va kesh headerlarini, `public/_redirects` SPA yo'naltirishni beradi. Netlify → Environment variables'da `VITE_API_URL` (backend manzili, https) va `VITE_GOOGLE_CLIENT_ID` ni belgilang: ular bo'lmasa build ataylab xato beradi.
+
+Google Cloud Console → OAuth client → Authorized JavaScript origins'ga `https://rulda.page` qo'shing.
 
 ## Xususiyatlar
 

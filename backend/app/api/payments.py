@@ -1,4 +1,5 @@
 import hashlib
+import hmac
 import logging
 import uuid as uuid_lib
 from datetime import date, datetime, timedelta, timezone
@@ -38,6 +39,27 @@ def _safe_uuid(value: str) -> uuid_lib.UUID | None:
 
 def _md5(*parts: object) -> str:
     return hashlib.md5("".join(str(p) for p in parts).encode()).hexdigest()
+
+
+def _signature_ok(expected: str, received: str, service_id: str) -> bool:
+    """Click imzosini tekshiradi.
+
+    CLICK_SECRET_KEY bo'sh bo'lsa, imzoni istalgan kishi hisoblab qo'ya oladi va bepul Premium oladi,
+    shuning uchun kalit sozlanmagan bo'lsa barcha so'rovlar rad etiladi.
+    """
+    if not settings.click_secret_key or not settings.click_service_id:
+        logger.error("Click so'rovi keldi, lekin CLICK_SECRET_KEY/CLICK_SERVICE_ID sozlanmagan")
+        return False
+    if service_id != settings.click_service_id:
+        return False
+    return hmac.compare_digest(expected, received.lower())
+
+
+def _amount_matches(amount: str, expected: int) -> bool:
+    try:
+        return round(float(amount)) == expected
+    except ValueError:
+        return False
 
 
 def _extend_premium(user: User, plan: Plan) -> None:
@@ -92,7 +114,7 @@ def click_prepare(
     db: Session = Depends(get_db),
 ) -> dict:
     expected = _md5(click_trans_id, service_id, settings.click_secret_key, merchant_trans_id, amount, action, sign_time)
-    if expected != sign_string:
+    if not _signature_ok(expected, sign_string, service_id):
         return {
             "click_trans_id": click_trans_id,
             "merchant_trans_id": merchant_trans_id,
@@ -101,7 +123,8 @@ def click_prepare(
         }
 
     payment_id = _safe_uuid(merchant_trans_id)
-    payment = db.get(Payment, payment_id) if payment_id else None
+    # with_for_update: Click bir xil so'rovni qayta yuborsa, Premium ikki marta qo'shilmasin.
+    payment = db.get(Payment, payment_id, with_for_update=True) if payment_id else None
     if payment is None:
         return {
             "click_trans_id": click_trans_id,
@@ -110,7 +133,7 @@ def click_prepare(
             "error_note": "Transaction not found",
         }
 
-    if round(float(amount)) != payment.amount:
+    if not _amount_matches(amount, payment.amount):
         return {
             "click_trans_id": click_trans_id,
             "merchant_trans_id": merchant_trans_id,
@@ -155,7 +178,7 @@ def click_complete(
     expected = _md5(
         click_trans_id, service_id, settings.click_secret_key, merchant_trans_id, merchant_prepare_id, amount, action, sign_time
     )
-    if expected != sign_string:
+    if not _signature_ok(expected, sign_string, service_id):
         return {
             "click_trans_id": click_trans_id,
             "merchant_trans_id": merchant_trans_id,
@@ -164,13 +187,30 @@ def click_complete(
         }
 
     payment_id = _safe_uuid(merchant_trans_id)
-    payment = db.get(Payment, payment_id) if payment_id else None
+    # with_for_update: Click bir xil so'rovni qayta yuborsa, Premium ikki marta qo'shilmasin.
+    payment = db.get(Payment, payment_id, with_for_update=True) if payment_id else None
     if payment is None or str(payment.local_id) != merchant_prepare_id:
         return {
             "click_trans_id": click_trans_id,
             "merchant_trans_id": merchant_trans_id,
             "error": ERR_TRANSACTION_NOT_FOUND,
             "error_note": "Transaction not found",
+        }
+
+    if not _amount_matches(amount, payment.amount):
+        return {
+            "click_trans_id": click_trans_id,
+            "merchant_trans_id": merchant_trans_id,
+            "error": ERR_AMOUNT,
+            "error_note": "Incorrect amount",
+        }
+
+    if payment.status == "cancelled":
+        return {
+            "click_trans_id": click_trans_id,
+            "merchant_trans_id": merchant_trans_id,
+            "error": ERR_TRANSACTION_CANCELLED,
+            "error_note": "Transaction cancelled",
         }
 
     if error != 0:
