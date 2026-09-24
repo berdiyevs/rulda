@@ -46,7 +46,7 @@ export function CategoriesPage() {
 
         <Stack gap="lg" mb="xl">
           {loading || !progress ? <Skeleton height={150} radius="lg" /> : <ContinueCard progress={progress} />}
-          <ExamCountdownCard />
+          <ExamCountdownCard ticketsLeft={progress?.unsolvedAvailableCount} />
           <DailyQuestionCard />
         </Stack>
 

@@ -3,40 +3,10 @@ import { Paper, Stack, Group, Text, TextInput } from '@mantine/core'
 import { IconCalendarEvent, IconEdit } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
 import { useAuth, updateExamDate } from '../../../entities/user'
+import { isoToDisplay, maskDate, displayToIso, daysUntil } from '../../../shared/lib/examDate'
 
-function daysUntil(dateStr) {
-  const target = new Date(`${dateStr}T00:00:00`)
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  return Math.ceil((target - today) / 86400000)
-}
-
-// "2026-12-25" -> "25.12.2026"
-function isoToDisplay(iso) {
-  if (!iso) return ''
-  const [y, m, d] = iso.split('-')
-  return `${d}.${m}.${y}`
-}
-
-// Faqat raqamlarni qoldirib, "kk.oo.yyyy" ko'rinishiga keltiradi.
-function maskDate(raw) {
-  const digits = raw.replace(/\D/g, '').slice(0, 8)
-  const parts = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)].filter(Boolean)
-  return parts.join('.')
-}
-
-// "25.12.2026" -> "2026-12-25"; sana noto'g'ri bo'lsa null.
-function displayToIso(display) {
-  const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(display)
-  if (!match) return null
-  const [, dd, mm, yyyy] = match
-  const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd))
-  const isReal =
-    date.getFullYear() === Number(yyyy) && date.getMonth() === Number(mm) - 1 && date.getDate() === Number(dd)
-  return isReal ? `${yyyy}-${mm}-${dd}` : null
-}
-
-export function ExamCountdownCard() {
+// ticketsLeft: foydalanuvchiga ochiq va hali yechilmagan biletlar soni (tavsiya hisoblash uchun).
+export function ExamCountdownCard({ ticketsLeft }) {
   const { user, profile, refreshProfile } = useAuth()
   const examDate = profile?.examDate
   const [editing, setEditing] = useState(false)
@@ -114,6 +84,14 @@ export function ExamCountdownCard() {
   const days = daysUntil(examDate)
   const isPast = days < 0
 
+  let recommendation = null
+  if (!isPast && days > 0 && typeof ticketsLeft === 'number') {
+    recommendation =
+      ticketsLeft === 0
+        ? "Ochiq biletlarning hammasini yechib bo'ldingiz. Endi xatolaringiz ustida ishlang."
+        : `Imtihongacha ${days} kun. Kuniga ${Math.ceil(ticketsLeft / days)} ta bilet yechsangiz, hammasini ulgurasiz.`
+  }
+
   return (
     <Paper className="glass-card" p="lg">
       <Group justify="space-between" align="center" wrap="wrap" gap="md">
@@ -140,6 +118,11 @@ export function ExamCountdownCard() {
           O'zgartirish
         </Button>
       </Group>
+      {recommendation && (
+        <Text fz="sm" mt="sm" pt="sm" style={{ borderTop: '1px solid var(--border)' }}>
+          {recommendation}
+        </Text>
+      )}
     </Paper>
   )
 }

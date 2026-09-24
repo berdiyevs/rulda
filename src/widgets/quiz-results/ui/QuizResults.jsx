@@ -6,6 +6,7 @@ import { GoogleButton } from '../../../shared/ui/GoogleButton/GoogleButton'
 import { useAuth } from '../../../entities/user'
 import { useAuthActions } from '../../../features/auth'
 import { useLoginModal } from '../../login-modal'
+import { ExamPromptCard } from '../../exam-prompt'
 import { ROUTES } from '../../../shared/config/routes'
 
 // Telefonda kichik katakchalarda yozuv kesilmasligi uchun.
@@ -102,6 +103,8 @@ export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
             {endReasonText}
           </Text>
         )}
+
+        {user && answeredCount > 0 && <ExamPromptCard />}
 
         {!user && (
           <Stack gap="xs" w="100%" p="md" className="glass-card" ta="center">
