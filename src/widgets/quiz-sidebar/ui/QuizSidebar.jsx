@@ -1,10 +1,9 @@
-import { Box, SimpleGrid, Stack, Group, Text, RingProgress, Center } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
-import { IconCheck, IconX } from '@tabler/icons-react'
+import { useEffect, useRef } from 'react'
+import { Box, SimpleGrid, Stack, Group, Text, Center, Drawer, UnstyledButton } from '@mantine/core'
+import { useDisclosure, useMediaQuery } from '@mantine/hooks'
+import { IconCheck, IconX, IconChevronUp } from '@tabler/icons-react'
 
-function StepBox({ index, isCurrent, status }) {
-  const label = index + 1 < 10 ? `0${index + 1}` : `${index + 1}`
-
+function getStepColors(isCurrent, status) {
   let colors = { bg: 'var(--bg-card-hover)', border: 'var(--border-strong)', text: 'var(--text-secondary)' }
   if (isCurrent) {
     colors = { bg: 'var(--primary-soft)', border: 'var(--mantine-color-brand-6)', text: 'var(--text-primary)' }
@@ -18,6 +17,12 @@ function StepBox({ index, isCurrent, status }) {
   if (status === 'wrong') {
     colors = { bg: 'var(--mantine-color-danger-light)', border: 'var(--mantine-color-danger-6)', text: 'var(--mantine-color-danger-6)' }
   }
+  return colors
+}
+
+function StepBox({ index, isCurrent, status }) {
+  const label = index + 1 < 10 ? `0${index + 1}` : `${index + 1}`
+  const colors = getStepColors(isCurrent, status)
 
   return (
     <Center
@@ -92,36 +97,111 @@ function Legend() {
   )
 }
 
-export function QuizSidebar({ totalSteps, currentIndex, stepStatuses }) {
-  const { correctCount, wrongCount, progressPercent } = useQuizProgress({ totalSteps, stepStatuses })
-  const isMobile = useMediaQuery('(max-width: 800px)')
+// Telefonda: bitta ixcham qator ("7 / 20" + scroll qilinadigan raqamlar). "7 / 20" bosilsa to'liq ro'yxat ochiladi.
+function MobileSteps({ totalSteps, currentIndex, stepStatuses, correctCount, wrongCount }) {
+  const [opened, { open, close }] = useDisclosure(false)
+  const listRef = useRef(null)
 
-  if (isMobile) {
-    return (
+  useEffect(() => {
+    const list = listRef.current
+    const chip = list?.children[currentIndex]
+    if (!list || !chip) return
+    list.scrollTo({ left: chip.offsetLeft - list.clientWidth / 2 + chip.clientWidth / 2, behavior: 'smooth' })
+  }, [currentIndex])
+
+  return (
+    <>
       <Box
-        px={20}
-        py={12}
+        w="100%"
+        px={10}
+        py={8}
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 16,
+          gap: 10,
+          flexShrink: 0,
           background: 'var(--bg-elevated)',
-          borderBottom: '1px solid var(--border)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-md)',
         }}
       >
-        <RingProgress
-          size={48}
-          thickness={4}
-          roundCaps
-          sections={[{ value: progressPercent, color: 'brand' }]}
-          label={
-            <Text size={10} fw={700} ta="center">
-              {progressPercent}%
-            </Text>
-          }
-        />
-        <LiveStats correctCount={correctCount} wrongCount={wrongCount} />
+        <UnstyledButton
+          onClick={open}
+          aria-label="Barcha savollar ro'yxatini ochish"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            flexShrink: 0,
+            padding: '4px 10px',
+            borderRadius: 'var(--r-full)',
+            background: 'var(--primary-soft)',
+            color: 'var(--text-primary)',
+            fontWeight: 800,
+            fontSize: 13,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {Math.min(currentIndex + 1, totalSteps)} / {totalSteps}
+          <IconChevronUp size={14} />
+        </UnstyledButton>
+
+        <div
+          ref={listRef}
+          style={{ display: 'flex', gap: 6, overflowX: 'auto', flex: 1, scrollbarWidth: 'none', padding: '2px 0' }}
+        >
+          {Array.from({ length: totalSteps }, (_, i) => {
+            const colors = getStepColors(i === currentIndex, stepStatuses[i])
+            return (
+              <Center
+                key={i}
+                style={{
+                  flexShrink: 0,
+                  width: 28,
+                  height: 28,
+                  borderRadius: 'var(--mantine-radius-sm)',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  background: colors.bg,
+                  color: colors.text,
+                  border: `1px solid ${colors.border}`,
+                }}
+              >
+                {i + 1}
+              </Center>
+            )
+          })}
+        </div>
       </Box>
+
+      <Drawer opened={opened} onClose={close} position="bottom" size="auto" title="Savollar" radius="lg">
+        <Stack gap="md" pb="md">
+          <SimpleGrid cols={5} spacing={10}>
+            {Array.from({ length: totalSteps }, (_, i) => (
+              <StepBox key={i} index={i} isCurrent={i === currentIndex} status={stepStatuses[i]} />
+            ))}
+          </SimpleGrid>
+          <LiveStats correctCount={correctCount} wrongCount={wrongCount} />
+          <Legend />
+        </Stack>
+      </Drawer>
+    </>
+  )
+}
+
+export function QuizSidebar({ totalSteps, currentIndex, stepStatuses }) {
+  const { correctCount, wrongCount, progressPercent } = useQuizProgress({ totalSteps, stepStatuses })
+  const isMobile = useMediaQuery('(max-width: 800px)', false, { getInitialValueInEffect: false })
+
+  if (isMobile) {
+    return (
+      <MobileSteps
+        totalSteps={totalSteps}
+        currentIndex={currentIndex}
+        stepStatuses={stepStatuses}
+        correctCount={correctCount}
+        wrongCount={wrongCount}
+      />
     )
   }
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Box, Center, Flex, Skeleton, Text } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import { QuizNav, QuizSidebar } from '../../../widgets/quiz-sidebar'
 import { QuizResults } from '../../../widgets/quiz-results'
 import { QuestionCard } from '../../../entities/question'
@@ -45,6 +46,7 @@ export function QuizPlay({
   const { user } = useAuth()
   const backTo = location.state?.from ?? (mode === 'ticket' ? ROUTES.TICKETS : user ? ROUTES.CATEGORIES : ROUTES.HOME)
 
+  const isMobile = useMediaQuery('(max-width: 800px)', false, { getInitialValueInEffect: false })
   const scrollRef = useRef(null)
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 })
@@ -96,7 +98,15 @@ export function QuizPlay({
       )}
 
       <Box ref={scrollRef} style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-        <Flex h="100%" gap="lg" px={{ base: 20, sm: 28, lg: 40 }} py={{ base: 20, sm: 28 }} wrap="wrap">
+        <Flex
+          h={isMobile ? 'auto' : '100%'}
+          mih="100%"
+          gap={isMobile ? 'sm' : 'lg'}
+          px={{ base: 12, sm: 28, lg: 40 }}
+          py={{ base: 12, sm: 28 }}
+          direction={isMobile ? 'column' : 'row'}
+          wrap={isMobile ? 'nowrap' : 'wrap'}
+        >
           {!finished && (
             <QuizSidebar totalSteps={totalSteps} currentIndex={currentIndex} stepStatuses={displayStatuses} />
           )}
@@ -104,7 +114,12 @@ export function QuizPlay({
           <Box
             flex={1}
             miw={280}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: isMobile ? 'flex-start' : 'center',
+            }}
           >
             {loading && <Skeleton height={420} radius="lg" w="100%" maw={920} />}
             {error && <Text c="danger">{error}</Text>}
