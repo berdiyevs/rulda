@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Box, Group, Text, ActionIcon, Button } from '@mantine/core'
+import { Box, Group, Text, ActionIcon, Avatar, Button, Modal, Stack } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import {
   IconLogout,
   IconLayoutGrid,
@@ -46,17 +47,20 @@ export function CategoriesNav() {
   const { profile, user, logout, isAdmin, isPremiumActive } = useAuth()
   const navigate = useNavigate()
   const openQuizStart = useQuizStart()
+  const [logoutOpen, { open: openLogout, close: closeLogout }] = useDisclosure(false)
 
   const handleExamClick = () => {
     openQuizStart({ topic: 'all', mode: 'exam' })
   }
 
   const handleLogout = () => {
+    closeLogout()
     logout()
     navigate(ROUTES.HOME)
   }
 
   const displayName = profile?.displayName || user?.displayName || user?.email?.split('@')[0]
+  const initial = displayName ? displayName[0].toUpperCase() : '?'
 
   return (
     <>
@@ -72,7 +76,8 @@ export function CategoriesNav() {
           zIndex: 100,
           display: 'flex',
           alignItems: 'center',
-          gap: 32,
+          gap: 24,
+          flexWrap: 'nowrap',
           background: 'var(--bg-elevated)',
           borderBottom: '1px solid var(--border)',
         }}
@@ -97,19 +102,23 @@ export function CategoriesNav() {
           da
         </Text>
 
-        <Group gap={26} mr="auto" visibleFrom="sm">
+        <Group gap={{ base: 16, lg: 26 }} mr="auto" visibleFrom="sm" wrap="nowrap">
           {LINKS.map((link) =>
             link.action === 'exam' ? (
               <button key="exam" type="button" onClick={handleExamClick} style={actionStyle}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <link.icon size={16} stroke={2} />
+                  <Box component="span" visibleFrom="md" style={{ display: 'inline-flex' }}>
+                    <link.icon size={16} stroke={2} />
+                  </Box>
                   {link.label}
                 </span>
               </button>
             ) : (
               <NavLink key={link.to} to={link.to} end={link.end} style={linkStyle}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <link.icon size={16} stroke={2} />
+                  <Box component="span" visibleFrom="md" style={{ display: 'inline-flex' }}>
+                    <link.icon size={16} stroke={2} />
+                  </Box>
                   {link.label}
                 </span>
               </NavLink>
@@ -117,7 +126,7 @@ export function CategoriesNav() {
           )}
         </Group>
 
-        <Group gap={14} fz="0.88rem" c="dimmed" visibleFrom="sm" ml="auto">
+        <Group gap={{ base: 8, lg: 14 }} fz="0.88rem" c="dimmed" visibleFrom="sm" ml="auto" wrap="nowrap">
           {isPremiumActive ? (
             <Badge variant="warning">
               <Group gap={4} wrap="nowrap">
@@ -150,12 +159,41 @@ export function CategoriesNav() {
               <IconShieldLock size={18} />
             </ActionIcon>
           )}
-          <Text size="sm" c="dimmed">
+          <Avatar
+            radius="xl"
+            size={30}
+            variant="gradient"
+            gradient={{ from: 'brand.6', to: 'accent.5', deg: 135 }}
+            color="white"
+            title={displayName}
+            aria-label={displayName}
+          >
+            {initial}
+          </Avatar>
+          <Text size="sm" c="dimmed" visibleFrom="lg">
             {displayName}
           </Text>
-          <Button variant="subtle" color="danger" size="xs" onClick={handleLogout} leftSection={<IconLogout size={15} />}>
+          <Button
+            variant="subtle"
+            color="danger"
+            size="xs"
+            onClick={openLogout}
+            leftSection={<IconLogout size={15} />}
+            visibleFrom="lg"
+          >
             Chiqish
           </Button>
+          <ActionIcon
+            variant="subtle"
+            color="danger"
+            size="lg"
+            onClick={openLogout}
+            aria-label="Chiqish"
+            title="Chiqish"
+            hiddenFrom="lg"
+          >
+            <IconLogout size={18} />
+          </ActionIcon>
         </Group>
 
         <Group gap={6} hiddenFrom="sm" ml="auto">
@@ -167,11 +205,12 @@ export function CategoriesNav() {
               variant="subtle"
               color="brand"
               aria-label="Admin panel"
+              title="Admin panel"
             >
               <IconShieldLock size={18} />
             </ActionIcon>
           )}
-          <ActionIcon variant="subtle" color="danger" size="lg" onClick={handleLogout} aria-label="Chiqish">
+          <ActionIcon variant="subtle" color="danger" size="lg" onClick={openLogout} aria-label="Chiqish" title="Chiqish">
             <IconLogout size={18} />
           </ActionIcon>
         </Group>
@@ -201,6 +240,22 @@ export function CategoriesNav() {
           ),
         )}
       </Box>
+
+      <Modal opened={logoutOpen} onClose={closeLogout} title="Hisobdan chiqish" centered size={380}>
+        <Stack gap="lg">
+          <Text c="dimmed" size="sm">
+            Hisobingizdan chiqmoqchimisiz?
+          </Text>
+          <Group justify="flex-end" gap="sm">
+            <Button variant="subtle" color="gray" onClick={closeLogout}>
+              Bekor qilish
+            </Button>
+            <Button variant="filled" color="danger" onClick={handleLogout}>
+              Chiqish
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </>
   )
 }
