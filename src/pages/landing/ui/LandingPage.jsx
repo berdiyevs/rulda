@@ -1,21 +1,22 @@
 import { useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Container, Stack, Group, Title, Text, SimpleGrid, Box, Accordion, ThemeIcon } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { IconTargetArrow, IconPhoto, IconChartBar } from '@tabler/icons-react'
 import { Navbar } from '../../../widgets/navbar'
-import { DailyQuestionCard } from '../../../widgets/daily-question'
 import { useLoginModal } from '../../../widgets/login-modal'
 import { Footer } from '../../../widgets/footer'
 import { Button } from '../../../shared/ui/Button/Button'
 import { Badge } from '../../../shared/ui/Badge/Badge'
 import { useAuth } from '../../../entities/user'
 import { ROUTES } from '../../../shared/config/routes'
+import { FAQS } from '../model/faq'
 
+// Raqamlar bosiladigan havolalar: foydalanuvchi va qidiruv tizimlari uchun ichki bo'limlarga yo'l.
 const STATS = [
-  { value: '1240 ta', label: 'Rasmiy savollar' },
-  { value: '93', label: "Yo'l belgilari" },
-  { value: '62 ta bilet', label: 'Har birida 20 ta savol' },
+  { value: '1240 ta', label: 'Rasmiy savollar', to: ROUTES.TICKETS },
+  { value: '93', label: "Yo'l belgilari", to: ROUTES.ROAD_SIGNS },
+  { value: '62 ta bilet', label: 'Har birida 20 ta savol', to: ROUTES.TICKETS },
 ]
 
 const FEATURES = [
@@ -33,38 +34,6 @@ const FEATURES = [
     icon: IconChartBar,
     title: 'Progress kuzatuvi',
     text: "Har bir urinishingiz saqlanadi — qayerda ko'proq mashq qilish kerakligini bilib boring.",
-  },
-]
-
-const FAQS = [
-  {
-    question: 'Savollar bazasi rasmiymi?',
-    answer:
-      "Ha, saytdagi 1240 ta savol O'zbekiston DAN (Davlat Avtomobil Nazorati) rasmiy test bazasiga asoslangan va 2026-yilgi o'zgarishlarga moslab yangilangan.",
-  },
-  {
-    question: 'Imtihon rejimi qanday ishlaydi?',
-    answer:
-      "Rasmiy imtihon rejimida (Premium) 20 ta tasodifiy savol, 25 daqiqa vaqt beriladi. 2 tadan ortiq xato qilinsa (ya'ni 3-xatoda), real imtihondagi kabi test darhol tugaydi. Kengaytirilgan mashg'ulot rejimida esa savollar sonini, vaqt chegarasini (vaqtsiz ham bo'ladi) va ruxsat etilgan xatolar sonini (cheklanmagan ham bo'ladi) o'zingiz tanlaysiz.",
-  },
-  {
-    question: 'Foydalanish bepulmi?',
-    answer: "Qisman. Bepul: 1–3-biletlar, kengaytirilgan rejimda mavzular bo'yicha mashq, yo'l belgilari to'plami va statistika. Premium: 4–62-biletlar, qat'iy rejim, rasmiy imtihon rejimi va xatolar ustida ishlash.",
-  },
-  {
-    question: "Natijalarim saqlanadimi?",
-    answer:
-      "Ha, ro'yxatdan o'tgan har bir foydalanuvchining urinishlari profiliga saqlanadi va har bir mavzu bo'yicha eng so'nggi natijani mavzular sahifasida ko'rish mumkin.",
-  },
-  {
-    question: "Telefon yoki planshetda ishlaydimi?",
-    answer:
-      "Ha, sayt barcha qurilmalarga (telefon, planshet, kompyuter) moslashgan va brauzer orqali qo'shimcha ilova o'rnatmasdan ishlatilaveradi.",
-  },
-  {
-    question: "Ro'yxatdan o'tish shartmi?",
-    answer:
-      "Avval ro'yxatdan o'tmasdan sinab ko'rishingiz mumkin: mini-test, Bilet 1 va yo'l belgilari hamma uchun ochiq. Natijalarni hisobingizda saqlash, qolgan biletlar va statistika uchun Google hisobingiz yoki email va parol orqali ro'yxatdan o'tasiz (email orqali bo'lsa, emailni tasdiqlash kerak). Mehmon sifatida yechgan natijalaringiz ro'yxatdan o'tgach hisobingizga ko'chiriladi.",
   },
 ]
 
@@ -129,7 +98,7 @@ export function LandingPage() {
               </Title>
               <Text c="dimmed" fz="lg">
                 O'zbekiston yo'l harakati qoidalarini interaktiv testlar orqali o'rganing. Rasmiy DAN
-                savollar bazasi, real imtihon rejimi va shaxsiy progress kuzatuvi bilan.
+                savollar bazasi, imtihon formatidagi biletlar va shaxsiy progress kuzatuvi bilan.
               </Text>
               <Group justify="center">
                 <Button variant="primary" size="lg" onClick={handlePrimaryClick}>
@@ -141,15 +110,17 @@ export function LandingPage() {
               </Group>
             </Stack>
 
-            <Box maw={720} mx="auto" mt={{ base: 'lg', sm: 'xl' }}>
-              <DailyQuestionCard />
-            </Box>
-
             <Stack align="center" ta="center" maw={720} mx="auto" mt={{ base: 'lg', sm: 'xl' }}>
-
-              <SimpleGrid cols={3} spacing={{ base: 8, sm: 'xl' }} mt="md">
+              <SimpleGrid cols={3} spacing={{ base: 8, sm: 'xl' }} mt="md" w="100%">
                 {STATS.map((s) => (
-                  <Stack key={s.label} gap={2} align="center">
+                  <Stack
+                    key={s.label}
+                    component={Link}
+                    to={s.to}
+                    gap={2}
+                    align="center"
+                    className="landing-stat-link"
+                  >
                     <Text fz={{ base: 18, sm: 28 }} fw={800} className="gradient-text" ta="center">
                       {s.value}
                     </Text>
@@ -207,10 +178,14 @@ export function LandingPage() {
         <Box component="section" py={{ base: 32, sm: 60 }}>
           <Container size={1180}>
             <Stack align="center" ta="center" gap="md" className="glass-card" p="xl">
-              <Title order={2}>Bugundan boshlang</Title>
-              <Text c="dimmed">Bepul ro'yxatdan o'ting va zaif tomonlaringizni aniqlashtiring.</Text>
+              <Title order={2}>{isMember ? 'Mashqni davom ettiring' : 'Bugundan boshlang'}</Title>
+              <Text c="dimmed">
+                {isMember
+                  ? "Har kuni ozgina mashq qiling: seriyangiz va natijalaringiz saqlanib boradi."
+                  : "Ro'yxatdan o'tmasdan 10 ta savollik mini-testni yeching va darajangizni bilib oling."}
+              </Text>
               <Button variant="primary" size="lg" onClick={handlePrimaryClick}>
-                Hoziroq boshlash
+                {isMember ? 'Davom ettirish' : 'Hoziroq boshlash'}
               </Button>
             </Stack>
           </Container>

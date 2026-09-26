@@ -4,10 +4,12 @@ import { IconBulb } from '@tabler/icons-react'
 import { fetchQuestions } from '../../../entities/question'
 import { useAuth } from '../../../entities/user'
 import { Badge } from '../../../shared/ui/Badge/Badge'
+import { uzToday } from '../../../shared/lib/uzDate'
 import './DailyQuestionCard.css'
 
+// Kun O'zbekiston vaqti bo'yicha almashadi (UTC bo'yicha emas: aks holda savol soat 05:00 da o'zgarardi).
 function pickDailyQuestion(questions) {
-  const dayKey = new Date().toISOString().slice(0, 10)
+  const dayKey = `uz-${uzToday()}`
   let hash = 0
   for (let i = 0; i < dayKey.length; i += 1) {
     hash = (hash * 31 + dayKey.charCodeAt(i)) >>> 0
