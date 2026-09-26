@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { fetchAllAttempts, computeStreak, getMistakeIds } from '../../../entities/quiz-attempt'
-import { fetchQuestions } from '../../../entities/question'
+import { fetchAllAttempts, computeStreak, getMistakeIds, getLatestResults } from '../../../entities/quiz-attempt'
+import { fetchQuestions, filterQuestionsByTopic, uniqueQuestions } from '../../../entities/question'
 import { TOPICS } from '../../../entities/category'
 import { useAuth } from '../../../entities/user'
 
@@ -11,32 +11,43 @@ function answeredOf(attempt) {
 
 function percentOf(attempt) {
   if (!attempt) return null
-  const answered = answeredOf(attempt)
-  if (!answered) return null
-  return Math.round((attempt.correctCount / answered) * 100)
+  const total = attempt.totalQuestions || answeredOf(attempt)
+  if (!total) return null
+  return Math.round((attempt.correctCount / total) * 100)
 }
 
-function computeStatistics(attempts, questions) {
-  const latestByTopic = {}
-  TOPICS.forEach((t) => {
-    const topicAttempts = attempts.filter((a) => a.topic === t.id)
-    latestByTopic[t.id] = topicAttempts.length ? topicAttempts[topicAttempts.length - 1] : null
+// Kichik foizlar 0% bo'lib ko'rinmasligi uchun 10% gacha bitta kasr xonasi bilan.
+function roundPercent(value) {
+  return value > 0 && value < 10 ? Math.round(value * 10) / 10 : Math.round(value)
+}
+
+function computeStatistics(attempts, allQuestions) {
+  const questions = uniqueQuestions(allQuestions)
+  // Har bir savolning oxirgi natijasi — barcha rejimlar (bilet, mashq, takrorlash, imtihon) hisobga olinadi.
+  // Oldin faqat "mavzular" rejimi hisoblangani uchun biletlar yechilsa ham tayyorlik 0% qolardi.
+  const latest = getLatestResults(attempts)
+  const questionIds = new Set(questions.map((q) => q.id))
+  const masteredCount = Array.from(latest.entries()).filter(([id, correct]) => correct && questionIds.has(id)).length
+  const seenCount = Array.from(latest.keys()).filter((id) => questionIds.has(id)).length
+  const readinessPercent = questions.length ? roundPercent((masteredCount / questions.length) * 100) : 0
+
+  const topicBreakdown = TOPICS.map((t) => {
+    const topicQuestions = filterQuestionsByTopic(questions, t.id)
+    const seen = topicQuestions.filter((q) => latest.has(q.id))
+    const correct = seen.filter((q) => latest.get(q.id)).length
+    return {
+      id: t.id,
+      title: t.title,
+      seenCount: seen.length,
+      totalCount: topicQuestions.length,
+      percent: seen.length ? Math.round((correct / seen.length) * 100) : null,
+    }
   })
 
-  const topicBreakdown = TOPICS.map((t) => ({
-    id: t.id,
-    title: t.title,
-    percent: percentOf(latestByTopic[t.id]),
-  }))
-
-  const availablePercents = topicBreakdown.map((t) => t.percent).filter((p) => p != null)
-  const readinessPercent = availablePercents.length
-    ? Math.round(availablePercents.reduce((sum, p) => sum + p, 0) / availablePercents.length)
-    : 0
-
+  // Eng zaif mavzu: kamida 5 ta savol yechilgan mavzular orasidan.
   const weakestTopic =
     topicBreakdown
-      .filter((t) => t.id !== 'all' && t.percent != null)
+      .filter((t) => t.id !== 'all' && t.percent != null && t.seenCount >= 5)
       .sort((a, b) => a.percent - b.percent)[0] || null
 
   const examAttempts = attempts.filter((a) => a.mode === 'exam')
@@ -70,6 +81,9 @@ function computeStatistics(attempts, questions) {
 
   return {
     readinessPercent,
+    masteredCount,
+    seenCount,
+    totalQuestionCount: questions.length,
     topicBreakdown,
     weakestTopic,
     examStats,

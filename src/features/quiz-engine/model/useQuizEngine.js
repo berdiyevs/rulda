@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import { notifications } from '@mantine/notifications'
-import { fetchQuestions, filterQuestionsByTopic } from '../../../entities/question'
+import { fetchQuestions, filterQuestionsByTopic, uniqueQuestions } from '../../../entities/question'
 import {
   saveAttempt,
   addGuestAttempt,
@@ -13,6 +13,7 @@ import {
   sessionMatches,
   getTodayProgress,
   computeStreak,
+  DAILY_GOAL,
 } from '../../../entities/quiz-attempt'
 import { useAuth } from '../../../entities/user'
 import { shuffleArray, pickRandom } from '../../../shared/lib/shuffle'
@@ -28,11 +29,14 @@ const EXAM_MAX_MISTAKES = 2
 const MINI_TEST_SIZE = 10
 const EMPTY_QUESTION_IDS = []
 
-function prepareSession(allQuestions, topic, mode, ticketId, questionIds, questionCount) {
+function prepareSession(sourceQuestions, topic, mode, ticketId, questionIds, questionCount) {
   if (mode === 'ticket') {
-    const pool = allQuestions.filter((q) => q.ticketId === Number(ticketId))
+    const pool = sourceQuestions.filter((q) => q.ticketId === Number(ticketId))
     return pool.map((q) => ({ ...q, options: shuffleArray(q.options) }))
   }
+
+  // Bilet bo'lmagan rejimlarda takrorlangan savollar bir marta olinadi.
+  const allQuestions = uniqueQuestions(sourceQuestions)
 
   if (mode === 'mini') {
     // Mehmon uchun mini-test: faqat bepul (1–3) biletlardagi savollardan tasodifiy tanlanadi.
@@ -208,7 +212,7 @@ export function useQuizEngine({
             notifications.show({
               color: 'success',
               title: 'Bugungi maqsad bajarildi!',
-              message: `Kuniga 20 ta savol. Seriyangiz: ${computeStreak(data)} kun.`,
+              message: `Kuniga ${DAILY_GOAL} ta savol. Seriyangiz: ${computeStreak(data)} kun.`,
             })
           })
           .catch((error) => {

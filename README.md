@@ -46,6 +46,12 @@ VITE_GOOGLE_CLIENT_ID=<Google Cloud Console'dan olingan OAuth Web Client ID>
 VITE_YM_ID=<Yandex Metrica hisoblagich raqami, ixtiyoriy>
 ```
 
+`VITE_SUPPORT_URL` (ixtiyoriy) — footer'dagi "Texnik yordam" havolasi, masalan Telegram. Bo'sh bo'lsa havola ko'rinmaydi.
+
+### SEO
+
+`npm run build` Vite build'dan keyin `scripts/prerender-seo.mjs` ni ishga tushiradi. U har bir ochiq sahifa (`/`, `/tickets`, `/road-signs`, `/terms`, `/privacy`) uchun o'z title, description, canonical, OG teglari, JSON-LD va asosiy matni bor statik HTML yaratadi, shuningdek `sitemap.xml` va shaxsiy sahifalar uchun indekslanmaydigan `app.html` shablonini. Sahifa ma'lumotlari bitta joyda: `src/shared/config/seo.js` (brauzerda sahifa almashganda ham shu fayldan o'qiladi). Yangi ochiq sahifa qo'shilsa, uni `PUBLIC_PAGES`ga, skriptdagi `buildPages`ga va `public/_redirects`ga qo'shing.
+
 `VITE_YM_ID` bo'sh bo'lsa analitika yuklanmaydi (xato ham bermaydi). U faqat production build'da ishlaydi: `npm run dev` da doim o'chiq. Kod bitta joyda: `src/shared/lib/analytics.js`, hodisalar `track('nomi')` orqali yuboriladi.
 
 Email tasdiqlash hozircha soddalashtirilgan rejimda ishlaydi (`SIMPLE_EMAIL_MODE=true`): real email yuborilmaydi, tasdiqlash havolasi ro'yxatdan o'tish javobida (va backend loglarida) qaytariladi. Productionga chiqishdan oldin `backend/app/api/auth.py`dagi `signup` funksiyasiga real SMTP/email xizmati ulanishi kerak.

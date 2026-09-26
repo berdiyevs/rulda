@@ -524,17 +524,17 @@
       },
       {
         "id": 3,
-        "text": "«А» ва «Б»",
+        "text": "«А» va «Б»",
         "is_correct": true
       },
       {
         "id": 4,
-        "text": "«А», «Б», «B» va «Г»",
+        "text": "«А», «Б», «В» va «Г»",
         "is_correct": false
       },
       {
         "id": 5,
-        "text": "«A», «B» va «B»",
+        "text": "«А», «В» va «Г»",
         "is_correct": false
       }
     ],
@@ -1534,12 +1534,12 @@
       },
       {
         "id": 4,
-        "text": "«А» ва «Б»",
+        "text": "«А» va «Б»",
         "is_correct": true
       },
       {
         "id": 5,
-        "text": "«А» ва «В»",
+        "text": "«А» va «В»",
         "is_correct": false
       }
     ],
@@ -3694,7 +3694,7 @@
     "options": [
       {
         "id": 1,
-        "text": "«A»",
+        "text": "«А»",
         "is_correct": true
       },
       {
@@ -3704,7 +3704,7 @@
       },
       {
         "id": 3,
-        "text": "«А» ва «Б»",
+        "text": "«А» va «Б»",
         "is_correct": false
       }
     ],
@@ -16079,7 +16079,7 @@
     "options": [
       {
         "id": 1,
-        "text": "«А» ва «Б»",
+        "text": "«А» va «Б»",
         "is_correct": false
       },
       {
@@ -16089,17 +16089,17 @@
       },
       {
         "id": 3,
-        "text": "«Б» ва «Г»",
+        "text": "«Б» va «Г»",
         "is_correct": false
       },
       {
         "id": 4,
-        "text": "«В» ва «Г»",
+        "text": "«В» va «Г»",
         "is_correct": false
       },
       {
         "id": 5,
-        "text": "«Б», «В» ва «Г»",
+        "text": "«Б», «В» va «Г»",
         "is_correct": true
       }
     ],
@@ -18198,7 +18198,7 @@
     "options": [
       {
         "id": 1,
-        "text": "Сhapga va orqaga qayrilib olishga",
+        "text": "Chapga va orqaga qayrilib olishga",
         "is_correct": false
       },
       {
@@ -20605,7 +20605,7 @@
     "options": [
       {
         "id": 1,
-        "text": "«A» ва «Д»",
+        "text": "«А» va «Д»",
         "is_correct": false
       },
       {

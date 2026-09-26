@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { Box, Group, Text, Avatar, Menu, UnstyledButton } from '@mantine/core'
+import { Anchor, Box, Group, Text, Avatar, Menu, UnstyledButton } from '@mantine/core'
 import { IconChevronDown, IconLogout, IconList } from '@tabler/icons-react'
 import { useAuth } from '../../../entities/user'
 import { Button } from '../../../shared/ui/Button/Button'
@@ -55,6 +55,15 @@ export function Navbar({ onOpenModal }) {
           da
         </Text>
 
+        <Group gap={24} visibleFrom="sm" mr="auto" ml={32}>
+          <Anchor component={Link} to={ROUTES.TICKETS} c="dimmed" fw={600} fz="0.92rem" underline="never">
+            Biletlar
+          </Anchor>
+          <Anchor component={Link} to={ROUTES.ROAD_SIGNS} c="dimmed" fw={600} fz="0.92rem" underline="never">
+            Yo'l belgilari
+          </Anchor>
+        </Group>
+
         <Group gap={12}>
           <ThemeToggle />
           {user ? (
@@ -88,7 +97,7 @@ export function Navbar({ onOpenModal }) {
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Item component={Link} to={ROUTES.CATEGORIES} leftSection={<IconList size={16} />}>
-                  Boshlash
+                  Asosiy sahifa
                 </Menu.Item>
                 <Menu.Item color="danger" leftSection={<IconLogout size={16} />} onClick={handleLogout}>
                   Chiqish

@@ -1,7 +1,8 @@
 import { uzDayNumber, uzToday } from '../../../shared/lib/uzDate'
 
-// Kunlik maqsad: kuniga kamida 20 ta savolga javob berish (bitta bilet).
-export const DAILY_GOAL = 20
+// Kunlik maqsad: kuniga kamida 10 ta savolga javob berish. 20 ta (to'liq bilet) yangi
+// foydalanuvchi uchun og'ir edi va seriya deyarli hech qachon boshlanmasdi.
+export const DAILY_GOAL = 10
 
 function answeredOf(attempt) {
   return (attempt.correctCount || 0) + (attempt.wrongCount || 0)

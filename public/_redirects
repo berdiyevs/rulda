@@ -1,1 +1,8 @@
-/*    /index.html   200
+# Ochiq sahifalar build paytida yaratilgan o'z statik HTML'iga ega (scripts/prerender-seo.mjs).
+/tickets      /tickets.html      200
+/road-signs   /road-signs.html   200
+/terms        /terms.html        200
+/privacy      /privacy.html      200
+
+# Qolgan barcha yo'llar (shaxsiy sahifalar, 404) indekslanmaydigan SPA shabloniga.
+/*            /app.html          200

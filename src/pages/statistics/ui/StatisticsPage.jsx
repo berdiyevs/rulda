@@ -30,6 +30,7 @@ import { useStatistics } from '../../../features/statistics'
 import { useQuizStart } from '../../../widgets/quiz-start'
 import { useAuth } from '../../../entities/user'
 import { ROUTES } from '../../../shared/config/routes'
+import { DAILY_GOAL } from '../../../entities/quiz-attempt'
 
 function readinessColor(percent) {
   if (percent >= 75) return 'success'
@@ -163,7 +164,8 @@ export function StatisticsPage() {
                     }
                   />
                   <Text c="dimmed" fz="xs">
-                    Har bir mavzu bo'yicha oxirgi urinish natijalarining o'rtacha foizi.
+                    {stats.totalQuestionCount} ta savoldan {stats.masteredCount} tasiga oxirgi marta to'g'ri javob
+                    bergansiz. Imtihonda savollar butun bazadan tushadi.
                   </Text>
                 </Stack>
               </Paper>
@@ -177,7 +179,7 @@ export function StatisticsPage() {
                     {stats.streak} kun
                   </Text>
                   <Text c="dimmed" fz="sm">
-                    Ketma-ket kunlik maqsad (kuniga 20 savol)
+                    Ketma-ket kunlik maqsad (kuniga {DAILY_GOAL} ta savol)
                   </Text>
                 </Stack>
               </Paper>
@@ -200,7 +202,7 @@ export function StatisticsPage() {
             <div>
               <Group justify="space-between" mb="md">
                 <Title order={2} fz="lg">
-                  Mavzular bo'yicha natija
+                  Mavzular bo'yicha aniqlik
                 </Title>
                 {stats.weakestTopic && (
                   <Badge variant="warning">Eng zaif: {stats.weakestTopic.title}</Badge>
@@ -209,10 +211,17 @@ export function StatisticsPage() {
               <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
                 {stats.topicBreakdown.map((t) => (
                   <Paper key={t.id} className="glass-card" p="md">
-                    <Group justify="space-between" mb={8}>
-                      <Text fw={600} fz="sm">
-                        {t.title}
-                      </Text>
+                    <Group justify="space-between" mb={8} wrap="nowrap" align="flex-start">
+                      <div>
+                        <Text fw={600} fz="sm">
+                          {t.title}
+                        </Text>
+                        <Text c="dimmed" fz="xs">
+                          {t.seenCount > 0
+                            ? `${t.totalCount} tadan ${t.seenCount} ta savol yechilgan`
+                            : 'Hali yechilmagan'}
+                        </Text>
+                      </div>
                       <Text fw={700} fz="sm" c={t.percent == null ? 'dimmed' : undefined}>
                         {t.percent == null ? '—' : `${t.percent}%`}
                       </Text>
