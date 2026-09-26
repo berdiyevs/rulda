@@ -311,3 +311,12 @@ Savol ID'si admin panelda ko'rsatiladigan ID bilan bir xil. Faqat imlo tuzatilga
 - **variant #5**
   - Eski: Barcha javoblar to'gri
   - Yangi: Barcha javoblar to'g'ri
+
+## Avtomatik tuzatishlar (migratsiya 0005)
+
+Quyidagilar admin panelda qo'lda o'zgartirilishi shart emas: `backend/alembic/versions/0005_question_text_fixes.py`
+deploy paytida (`alembic upgrade head`) ularni o'zi yangilaydi. Matn admin panelda allaqachon o'zgartirilgan bo'lsa, tegilmaydi.
+
+- ID 22, 62, 147, 652, 844: lotin matn ichidagi kirillcha "ва" → "va"; rasmdagi harflarga mos kelishi uchun lotin «A», «B» → kirill «А», «В»
+- ID 22, variant #5: «A», «B» va «B» (harf takrorlangan) → «А», «В» va «Г». Bu noto'g'ri javob varianti; rasm bilan solishtirib tekshirib qo'ying.
+- ID 740, variant #1: "Сhapga" (kirillcha С) → "Chapga"

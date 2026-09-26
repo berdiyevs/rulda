@@ -131,3 +131,62 @@
 .mobile-tabbar-item.is-active .mobile-tabbar-icon {
   background: var(--primary-soft);
 }
+
+/* Landing: raqamlar ichki bo'limlarga havola */
+.landing-stat-link {
+  text-decoration: none;
+  color: inherit;
+  padding: 8px 4px;
+  border-radius: var(--r-md);
+  transition: background 0.15s ease;
+}
+
+.landing-stat-link:hover,
+.landing-stat-link:focus-visible {
+  background: var(--primary-soft);
+}
+
+/* Build paytida HTML'ga yozilgan statik matn (scripts/prerender-seo.mjs). React yuklangach almashtiriladi. */
+.seo-static {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 96px 16px 48px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.seo-static h1,
+.seo-static h2,
+.seo-static h3 {
+  color: var(--text-primary);
+  margin: 1.2em 0 0.4em;
+}
+
+.seo-static a {
+  color: var(--primary);
+}
+
+.seo-static ul {
+  list-style: none;
+  padding: 0;
+}
+
+.seo-static li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+/* Uzun matnli tugma: matn kesilmasin, kerak bo'lsa ikki qatorga o'tsin */
+.btn-wrap.mantine-Button-root {
+  height: auto;
+  min-height: var(--button-height);
+  padding-block: 8px;
+}
+
+.btn-wrap .mantine-Button-label {
+  white-space: normal;
+  text-align: center;
+  line-height: 1.3;
+}

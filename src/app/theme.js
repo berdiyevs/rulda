@@ -105,7 +105,21 @@ export const theme = createTheme({
       defaultProps: { radius: 'lg' },
     },
     Modal: {
-      defaultProps: { radius: 'lg', overlayProps: { backgroundOpacity: 0.6, blur: 6 } },
+      // zIndex telefon pastki menyusidan (1000) yuqori: aks holda oyna tugmalari menyu ostida qolardi.
+      defaultProps: { radius: 'lg', zIndex: 1100, overlayProps: { backgroundOpacity: 0.6, blur: 6 } },
+    },
+    // Ochiluvchi ro'yxatlar modal (1100) ichida ham ustida ko'rinsin.
+    Popover: {
+      defaultProps: { zIndex: 1200 },
+    },
+    Menu: {
+      defaultProps: { zIndex: 1200 },
+    },
+    Combobox: {
+      defaultProps: { zIndex: 1200 },
+    },
+    Tooltip: {
+      defaultProps: { zIndex: 1200 },
     },
     Button: {
       defaultProps: { radius: 'xl' },
