@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Card, Grid } from '@mantine/core'
-import { IconEye, IconArrowRight } from '@tabler/icons-react'
+import { useEffect, useRef, useState } from 'react'
+import { Card, Grid, Modal } from '@mantine/core'
+import { IconEye, IconArrowRight, IconZoomIn } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
 import './QuestionCard.css'
 
@@ -17,6 +17,17 @@ export function QuestionCard({
   nextLabel = 'Keyingi savol',
 }) {
   const [imageError, setImageError] = useState(false)
+  const [zoomOpen, setZoomOpen] = useState(false)
+  const nextRef = useRef(null)
+
+  // Telefonda javobdan keyin "Keyingi savol" tugmasi ekrandan pastda qolib ketmasin.
+  useEffect(() => {
+    if (!isAnswered || !revealAnswer) return
+    const frame = requestAnimationFrame(() => {
+      nextRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [isAnswered, revealAnswer])
 
   if (!question) return null
 
@@ -34,14 +45,21 @@ export function QuestionCard({
       <Grid gutter={0}>
         {hasImage && (
           <Grid.Col span={{ base: 12, sm: 5 }} className="question-image-col">
-            <div className="question-image">
+            <button
+              type="button"
+              className="question-image"
+              onClick={() => setZoomOpen(true)}
+              aria-label="Rasmni kattalashtirish"
+            >
               <img
                 src={question.image_url}
-                alt="Yo'l belgisi"
-                loading="lazy"
+                alt="Savol rasmi"
                 onError={() => setImageError(true)}
               />
-            </div>
+              <span className="question-image-zoom" aria-hidden="true">
+                <IconZoomIn size={16} />
+              </span>
+            </button>
             <div className="question-image-caption">
               <IconEye size={13} stroke={2} />
               <span>Rasmga diqqat bilan e'tibor bering</span>
@@ -49,7 +67,10 @@ export function QuestionCard({
           </Grid.Col>
         )}
 
-        <Grid.Col span={{ base: 12, sm: hasImage ? 7 : 12 }} className="question-body">
+        <Grid.Col span={{ base: 12, sm: hasImage ? 7 : 12 }}>
+          {/* Padding ichki div'da: Grid.Col o'z paddingini (gutter) majburan qo'yadi va telefonda
+              matn karta chetiga yopishib qolardi. */}
+          <div className="question-body">
           {showCounter && <span className="question-counter">Savol {index + 1} / {total}</span>}
           <p className="question-text">{question.question}</p>
 
@@ -84,6 +105,7 @@ export function QuestionCard({
 
           {isAnswered && revealAnswer && onNext && (
             <Button
+              ref={nextRef}
               variant="primary"
               size="md"
               className="question-next-btn"
@@ -93,8 +115,22 @@ export function QuestionCard({
               {nextLabel}
             </Button>
           )}
+          </div>
         </Grid.Col>
       </Grid>
+
+      {hasImage && (
+        <Modal
+          opened={zoomOpen}
+          onClose={() => setZoomOpen(false)}
+          size="xl"
+          centered
+          title="Savol rasmi"
+          zIndex={2000}
+        >
+          <img src={question.image_url} alt="Savol rasmi (katta)" className="question-image-full" />
+        </Modal>
+      )}
     </Card>
   )
 }

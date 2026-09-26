@@ -15,6 +15,7 @@ import {
 } from '../../../entities/quiz-attempt'
 import { useQuizStart } from '../../quiz-start'
 import { isTicketLocked } from '../../../shared/lib/premium'
+import { ticketStatusOf } from '../../../entities/ticket'
 import { uzHour } from '../../../shared/lib/uzDate'
 import { ROUTES } from '../../../shared/config/routes'
 
@@ -42,7 +43,10 @@ export function ContinueCard({ progress }) {
   const targetTicketId = hasStarted ? nextTicketId : 1
   const targetLocked = targetTicketId != null && isTicketLocked(targetTicketId, isPremiumActive)
   const answered = lastAttempt ? lastAttempt.correctCount + lastAttempt.wrongCount : 0
-  const isPartial = lastAttempt && answered < lastAttempt.totalQuestions
+  const lastStatus = ticketStatusOf(lastAttempt)
+  // Kartada aynan boshlanadigan sessiyadagi savollar soni ko'rsatiladi (bepul: 10 tagacha).
+  const reviewCount = Math.min(reviewDueIds.length, reviewSize)
+  const reviewRest = reviewDueIds.length - reviewCount
 
   const startTicket = (ticketId) => {
     if (isTicketLocked(ticketId, isPremiumActive)) navigate(ROUTES.PREMIUM)
@@ -64,9 +68,11 @@ export function ContinueCard({ progress }) {
     ? `Tugallanmagan: ${describeSession(saved)} · ${answeredCountOf(saved)}/${saved.questionIds.length} savol`
     : !hasStarted
     ? 'Rasmiy imtihon formatidagi 20 ta savol, 25 daqiqa. Natijangiz saqlanadi.'
-    : isPartial
+    : lastStatus === 'incomplete'
       ? `Oxirgi: Bilet ${lastTicketId} · tugallanmagan (${answered}/${lastAttempt.totalQuestions} savolga javob berilgan)`
-      : `Oxirgi: Bilet ${lastTicketId} · ${lastAttempt.correctCount}/${answered} to'g'ri`
+      : lastStatus === 'passed'
+        ? `Oxirgi: Bilet ${lastTicketId} · o'tildi (${lastAttempt.correctCount}/${lastAttempt.totalQuestions} to'g'ri)`
+        : `Oxirgi: Bilet ${lastTicketId} · o'tilmadi (${lastAttempt.wrongCount} ta xato)`
 
   return (
     <Paper className="glass-card" p="lg">
@@ -119,7 +125,8 @@ export function ContinueCard({ progress }) {
           >
             <div>
               <Text fw={700} fz="sm">
-                Bugungi takrorlash: {reviewDueIds.length} ta savol
+                Bugungi takrorlash: {reviewCount} ta savol
+                {reviewRest > 0 && !reviewLimitReached ? ` (yana ${reviewRest} tasi keyingi safar)` : ''}
               </Text>
               <Text c="dimmed" fz="xs">
                 {reviewLimitReached
@@ -148,6 +155,7 @@ export function ContinueCard({ progress }) {
           {saved && (
             <Button
               variant="primary"
+              className="btn-wrap"
               style={{ flex: '1 1 220px' }}
               leftSection={<IconPlayerPlay size={16} />}
               onClick={() => navigate(resumeUrl(saved), { state: { from: ROUTES.CATEGORIES } })}
@@ -159,6 +167,7 @@ export function ContinueCard({ progress }) {
           {targetTicketId != null && !(saved?.mode === 'ticket' && Number(saved.ticketId) === targetTicketId) && (
             <Button
               variant={saved ? 'secondary' : 'primary'}
+              className="btn-wrap"
               style={{ flex: '1 1 220px' }}
               leftSection={targetLocked ? <IconLock size={16} /> : <IconPlayerPlay size={16} />}
               onClick={() => startTicket(targetTicketId)}
@@ -174,6 +183,7 @@ export function ContinueCard({ progress }) {
           {hasStarted && lastTicketId !== targetTicketId && (
             <Button
               variant="secondary"
+              className="btn-wrap"
               style={{ flex: '1 1 220px' }}
               leftSection={<IconRefresh size={16} />}
               onClick={() => startTicket(lastTicketId)}
@@ -185,11 +195,14 @@ export function ContinueCard({ progress }) {
           {mistakeIds.length > 0 && (
             <Button
               variant="secondary"
+              className="btn-wrap"
               style={{ flex: '1 1 220px' }}
               leftSection={isPremiumActive ? <IconArrowBackUp size={16} /> : <IconLock size={16} />}
               onClick={startMistakes}
             >
-              Xatolaringizni takrorlang ({mistakeIds.length} ta)
+              {isPremiumActive
+                ? `Barcha xatolarim (${mistakeIds.length} ta)`
+                : `Barcha xatolarim (${mistakeIds.length} ta) · Premium`}
             </Button>
           )}
         </Group>

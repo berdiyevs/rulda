@@ -59,7 +59,7 @@ export function useAttempts() {
   return useContext(AttemptsContext)
 }
 
-// Seriya va bugungi maqsad (kuniga 20 ta savol, O'zbekiston vaqti bo'yicha).
+// Seriya va bugungi maqsad (kuniga DAILY_GOAL ta savol, O'zbekiston vaqti bo'yicha).
 export function useDailyProgress() {
   const { attempts } = useAttempts()
   return useMemo(() => ({ streak: computeStreak(attempts), ...getTodayProgress(attempts) }), [attempts])

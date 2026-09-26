@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Card, Stack, Text, Title, RingProgress, SimpleGrid, ThemeIcon, Badge } from '@mantine/core'
 import { IconCheck, IconX, IconCircleCheck } from '@tabler/icons-react'
 import { Button } from '../../../shared/ui/Button/Button'
@@ -9,6 +9,9 @@ import { useLoginModal } from '../../login-modal'
 import { ExamPromptCard } from '../../exam-prompt'
 import { ShareResult } from './ShareResult'
 import { ROUTES } from '../../../shared/config/routes'
+import { ticketIdOf } from '../../../entities/ticket'
+import { isTicketLocked, isTicketGuestLocked } from '../../../shared/lib/premium'
+import { useQuizStart } from '../../quiz-start'
 
 // Telefonda kichik katakchalarda yozuv kesilmasligi uchun.
 const LABEL_STYLES = { overflow: 'visible', textOverflow: 'clip' }
@@ -20,16 +23,30 @@ const BACK_LABELS = {
 }
 
 export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
-  const { user } = useAuth()
+  const { user, isPremiumActive } = useAuth()
   const openLogin = useLoginModal()
+  const openQuizStart = useQuizStart()
+  const navigate = useNavigate()
   const { loginWithGoogle } = useAuthActions({ redirectTo: false })
 
   if (!result) return null
 
   const { correctCount, wrongCount, totalQuestions, passed, mode, endReason, isGuest, ticketCount } = result
   const answeredCount = correctCount + wrongCount
-  const percent = answeredCount ? Math.round((correctCount / answeredCount) * 100) : 0
+  // Foiz barcha savollardan hisoblanadi: 20 tadan 4 tasi to'g'ri bo'lsa 20%, 67% emas.
+  const percent = totalQuestions ? Math.round((correctCount / totalQuestions) * 100) : 0
   const stoppedEarly = answeredCount < totalQuestions
+
+  // Bilet rejimida keyingi biletga to'g'ridan-to'g'ri o'tish.
+  const ticketId = ticketIdOf(result)
+  const nextTicketId = ticketId != null && ticketId < (ticketCount || 0) ? ticketId + 1 : null
+  const nextGuestLocked = nextTicketId != null && isTicketGuestLocked(nextTicketId, !user)
+  const nextPremiumLocked = nextTicketId != null && Boolean(user) && isTicketLocked(nextTicketId, isPremiumActive)
+  const startNextTicket = () => {
+    if (nextGuestLocked) openLogin({ title: `Bilet ${nextTicketId} ni ochish uchun kiring`, redirectTo: false })
+    else if (nextPremiumLocked) navigate(ROUTES.PREMIUM)
+    else openQuizStart({ ticketId: nextTicketId })
+  }
 
   const endReasonText = {
     mistakes: "Ruxsat etilgan xatolar soni oshgani uchun test avtomatik tugadi.",
@@ -46,7 +63,7 @@ export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
 
         <div>
           <Title order={2} fz="1.5rem" mb={6}>
-            {passed ? 'Tabriklaymiz!' : "Qayta urinib ko'ring"}
+            {passed ? 'Tabriklaymiz!' : stoppedEarly && endReason === 'manual' ? 'Test tugallanmadi' : "Qayta urinib ko'ring"}
           </Title>
           <Text c="dimmed" fz="0.92rem">
             {mode === 'exam'
@@ -55,7 +72,9 @@ export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
                 : "Imtihondan o'ta olmadingiz, ruxsat etilgan xatolar sonidan oshib ketdi."
               : mode === 'review'
                 ? "Takrorlash yakunlandi. To'g'ri javoblar keyingi bosqichga o'tadi, xatolar ertaga qayta chiqadi."
-                : "Mashg'ulot yakunlandi."}
+                : ticketId != null
+                  ? `Bilet ${ticketId} yakunlandi.`
+                  : "Mashg'ulot yakunlandi."}
           </Text>
         </div>
 
@@ -146,11 +165,17 @@ export function QuizResults({ result, onRetry, backTo = ROUTES.CATEGORIES }) {
             {BACK_LABELS[backTo] || 'Orqaga qaytish'}
           </Button>
           {mode !== 'review' && (
-            <Button variant="primary" onClick={onRetry} fullWidth>
+            <Button variant={nextTicketId != null ? 'secondary' : 'primary'} onClick={onRetry} fullWidth>
               Qayta urinish
             </Button>
           )}
         </SimpleGrid>
+
+        {nextTicketId != null && (
+          <Button variant="primary" onClick={startNextTicket} fullWidth>
+            {nextPremiumLocked ? `Bilet ${nextTicketId} (Premium)` : `Keyingi bilet: ${nextTicketId}`}
+          </Button>
+        )}
 
         {!passed && answeredCount > 0 && <ShareResult result={result} />}
       </Stack>

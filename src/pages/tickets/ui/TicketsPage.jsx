@@ -4,7 +4,7 @@ import { Container, Stack, Group, Title, Text, SimpleGrid, Skeleton, Modal, Prog
 import { IconCheck, IconX, IconPlayerPlay, IconLock } from '@tabler/icons-react'
 import { CategoriesNav } from '../../../widgets/sidebar'
 import { fetchQuestions } from '../../../entities/question'
-import { groupByTicket } from '../../../entities/ticket'
+import { groupByTicket, lastAttemptByTicket, ticketStatusOf, getNextTicket } from '../../../entities/ticket'
 import { useAttempts, getResumableSession, sessionMatches } from '../../../entities/quiz-attempt'
 import { useAuth } from '../../../entities/user'
 import { useQuizStart } from '../../../widgets/quiz-start'
@@ -19,7 +19,8 @@ import './TicketsPage.css'
 const STATUS_LABELS = {
   passed: "o'tilgan",
   failed: 'yiqilgan',
-  inprogress: 'boshlangan, tugallanmagan',
+  inprogress: 'boshlangan, davom ettirish mumkin',
+  incomplete: 'tugallanmagan',
   new: 'yechilmagan',
   locked: 'qulflangan',
 }
@@ -27,7 +28,7 @@ const STATUS_LABELS = {
 function StatusIcon({ status }) {
   if (status === 'passed') return <IconCheck size={12} stroke={3} />
   if (status === 'failed') return <IconX size={12} stroke={3} />
-  if (status === 'inprogress') return <IconPlayerPlay size={11} stroke={3} />
+  if (status === 'inprogress' || status === 'incomplete') return <IconPlayerPlay size={11} stroke={3} />
   if (status === 'locked') return <IconLock size={12} stroke={2.5} />
   return null
 }
@@ -71,25 +72,25 @@ export function TicketsPage() {
 
   // Har bir biletning holati: o'tgan / yiqilgan / boshlangan / yechilmagan / qulflangan.
   const cells = useMemo(() => {
-    const lastByTicket = new Map()
-    attempts.forEach((a) => {
-      if (a.topic?.startsWith('ticket-')) lastByTicket.set(Number(a.topic.slice('ticket-'.length)), a)
-    })
+    const lastByTicket = lastAttemptByTicket(attempts)
     return tickets.map(({ ticketId }) => {
       const guestLocked = isTicketGuestLocked(ticketId, isAuthReady && !user)
       const premiumLocked = isTicketLocked(ticketId, isPremiumActive)
       const locked = guestLocked || premiumLocked
       const last = lastByTicket.get(ticketId)
-      let status = 'new'
-      if (sessionMatches(saved, { mode: 'ticket', ticketId })) status = 'inprogress'
-      else if (last) status = last.passed ? 'passed' : 'failed'
+      const status = sessionMatches(saved, { mode: 'ticket', ticketId }) ? 'inprogress' : ticketStatusOf(last)
       return { ticketId, status, locked, guestLocked, displayStatus: locked ? 'locked' : status }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tickets, attempts, saved?.updatedAt, saved?.ticketId, user, isAuthReady, isPremiumActive])
 
   const passedCount = cells.filter((c) => c.status === 'passed').length
-  const nextCell = cells.find((c) => !c.locked && c.status !== 'passed')
+  // Asosiy sahifadagi "Davom ettirish" kartasi bilan bir xil qoida (entities/ticket).
+  const nextTicket = useMemo(
+    () => getNextTicket(tickets.map((t) => t.ticketId), attempts, (id) => cells.find((c) => c.ticketId === id)?.locked),
+    [tickets, attempts, cells],
+  )
+  const nextCell = nextTicket ? cells.find((c) => c.ticketId === nextTicket.ticketId) : null
 
   const openCell = (cell) => {
     if (cell.guestLocked) {
@@ -144,6 +145,22 @@ export function TicketsPage() {
               </Stack>
             </Paper>
 
+            <div className="ticket-legend">
+              <span className="ticket-legend-item is-passed">
+                <IconCheck size={12} stroke={3} /> o'tilgan
+              </span>
+              <span className="ticket-legend-item is-failed">
+                <IconX size={12} stroke={3} /> yiqilgan
+              </span>
+              <span className="ticket-legend-item is-inprogress">
+                <IconPlayerPlay size={11} stroke={3} /> tugallanmagan
+              </span>
+              <span className="ticket-legend-item is-new">yechilmagan</span>
+              <span className="ticket-legend-item is-locked">
+                <IconLock size={12} stroke={2.5} /> Premium
+              </span>
+            </div>
+
             <div className="ticket-grid">
               {cells.map((cell) => (
                 <button
@@ -161,21 +178,6 @@ export function TicketsPage() {
               ))}
             </div>
 
-            <div className="ticket-legend">
-              <span className="ticket-legend-item is-passed">
-                <IconCheck size={12} stroke={3} /> o'tilgan
-              </span>
-              <span className="ticket-legend-item is-failed">
-                <IconX size={12} stroke={3} /> yiqilgan
-              </span>
-              <span className="ticket-legend-item is-inprogress">
-                <IconPlayerPlay size={11} stroke={3} /> boshlangan
-              </span>
-              <span className="ticket-legend-item is-new">yechilmagan</span>
-              <span className="ticket-legend-item is-locked">
-                <IconLock size={12} stroke={2.5} /> Premium
-              </span>
-            </div>
           </Stack>
         )}
       </Container>

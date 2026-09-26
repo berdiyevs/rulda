@@ -7,8 +7,8 @@ import { track } from '../../../shared/lib/analytics'
 import { isoToDisplay, maskDate, displayToIso, daysUntil } from '../../../shared/lib/examDate'
 import { getExamRecommendation } from '../../../shared/lib/examPlan'
 
-// ticketsLeft: foydalanuvchiga ochiq va hali yechilmagan biletlar soni (tavsiya hisoblash uchun).
-export function ExamCountdownCard({ ticketsLeft }) {
+// ticketsLeft: ochiq va hali o'tilmagan biletlar; totalLeft: barcha o'tilmagan biletlar (tavsiya uchun).
+export function ExamCountdownCard({ ticketsLeft, totalLeft }) {
   const { user, profile, isPremiumActive, refreshProfile } = useAuth()
   const examDate = profile?.examDate
   const [editing, setEditing] = useState(false)
@@ -91,7 +91,7 @@ export function ExamCountdownCard({ ticketsLeft }) {
   if (isPast) {
     recommendation = "Qayta topshirmoqchi bo'lsangiz, yangi imtihon sanasini kiriting: tayyorgarlik rejangiz yangilanadi."
   } else if (days > 0 && typeof ticketsLeft === 'number') {
-    recommendation = getExamRecommendation({ days, ticketsLeft, isPremiumActive })
+    recommendation = getExamRecommendation({ days, ticketsLeft, totalLeft, isPremiumActive })
   }
 
   return (

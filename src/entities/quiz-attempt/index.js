@@ -6,7 +6,7 @@ export {
   syncGuestAttempts,
 } from './api/attemptsApi'
 export { addGuestAttempt } from './lib/guestAttempts'
-export { getMistakeIds } from './lib/mistakes'
+export { getMistakeIds, getLatestResults } from './lib/mistakes'
 export {
   getReviewDueIds,
   hasReviewedToday,

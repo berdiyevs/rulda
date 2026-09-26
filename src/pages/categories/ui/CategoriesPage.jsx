@@ -32,7 +32,7 @@ export function CategoriesPage() {
                 {displayName}
               </Text>
             </Title>
-            <Text c="dimmed">O'rganishni davom ettirish uchun mavzuni tanlang.</Text>
+            <Text c="dimmed">Bugungi mashqni davom ettiring yoki quyidan bo'limni tanlang.</Text>
           </Stack>
 
           {streak > 0 && (
@@ -47,7 +47,10 @@ export function CategoriesPage() {
 
         <Stack gap="lg" mb="xl">
           {loading || !progress ? <Skeleton height={150} radius="lg" /> : <ContinueCard progress={progress} />}
-          <ExamCountdownCard ticketsLeft={progress?.unsolvedAvailableCount} />
+          <ExamCountdownCard
+            ticketsLeft={progress?.unsolvedAvailableCount}
+            totalLeft={progress?.unsolvedTotalCount}
+          />
           <DailyQuestionCard />
           <AppInstallCard />
         </Stack>
