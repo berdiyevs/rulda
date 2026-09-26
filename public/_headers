@@ -10,8 +10,18 @@
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate
 
-# index.html har doim yangidan tekshirilsin (yangi deploy darhol ko'rinsin)
+# HTML fayllar har doim yangidan tekshirilsin (yangi deploy darhol ko'rinsin)
 /index.html
+  Cache-Control: public, max-age=0, must-revalidate
+/app.html
+  Cache-Control: public, max-age=0, must-revalidate
+/tickets.html
+  Cache-Control: public, max-age=0, must-revalidate
+/road-signs.html
+  Cache-Control: public, max-age=0, must-revalidate
+/terms.html
+  Cache-Control: public, max-age=0, must-revalidate
+/privacy.html
   Cache-Control: public, max-age=0, must-revalidate
 
 # Vite build'dagi hash nomli JS/CSS fayllar hech qachon o'zgarmaydi
